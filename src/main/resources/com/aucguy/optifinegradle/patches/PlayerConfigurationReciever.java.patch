@@ -1,0 +1,14 @@
+--- /net/minecraft/src/PlayerConfigurationReceiver.java
++++ /net/minecraft/src/PlayerConfigurationReceiver.java
+@@ -33,9 +33,9 @@
+                     PlayerConfigurations.setPlayerConfiguration(this.player, pc);
+                 }
+             }
+-            catch (Exception exception)
++            catch (Exception e)
+             {
+-                exception.printStackTrace();
++                e.printStackTrace();
+             }
+         }
+     }

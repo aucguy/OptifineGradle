@@ -19,6 +19,8 @@
  */
 package net.minecraftforge.gradle.tasks;
 
+import static com.aucguy.optifinegradle.OptifineConstants.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
@@ -44,6 +47,8 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.ParallelizableTask;
 
+import com.aucguy.optifinegradle.IOManager;
+import com.aucguy.optifinegradle.Patching;
 import com.cloudbees.diff.PatchException;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
@@ -66,7 +71,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private int                    maxFuzz       = 0;
 
     @Input
-    private int                    patchStrip    = 3;
+	protected int                    patchStrip    = 3;
 
     @Input
     private boolean                makeRejects   = true;
@@ -75,14 +80,22 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private boolean                failOnError   = false;
 
     private Object                 patches;
+    
+    @Input
+    @Optional
+    private String                 patchIndex;
 
     @InputFiles
     private List<Object>           injects       = Lists.newArrayList();
 
     // stateful pieces of this task
-    private ContextProvider        context;
+    protected ContextProvider        context;
     private ArrayList<PatchedFile> loadedPatches = Lists.newArrayList();
-
+    
+    @InputFile
+    @Optional
+	private Object deobfuscatedClasses;
+    
     @Override
     public void doStuffBefore() throws IOException
     {
@@ -90,10 +103,26 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
         // create context provider
         context = new ContextProvider(null, patchStrip); // add in the map later. 
-
+        final int fuzz = getMaxFuzz();
+        
+        String patchIndex = getPatchIndex();
+        if(patchIndex != null)
+        {
+        	IOManager manager = new IOManager(this);
+        	for(String line : IOManager.readLines(manager.openResourceForReading(patchIndex)))
+        	{
+        		String resource = PATCH_PREFIX + line + PATCH_POSTFIX;
+        		String contents = IOManager.readAllAsString(manager.openResourceForReading(resource));
+        		loadedPatches.add(new PatchedFile(contents, context, fuzz));
+        	}
+        	manager.closeAll();
+        	return;
+        }
+        
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
-        final int fuzz = getMaxFuzz();
+        
+        final Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
 
         if (patchThingy.isDirectory())
         {
@@ -123,6 +152,8 @@ public class PatchSourcesTask extends AbstractEditJarTask
                 @Override
                 public void visitFile(FileVisitDetails details)
                 {
+                	if(Patching.shouldSkip(details.getPath(), ignoredPatches, true)) return;
+                	
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     details.copyTo(stream);
                     String file = new String(stream.toByteArray(), Constants.CHARSET);
@@ -175,7 +206,10 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
                 if (details.getName().endsWith(".java"))
                 {
-                    sourceMap.put(path, new String(array, Constants.CHARSET));
+                	String text = new String(array, Constants.CHARSET);
+                	//text = text.replaceAll("EnumUsage", "EnumUseage");
+                	sourceMap.put(path, text);
+                    //sourceMap.put(path, new String(array, Constants.CHARSET));
                 }
                 else
                 {
@@ -348,7 +382,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private File getPatchesDir()
     {
         File patch = getPatches();
-        if (patch.isDirectory())
+        if (patch != null && patch.isDirectory())
             return getPatches();
         else
             return null;
@@ -359,7 +393,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private File getPatchesZip()
     {
         File patch = getPatches();
-        if (patch.isDirectory())
+        if (patch != null && patch.isDirectory())
             return null;
         else
             return getPatches();
@@ -367,7 +401,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
     public File getPatches()
     {
-        return getProject().file(patches);
+        return patches == null ? null : getProject().file(patches);
     }
 
     public void setPatches(Object patchDir)
@@ -400,7 +434,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
     // START INNER CLASSES
 
-    private static class ContextProvider implements ContextualPatch.IContextProvider
+    public static class ContextProvider implements ContextualPatch.IContextProvider
     {
         public Map<String, String> fileMap;
 
@@ -476,5 +510,25 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
             return new File(fileToPatch.getParentFile(), fileToPatch.getName() + ".rej");
         }
+    }
+    
+    public File getDeobfuscatedClasses()
+    {
+        return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);
+    }
+
+    public void setDeobfuscatedClasses(Object deobfuscatedClasses)
+    {
+        this.deobfuscatedClasses = deobfuscatedClasses;
+    }
+    
+    public String getPatchIndex()
+    {
+    	return patchIndex;
+    }
+    
+    public void setPatchIndex(String patchIndex)
+    {
+    	this.patchIndex = patchIndex;
     }
 }

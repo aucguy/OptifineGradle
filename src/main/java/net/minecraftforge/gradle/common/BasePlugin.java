@@ -20,6 +20,7 @@
 package net.minecraftforge.gradle.common;
 
 import static net.minecraftforge.gradle.common.Constants.*;
+import static com.aucguy.optifinegradle.OptifineConstants.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +29,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
@@ -45,6 +48,7 @@ import org.gradle.api.plugins.ExtraPropertiesExtension;
 import org.gradle.api.tasks.Delete;
 import org.gradle.testfixtures.ProjectBuilder;
 
+import com.aucguy.optifinegradle.JoinJars;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -84,9 +88,13 @@ import net.minecraftforge.gradle.util.json.fgversion.FGVersionWrapper;
 import net.minecraftforge.gradle.util.json.version.Version;
 public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Project>
 {
+	public boolean isOptifine = false;
+	
     public Project       project;
     public BasePlugin<?> otherPlugin;
     public ReplacementProvider replacer = new ReplacementProvider();
+    
+    public Set<String> optifineFiles = new HashSet<String>();
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
@@ -363,13 +371,34 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             
             splitServer.dependsOn(dlServer);
         }
+        
+        String mergeClientJar;
+        Task mergeDependency;
+        if(isOptifine)
+        {
+        	JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
+        	{
+        		join.client = delayedFile(JAR_CLIENT_FRESH);
+        		join.optifine = delayedFile(JAR_OPTIFINE_FRESH);
+        		join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
+        		join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
+        		join.dependsOn(dlClient);
+        	}
+        	mergeClientJar = JAR_CLIENT_JOINED;
+        	mergeDependency = join;
+        }
+        else
+        {
+        	mergeClientJar = JAR_CLIENT_FRESH;
+        	mergeDependency = dlClient;
+        }
 
         MergeJars merge = makeTask(TASK_MERGE_JARS, MergeJars.class);
         {
-            merge.setClient(delayedFile(JAR_CLIENT_FRESH));
+            merge.setClient(delayedFile(mergeClientJar));
             merge.setServer(delayedFile(JAR_SERVER_PURE));
-            merge.setOutJar(delayedFile(JAR_MERGED));
-            merge.dependsOn(dlClient, splitServer);
+            merge.setOutJar(delayedFile(JAR_MERGED, true));
+            merge.dependsOn(mergeDependency, splitServer);
 
             merge.setGroup(null);
             merge.setDescription(null);
@@ -507,7 +536,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
     public <T extends Task> T makeTask(String name, Class<T> type)
     {
-        return makeTask(project, name, type);
+        return makeTask(project, name, type, isOptifine);
     }
 
     public <T extends Task> T maybeMakeTask(String name, Class<T> type)
@@ -520,8 +549,9 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         return (T) proj.getTasks().maybeCreate(name, type);
     }
 
-    public static <T extends Task> T makeTask(Project proj, String name, Class<T> type)
+    public static <T extends Task> T makeTask(Project proj, String name, Class<T> type, boolean optifine)
     {
+    	//name = optifine ? name + "_optifine" : name;
         return (T) proj.getTasks().create(name, type);
     }
 
@@ -783,9 +813,20 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
     {
         return stringCache.getUnchecked(path);
     }
-
+    
     public DelayedFile delayedFile(String path)
     {
+    	return delayedFile(path, false);
+    }
+
+    public DelayedFile delayedFile(String path, boolean optifine)
+    {
+    	String modpath = path.replace(".jar", "-optifine.jar");
+    	if((isOptifine && optifine) || optifineFiles.contains(path))
+    	{
+    		optifineFiles.add(path);
+    		path = modpath;
+    	}
         return fileCache.getUnchecked(path);
     }
 

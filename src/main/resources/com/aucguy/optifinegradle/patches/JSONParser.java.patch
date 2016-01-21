@@ -1,0 +1,15 @@
+--- /optifine/json/JSONParser.java
++++ /optifine/json/JSONParser.java
+@@ -629,10 +629,10 @@
+             {
+                 return df.parse(input);
+             }
+-            catch (java.text.ParseException java.text.parseexception)
++            catch (java.text.ParseException var5)
+             {
+                 System.out.println("Error parsing date: " + input);
+-                System.out.println(java.text.parseexception.getClass().getName() + ": " + java.text.parseexception.getMessage());
++                System.out.println(var5.getClass().getName() + ": " + var5.getMessage());
+                 return null;
+             }
+         }

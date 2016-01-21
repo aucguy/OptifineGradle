@@ -1,0 +1,14 @@
+--- /net/minecraft/entity/EntityLiving.java
++++ /net/minecraft/entity/EntityLiving.java
+@@ -1392,10 +1392,6 @@
+ 
+         private static final String __OBFID = "CL_00002255";
+ 
+-        @SideOnly(Side.CLIENT)
+         private SpawnPlacementType(String p_i45893_1_, int p_i45893_2_) {}
+-
+-        @SideOnly(Side.SERVER)
+-
+     }
+ }
+\ No newline at end of file

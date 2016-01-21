@@ -19,6 +19,7 @@
  */
 package net.minecraftforge.gradle.user.patcherUser;
 
+import static com.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.common.Constants.DIR_JSONS;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
@@ -104,7 +105,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
 
         // setup binpatching
         {
-            final Object patchedJar = chooseDeobfOutput(global, local, "", "binpatched");
+            final Object patchedJar = chooseDeobfOutput(global, local, "", "binpatched", true);
 
             TaskApplyBinPatches task = makeTask(TASK_BINPATCH, TaskApplyBinPatches.class);
             task.setInJar(delayedFile(JAR_MERGED));
@@ -125,9 +126,15 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         // setup source patching
         {
             final Object postDecompJar = chooseDeobfOutput(global, local, "", "decompFixed");
-            final Object patchedJar = chooseDeobfOutput(global, local, "", "patched");
-
+            final Object patchedJar = chooseDeobfOutput(global, local, "", "patched", true);
+            final Object remappedJar = chooseDeobfOutput(global, local, "", "remapped", true);
+            final Object optifinePatchedJar = chooseDeobfOutput(global, local, "Src", "sources", true);
+            
             PatchSourcesTask patch = makeTask(TASK_PATCH, PatchSourcesTask.class);
+            if(isOptifine)
+            {
+            	patch.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+            }
             patch.setPatches(delayedFile(ZIP_UD_PATCHES));
             patch.addInject(delayedFile(ZIP_UD_SRC));
             patch.addInject(delayedFile(ZIP_UD_RES)); // injecting teh resources too... the src jar needs them afterall.
@@ -139,8 +146,24 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             patch.dependsOn(TASK_POST_DECOMP);
 
             RemapSources remap = (RemapSources) project.getTasks().getByName(TASK_REMAP);
+            if(isOptifine)
+            {
+            	remap.setOutJar(remappedJar);
+            }
             remap.setInJar(patchedJar);
             remap.dependsOn(patch);
+            
+            if(isOptifine)
+            {
+                PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
+                optifinePatch.setPatchIndex(OPTIFINE_PATCHES);
+                optifinePatch.setFailOnError(true);
+                optifinePatch.setMakeRejects(false);
+                optifinePatch.setPatchStrip(1);
+                optifinePatch.setInJar(remappedJar);
+                optifinePatch.setOutJar(optifinePatchedJar);
+                optifinePatch.dependsOn(TASK_REMAP);
+            }
         }
 
         // setup reobf
@@ -201,8 +224,9 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         String group = getApiGroup(exten);
         String artifact = getApiName(exten) + (isDecomp ? "Src" : "Bin");
         String version = getApiVersion(exten) + (useLocalCache ? "-PROJECT(" + project.getName() + ")" : "");
-
-        project.getDependencies().add(CONFIG_MC, ImmutableMap.of("group", group, "name", artifact, "version", version));
+        String classifier = isOptifine ? "optifine" : "";
+        
+        project.getDependencies().add(CONFIG_MC, ImmutableMap.of("group", group, "name", artifact, "version", version, "classifier", classifier));
     }
 
     @Override

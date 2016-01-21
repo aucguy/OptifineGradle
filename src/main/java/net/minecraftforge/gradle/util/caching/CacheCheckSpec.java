@@ -56,7 +56,12 @@ public class CacheCheckSpec implements Spec<Task>
         {
             try
             {
-                File file = task.getProject().file(field.getValue(task));
+            	Object f = field.getValue(task);
+            	if(f == null)
+            	{
+            		return true;
+            	}
+                File file = task.getProject().file(f);
 
                 // not there? do the task.
                 if (!file.exists())

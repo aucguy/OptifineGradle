@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.minecraftforge.gradle.common.Constants;
@@ -45,8 +46,10 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.LogLevel;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 
+import com.aucguy.optifinegradle.Patching;
 import com.github.abrarsyed.jastyle.ASFormatter;
 import com.github.abrarsyed.jastyle.OptParser;
 import com.google.common.base.Joiner;
@@ -65,7 +68,11 @@ public class PostDecompileTask extends AbstractEditJarTask
 
     @InputFile
     private Object                       astyleConfig;
-
+    
+    @InputFile
+    @Optional
+    private Object                       deobfuscatedClasses;
+    
     @OutputFile
     @Cached
     private Object                       outJar;
@@ -81,13 +88,17 @@ public class PostDecompileTask extends AbstractEditJarTask
     @Override
     public void doStuffBefore() throws Exception
     {
+    	Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
+    	
         for (File f : getPatches())
         {
             String name = f.getName();
 
             if (name.contains("Enum")) // because version of FF is awesome and dont need dat
                 continue;
-
+            
+            if(Patching.shouldSkip(name, ignoredPatches, false)) continue;
+            
             int patchIndex = name.indexOf(".patch");
 
             // 6 is the length of ".patch" + 3 to account for .## at the end of the file.
@@ -221,6 +232,16 @@ public class PostDecompileTask extends AbstractEditJarTask
     public void setAstyleConfig(Object astyleConfig)
     {
         this.astyleConfig = astyleConfig;
+    }
+    
+    public File getDeobfuscatedClasses()
+    {
+        return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);
+    }
+
+    public void setDeobfuscatedClasses(Object deobfuscatedClasses)
+    {
+        this.deobfuscatedClasses = deobfuscatedClasses;
     }
 
     @InputFiles

@@ -37,7 +37,10 @@ public class FFPatcher
     private static final Pattern SYNTHETICS = Pattern.compile("(?m)(\\s*// \\$FF: (synthetic|bridge) method(\\r\\n|\\n|\\r)){1,2}\\s*(?<modifiers>(?:(?:" + MODIFIERS + ") )*)(?<return>.+?) (?<method>.+?)\\((?<arguments>.*)\\)\\s*\\{(\\r\\n|\\n|\\r)\\s*return this\\.(?<method2>.+?)\\((?<arguments2>.*)\\);(\\r\\n|\\n|\\r)\\s*\\}");
     //private static final Pattern TYPECAST = Pattern.compile("\\([\\w\\.]+\\)");
     private static final Pattern ABSTRACT = Pattern.compile("(?m)^(?<indent>[ \\t\\f\\v]*)(?<modifiers>(?:(?:" + MODIFIERS + ") )*)(?<return>[^ ]+) (?<method>func_(?<number>\\d+)_[a-zA-Z_]+)\\((?<arguments>([^ ,]+ (\\.\\.\\. )?var\\d+,? ?)*)\\)(?: throws (?:[\\w$.]+,? ?)+)?;$");
-
+    
+    private static final Pattern CALL_METHOD = Pattern.compile("(?<main>(\\s)+public Object call\\(\\) throws Exception(\\s)+\\{(\\s)+return this.call\\(\\);(\\s)+\\})");
+    private static final Pattern CRASH_REPORT_FIELD = Pattern.compile("final CrashReport field_(\\d)+_a;");
+    
     // Remove TRAILING whitespace
     private static final String TRAILING = "(?m)[ \\t]+$";
 
@@ -88,8 +91,16 @@ public class FFPatcher
             m.appendReplacement(out, abstract_replacement(m).replace("$", "\\$"));
         }
         m.appendTail(out);
+        
+        text = out.toString(); //remove synthetic call methods
+        m = CALL_METHOD.matcher(text);
+        if(text.contains("class CrashReport ")) {
+            text = m.replaceAll("");
+            m = CRASH_REPORT_FIELD.matcher(text);
+        }
+        return m.replaceAll("");
 
-        return out.toString();
+        //return out.toString();
     }
 
     private static int processClass(List<String> lines, String indent, int startIndex, String qualifiedName, String simpleName)

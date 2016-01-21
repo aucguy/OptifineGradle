@@ -1,0 +1,15 @@
+--- /net/minecraft/client/settings/GameSettings.java
++++ /net/minecraft/client/settings/GameSettings.java
+@@ -2688,10 +2688,10 @@
+                         this.ofKeyBindZoom.setKeyCode(Integer.parseInt(exception1[1]));
+                     }
+                 }
+-                catch (Exception exception)
++                catch (Exception e)
+                 {
+                     Config.dbg("Skipping bad option: " + s);
+-                    exception.printStackTrace();
++                    e.printStackTrace();
+                 }
+             }
+ 

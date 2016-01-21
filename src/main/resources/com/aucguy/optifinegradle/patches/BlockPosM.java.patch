@@ -1,0 +1,11 @@
+--- /net/minecraft/src/BlockPosM.java
++++ /net/minecraft/src/BlockPosM.java
+@@ -156,7 +156,7 @@
+                     {
+                         if (this.theBlockPosM == null)
+                         {
+-                            this.theBlockPosM = new BlockPosM(posFromxx.getX(), posFrom.getY(), posFromx.getZ(), 3);
++                            this.theBlockPosM = new BlockPosM(posFrom.getX(), posFrom.getY(), posFrom.getZ(), 3);
+                             return this.theBlockPosM;
+                         }
+                         else if (this.theBlockPosM.equals(posTo))

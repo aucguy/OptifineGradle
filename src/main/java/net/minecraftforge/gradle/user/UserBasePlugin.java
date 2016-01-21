@@ -21,6 +21,7 @@ package net.minecraftforge.gradle.user;
 
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.user.UserConstants.*;
+import static com.aucguy.optifinegradle.OptifineConstants.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import com.google.common.collect.ImmutableList;
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.NamedDomainObjectContainer;
@@ -67,7 +67,6 @@ import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.ScalaSourceSet;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
-import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.api.tasks.compile.GroovyCompile;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
@@ -305,6 +304,11 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         final DeobfuscateJar deobfBin = makeTask(TASK_DEOBF_BIN, DeobfuscateJar.class);
         {
+        	if(isOptifine)
+        	{
+        		deobfBin.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
+                deobfBin.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+        	}
             deobfBin.setSrg(delayedFile(SRG_NOTCH_TO_MCP));
             deobfBin.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfBin.setExceptorCfg(delayedFile(EXC_MCP));
@@ -313,18 +317,23 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             deobfBin.setApplyMarkers(false);
             deobfBin.setStripSynthetics(true);
             deobfBin.setInJar(inputJar);
-            deobfBin.setOutJar(chooseDeobfOutput(globalPattern, localPattern, "Bin", ""));
+            deobfBin.setOutJar(chooseDeobfOutput(globalPattern, localPattern, "Bin", "", true));
             deobfBin.dependsOn(inputTask, TASK_GENERATE_SRGS, TASK_EXTRACT_DEP_ATS);
         }
 
-        final Object deobfDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "srgBin");
-        final Object decompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decomp");
-        final Object postDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decompFixed");
-        final Object remapped = chooseDeobfOutput(globalPattern, localPattern, "Src", "sources");
-        final Object recompiledJar = chooseDeobfOutput(globalPattern, localPattern, "Src", "");
+        final Object deobfDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "srgBin", true);
+        final Object decompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decomp", true);
+        final Object postDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decompFixed", true);
+        final Object remapped = chooseDeobfOutput(globalPattern, localPattern, "Src", "sources", true);
+        final Object recompiledJar = chooseDeobfOutput(globalPattern, localPattern, "Src", "", true);
 
         final DeobfuscateJar deobfDecomp = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
+        	if(isOptifine)
+        	{
+        		deobfDecomp.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
+                deobfDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+        	}
             deobfDecomp.setSrg(delayedFile(SRG_NOTCH_TO_SRG));
             deobfDecomp.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfDecomp.setExceptorCfg(delayedFile(EXC_SRG));
@@ -344,6 +353,10 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         final PostDecompileTask postDecomp = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
+        	if(isOptifine)
+        	{
+        		postDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+        	}
             postDecomp.setInJar(decompJar);
             postDecomp.setOutJar(postDecompJar);
             postDecomp.setPatches(mcpPatchSet);
@@ -367,7 +380,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             recompile.setClasspath(CONFIG_MC_DEPS);
             recompile.setOutJar(recompiledJar);
 
-            recompile.dependsOn(remap, TASK_DL_VERSION_JSON);
+            recompile.dependsOn(isOptifine ? TASK_OPTIFINE_PATCH : remap, TASK_DL_VERSION_JSON);
         }
 
         // create GradleStart
@@ -453,17 +466,23 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
      * @return useable deobfsucated output file
      */
     @SuppressWarnings("serial")
-    protected final Object chooseDeobfOutput(final String globalPattern, final String localPattern, final String appendage, final String classifier)
+    protected final Object chooseDeobfOutput(final String globalPattern, final String localPattern, final String appendage, final String classifier, final boolean optifine)
     {
         return new Closure<DelayedFile>(project, this) {
             public DelayedFile call()
             {
                 String classAdd = Strings.isNullOrEmpty(classifier) ? "" : "-" + classifier;
                 String str = useLocalCache(getExtension()) ? localPattern : globalPattern;
-                return delayedFile(String.format(str, appendage) + classAdd + ".jar");
+                return delayedFile(String.format(str, appendage) + classAdd + ".jar", optifine);
             }
         };
     }
+    
+    protected final Object chooseDeobfOutput(String globalPattern, String localPattern, String appendage, String classifier)
+    {
+    	return chooseDeobfOutput(globalPattern, localPattern, appendage, classifier, false);
+    }
+
 
     /**
      * A boolean used to cache the output of useLocalCache;

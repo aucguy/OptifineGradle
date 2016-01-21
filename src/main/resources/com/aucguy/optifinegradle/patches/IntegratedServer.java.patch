@@ -1,0 +1,11 @@
+--- /net/minecraft/server/integrated/IntegratedServer.java
++++ /net/minecraft/server/integrated/IntegratedServer.java
+@@ -116,7 +116,7 @@
+         else
+         {
+             this.worldServers = new WorldServer[3];
+-            this.timeOfLastDimensionTick = new long[this.worldServers.length][100];
++            //this.timeOfLastDimensionTick = new long[this.worldServers.length][100];
+             this.setResourcePackFromWorld(this.getFolderName(), isavehandler);
+ 
+             if (worldinfo == null)

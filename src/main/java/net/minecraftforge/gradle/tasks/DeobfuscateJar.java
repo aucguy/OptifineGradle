@@ -56,6 +56,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import com.aucguy.optifinegradle.Patching;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -100,7 +101,16 @@ public class DeobfuscateJar extends CachedTask
 
     @InputFile
     private Object            exceptorJson;
-
+    
+    @InputFile
+    @Optional
+    private Object            obfuscatedClasses;
+    
+    @Cached
+    @OutputFile
+    @Optional
+    private Object            deobfuscatedClasses;
+    
     @Input
     private boolean           applyMarkers  = false;
     
@@ -135,7 +145,7 @@ public class DeobfuscateJar extends CachedTask
 
         // deobf
         getLogger().lifecycle("Applying SpecialSource...");
-        deobfJar(getInJar(), tempObfJar, getSrg(), ats);
+        deobfJar(getInJar(), tempObfJar, getSrg(), ats, getObfuscatedClasses(), getDeobfuscatedClasses());
 
         File log = getLog();
         if (log == null)
@@ -153,12 +163,14 @@ public class DeobfuscateJar extends CachedTask
         }
     }
 
-    private void deobfJar(File inJar, File outJar, File srg, Collection<File> ats) throws IOException
+    private void deobfJar(File inJar, File outJar, File srg, Collection<File> ats, File obfClasses, File deobfClasses) throws IOException
     {
         // load mapping
         JarMapping mapping = new JarMapping();
         mapping.loadMappings(srg);
-
+        
+        Patching.deobfuscatedList(this, obfClasses, deobfClasses, mapping.classes);
+        
         // load in ATs
         ErroringRemappingAccessMap accessMap = new ErroringRemappingAccessMap(new File[] { getMethodCsv(), getFieldCsv() });
 
@@ -188,6 +200,9 @@ public class DeobfuscateJar extends CachedTask
 
         // remap jar
         remapper.remapJar(input, outJar);
+        
+        if(getObfuscatedClasses() != null)
+        	Patching.removeIgnoredBrokenLines(this, accessMap);
 
         // throw error for broken AT lines
         if (accessMap.brokenLines.size() > 0 && failOnAtError)
@@ -600,8 +615,28 @@ public class DeobfuscateJar extends CachedTask
     {
         this.stripSynthetics = stripSynthetics;
     }
+    
+    public File getObfuscatedClasses()
+    {
+        return obfuscatedClasses == null ? null : getProject().file(obfuscatedClasses);
+    }
 
-    private static final class ErroringRemappingAccessMap extends AccessMap
+    public void setObfuscatedClasses(Object obfuscatedClasses)
+    {
+        this.obfuscatedClasses = obfuscatedClasses;
+    }
+    
+    public File getDeobfuscatedClasses()
+    {
+        return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);
+    }
+
+    public void setDeobfuscatedClasses(Object deobfuscatedClasses)
+    {
+        this.deobfuscatedClasses = deobfuscatedClasses;
+    }
+
+    public static final class ErroringRemappingAccessMap extends AccessMap
     {
         private final Map<String, String> renames     = Maps.newHashMap();
         public final Map<String, String>  brokenLines = Maps.newHashMap();
