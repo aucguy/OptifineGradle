@@ -19,7 +19,7 @@
  */
 package net.minecraftforge.gradle.user.patcherUser;
 
-import static com.aucguy.optifinegradle.OptifineConstants.*;
+import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.common.Constants.DIR_JSONS;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;

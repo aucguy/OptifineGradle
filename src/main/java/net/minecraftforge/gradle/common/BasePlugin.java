@@ -19,8 +19,8 @@
  */
 package net.minecraftforge.gradle.common;
 
+import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.common.Constants.*;
-import static com.aucguy.optifinegradle.OptifineConstants.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +48,7 @@ import org.gradle.api.plugins.ExtraPropertiesExtension;
 import org.gradle.api.tasks.Delete;
 import org.gradle.testfixtures.ProjectBuilder;
 
-import com.aucguy.optifinegradle.JoinJars;
+import com.github.aucguy.optifinegradle.JoinJars;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;

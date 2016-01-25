@@ -1,6 +1,6 @@
-package com.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle;
 
-import static com.aucguy.optifinegradle.OptifineConstants.*;
+import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

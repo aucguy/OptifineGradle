@@ -1,4 +1,4 @@
-package com.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle;
 
 import net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin;
 

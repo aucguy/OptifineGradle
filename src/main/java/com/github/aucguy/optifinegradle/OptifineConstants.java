@@ -1,4 +1,4 @@
-package com.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle;
 
 import static net.minecraftforge.gradle.common.Constants.REPLACE_MC_VERSION;
 

@@ -19,7 +19,7 @@
  */
 package net.minecraftforge.gradle.tasks;
 
-import static com.aucguy.optifinegradle.OptifineConstants.*;
+import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -47,9 +47,9 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.ParallelizableTask;
 
-import com.aucguy.optifinegradle.IOManager;
-import com.aucguy.optifinegradle.Patching;
 import com.cloudbees.diff.PatchException;
+import com.github.aucguy.optifinegradle.IOManager;
+import com.github.aucguy.optifinegradle.Patching;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;

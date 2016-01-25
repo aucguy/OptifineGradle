@@ -1,4 +1,4 @@
-package com.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

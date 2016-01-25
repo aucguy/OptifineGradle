@@ -49,9 +49,9 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 
-import com.aucguy.optifinegradle.Patching;
 import com.github.abrarsyed.jastyle.ASFormatter;
 import com.github.abrarsyed.jastyle.OptParser;
+import com.github.aucguy.optifinegradle.Patching;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;

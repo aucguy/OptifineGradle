@@ -1,4 +1,4 @@
-package com.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;

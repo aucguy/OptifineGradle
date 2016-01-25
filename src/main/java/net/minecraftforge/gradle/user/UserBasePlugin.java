@@ -19,9 +19,9 @@
  */
 package net.minecraftforge.gradle.user;
 
+import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.user.UserConstants.*;
-import static com.aucguy.optifinegradle.OptifineConstants.*;
 
 import java.io.File;
 import java.io.IOException;
