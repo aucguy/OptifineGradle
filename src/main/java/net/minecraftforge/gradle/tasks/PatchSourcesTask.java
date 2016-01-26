@@ -104,7 +104,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
         // create context provider
         context = new ContextProvider(null, patchStrip); // add in the map later. 
         final int fuzz = getMaxFuzz();
-        
+        /*
         String patchIndex = getPatchIndex();
         if(patchIndex != null)
         {
@@ -116,11 +116,13 @@ public class PatchSourcesTask extends AbstractEditJarTask
         		loadedPatches.add(new PatchedFile(contents, context, fuzz));
         	}
         	manager.closeAll();
-        	return;
         }
+        */
         
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
+        
+        if(patchThingy == null) return;
         
         final Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
 

@@ -55,13 +55,12 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
     protected void applyUserPlugin()
     {
         // add the MC setup tasks..
-        String global = DIR_API_JAR_BASE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION;
-        String local = DIR_LOCAL_CACHE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION + "-PROJECT(" + project.getName() + ")";
+        String global = getGlobalPattern();
+        String local = getLocalPattern();
 
         // grab ATs from resource dirs
-        JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
-        SourceSet main = javaConv.getSourceSets().getByName("main");
-        SourceSet api = javaConv.getSourceSets().getByName("api");
+        SourceSet main = getSourceSet("main");
+        SourceSet api = getSourceSet("api");
 
         getExtension().atSources(main, api);
 
@@ -156,7 +155,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             if(isOptifine)
             {
                 PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
-                optifinePatch.setPatchIndex(OPTIFINE_PATCHES);
+                //optifinePatch.setPatchIndex(OPTIFINE_PATCHES);
                 optifinePatch.setFailOnError(true);
                 optifinePatch.setMakeRejects(false);
                 optifinePatch.setPatchStrip(1);
@@ -233,6 +232,22 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
     protected Object getStartDir()
     {
         return delayedFile(DIR_API_BASE + "/start");
+    }
+    
+    public String getGlobalPattern()
+    {
+    	return DIR_API_JAR_BASE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION;
+    }
+    
+    public String getLocalPattern()
+    {
+        return DIR_LOCAL_CACHE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION + "-PROJECT(" + project.getName() + ")";
+    }
+    
+    public SourceSet getSourceSet(String name)
+    {
+        JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
+        return javaConv.getSourceSets().getByName(name);
     }
 
     public abstract String getApiGroup(T ext);
