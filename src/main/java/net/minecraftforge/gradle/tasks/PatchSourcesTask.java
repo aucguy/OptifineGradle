@@ -19,8 +19,6 @@
  */
 package net.minecraftforge.gradle.tasks;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +46,6 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.ParallelizableTask;
 
 import com.cloudbees.diff.PatchException;
-import com.github.aucguy.optifinegradle.IOManager;
 import com.github.aucguy.optifinegradle.Patching;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
@@ -80,10 +77,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private boolean                failOnError   = false;
 
     private Object                 patches;
-    
-    @Input
-    @Optional
-    private String                 patchIndex;
 
     @InputFiles
     private List<Object>           injects       = Lists.newArrayList();
@@ -104,20 +97,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
         // create context provider
         context = new ContextProvider(null, patchStrip); // add in the map later. 
         final int fuzz = getMaxFuzz();
-        /*
-        String patchIndex = getPatchIndex();
-        if(patchIndex != null)
-        {
-        	IOManager manager = new IOManager(this);
-        	for(String line : IOManager.readLines(manager.openResourceForReading(patchIndex)))
-        	{
-        		String resource = PATCH_PREFIX + line + PATCH_POSTFIX;
-        		String contents = IOManager.readAllAsString(manager.openResourceForReading(resource));
-        		loadedPatches.add(new PatchedFile(contents, context, fuzz));
-        	}
-        	manager.closeAll();
-        }
-        */
         
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
@@ -208,10 +187,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
                 if (details.getName().endsWith(".java"))
                 {
-                	String text = new String(array, Constants.CHARSET);
-                	//text = text.replaceAll("EnumUsage", "EnumUseage");
-                	sourceMap.put(path, text);
-                    //sourceMap.put(path, new String(array, Constants.CHARSET));
+                    sourceMap.put(path, new String(array, Constants.CHARSET));
                 }
                 else
                 {
@@ -522,15 +498,5 @@ public class PatchSourcesTask extends AbstractEditJarTask
     public void setDeobfuscatedClasses(Object deobfuscatedClasses)
     {
         this.deobfuscatedClasses = deobfuscatedClasses;
-    }
-    
-    public String getPatchIndex()
-    {
-    	return patchIndex;
-    }
-    
-    public void setPatchIndex(String patchIndex)
-    {
-    	this.patchIndex = patchIndex;
     }
 }

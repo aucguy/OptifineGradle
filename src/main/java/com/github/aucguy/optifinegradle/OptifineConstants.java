@@ -7,15 +7,19 @@ import static net.minecraftforge.gradle.common.Constants.REPLACE_MC_VERSION;
  */
 public class OptifineConstants {
 	//normal setup
+	public static final String PATCH_ARCHIVE		= "patches-1.8.0-D5-0.zip";
     public static final String TASK_OPTIFINE_PATCH  = "optifinePatch";
     public static final String TASK_JOIN_JARS		= "joinJars";
+    public static final String TASK_DL_PATCHES		= "dlPatches";
 	public static final String JAR_OPTIFINE_FRESH	= "{BUILD_DIR}/OptiFine_1.8.0_HD_U_D5.jar";
 	public static final String JAR_CLIENT_JOINED	= "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION + "/minecraft-" + REPLACE_MC_VERSION + "-joined.jar";
     public static final String OBFUSCATED_CLASSES	= "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION + "/minecraft-" + REPLACE_MC_VERSION + "-obfuscatedClasses.txt";
     public static final String DEOBFUSCATED_CLASSES	= "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION + "/minecraft-" + REPLACE_MC_VERSION + "-deobfuscatedClasses.txt";
-	public static final String FIELD_RENAMES		= "com/github/aucguy/optifinegradle/renames.properties";
+	public static final String PATCHES_ZIP			= "{CACHE_DIR}/com/github/aucguy/optifinegradle/" + PATCH_ARCHIVE;
+    public static final String FIELD_RENAMES		= "com/github/aucguy/optifinegradle/renames.properties";
     public static final String IGNORED_BROKEN_LINES = "com/github/aucguy/optifinegradle/ignoredBrokenLines.txt";
-
+    public static final String URL_PATCHES			= "http://localhost:4000/downloads/optifinegradle/patches/" + PATCH_ARCHIVE;
+    
     //patch making
     public static final String TASK_EXTRACT_SOURCES = "extractOptifineSrc";
     public static final String TASK_EXTRACT_RESOURCES = "extractOptifineResc";

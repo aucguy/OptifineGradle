@@ -49,16 +49,13 @@ public class OptifinePlugin extends ForgePlugin {
 			genPatches.addOriginalSource(remappedJar);
 			genPatches.addChangedSource(project.file(SRC_DIR));
 			genPatches.setPatchDir(delayedFile(GEN_PATCH_DIR));
-			genPatches.setFlattened(true);
 		}
 		
 		Zip zipPatches = makeTask(TASK_ZIP_PATCHES, Zip.class);
 		{
 			zipPatches.from(delayedFile(GEN_PATCH_DIR));
 			zipPatches.setDestinationDir(new File(PATCH_ZIP_DIR));
-			zipPatches.setBaseName(PATCH_ZIP_NAME);
-			zipPatches.setVersion("0.0.0");
-			zipPatches.setExtension("zip");
+			zipPatches.setArchiveName(PATCH_ARCHIVE);
 			zipPatches.dependsOn(genPatches);
 		}
 		

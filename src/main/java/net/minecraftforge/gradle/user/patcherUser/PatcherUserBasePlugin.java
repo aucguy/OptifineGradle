@@ -41,6 +41,7 @@ import com.google.common.collect.ImmutableMap;
 
 import groovy.lang.Closure;
 import net.minecraftforge.gradle.tasks.DeobfuscateJar;
+import net.minecraftforge.gradle.tasks.Download;
 import net.minecraftforge.gradle.tasks.ExtractConfigTask;
 import net.minecraftforge.gradle.tasks.PatchSourcesTask;
 import net.minecraftforge.gradle.tasks.RemapSources;
@@ -154,14 +155,22 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             
             if(isOptifine)
             {
+        		Download dlPatches = makeTask(TASK_DL_PATCHES, Download.class);
+        		{
+        			dlPatches.setOutput(delayedFile(PATCHES_ZIP));
+        			dlPatches.setUrl(delayedString(URL_PATCHES));
+        		}
+            	
                 PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
-                //optifinePatch.setPatchIndex(OPTIFINE_PATCHES);
-                optifinePatch.setFailOnError(true);
-                optifinePatch.setMakeRejects(false);
-                optifinePatch.setPatchStrip(1);
-                optifinePatch.setInJar(remappedJar);
-                optifinePatch.setOutJar(optifinePatchedJar);
-                optifinePatch.dependsOn(TASK_REMAP);
+                {
+                	optifinePatch.setPatches(delayedFile(PATCHES_ZIP));
+                	optifinePatch.setFailOnError(true);
+                	optifinePatch.setMakeRejects(false);
+                	optifinePatch.setPatchStrip(1);
+                	optifinePatch.setInJar(remappedJar);
+                	optifinePatch.setOutJar(optifinePatchedJar);
+                	optifinePatch.dependsOn(TASK_REMAP, dlPatches);
+                }
             }
         }
 

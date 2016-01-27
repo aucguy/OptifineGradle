@@ -62,7 +62,6 @@ public class TaskGenPatches extends DefaultTask
     private final List<Object>      changed = new LinkedList<Object>();
     @Input private String           originalPrefix = "";
     @Input private String           changedPrefix = "";
-    @Input private boolean			flattened = false;
     //@formatter:on
     
     //@formatter:off
@@ -181,10 +180,8 @@ public class TaskGenPatches extends DefaultTask
     public void processFile(String relative, InputStream original, InputStream changed) throws IOException
     {
         getLogger().debug("Diffing: " + relative);
-        
-        File file = new File(relative + ".patch");
-        String rel = getFlattened() ? file.getName() : file.getPath();
-        File patchFile = new File(getPatchDir(), rel + ".patch").getCanonicalFile();
+
+        File patchFile = new File(getPatchDir(), relative + ".patch").getCanonicalFile();
 
         if (changed == null)
         {
@@ -296,15 +293,5 @@ public class TaskGenPatches extends DefaultTask
     public void setChangedPrefix(String changedPrefix)
     {
         this.changedPrefix = changedPrefix;
-    }
-    
-    public void setFlattened(boolean flattened)
-    {
-    	this.flattened = flattened;
-    }
-    
-    public boolean getFlattened()
-    {
-    	return flattened;
     }
 }
