@@ -52,6 +52,19 @@ public class IOManager {
 		this.handles.add(f);
 		return f;
 	}
+	
+	public InputStream openFileInZipForReading(Object zip, Object file) throws IOException {
+		ZipFile z = this.openZipForReading(zip);
+		InputStream f;
+		try {
+			f = z.getInputStream(z.getEntry((String) file));
+		} catch (IOException e) {
+			throw new IOException("Couldn't open input file in zip: " + e.getMessage());
+		}
+		this.handles.add(f);
+		return f;
+		
+	}
 
 	public BufferedInputStream openFileForReading(Object file) throws IOException {
 		BufferedInputStream f;

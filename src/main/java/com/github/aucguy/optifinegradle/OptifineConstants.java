@@ -16,9 +16,7 @@ public class OptifineConstants {
     public static final String OBFUSCATED_CLASSES	= "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION + "/minecraft-" + REPLACE_MC_VERSION + "-obfuscatedClasses.txt";
     public static final String DEOBFUSCATED_CLASSES	= "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION + "/minecraft-" + REPLACE_MC_VERSION + "-deobfuscatedClasses.txt";
 	public static final String PATCHES_ZIP			= "{CACHE_DIR}/com/github/aucguy/optifinegradle/" + PATCH_ARCHIVE;
-    public static final String FIELD_RENAMES		= "com/github/aucguy/optifinegradle/renames.properties";
-    public static final String IGNORED_BROKEN_LINES = "com/github/aucguy/optifinegradle/ignoredBrokenLines.txt";
-    public static final String URL_PATCHES			= "http://localhost:4000/downloads/optifinegradle/patches/" + PATCH_ARCHIVE;
+	public static final String URL_PATCHES			= "http://localhost:4000/downloads/optifinegradle/patches/" + PATCH_ARCHIVE;
     
     //patch making
     public static final String TASK_EXTRACT_SOURCES = "extractOptifineSrc";

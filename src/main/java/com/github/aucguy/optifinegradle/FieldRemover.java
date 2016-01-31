@@ -21,16 +21,4 @@ public class FieldRemover extends ClassVisitor {
 		}
 		return super.visitField(access, name, desc, signature, value);
 	}
-	
-	/*
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-		if(this.name.equals("c")) {
-			System.out.println("MD: " + this.name + "." + name);
-		}
-		if (name.equals("call") && desc.split("\\)")[1].equals("Ljava/lang/Object;")) {
-			return null;
-		}
-		return super.visitMethod(access, name, desc, signature, exceptions);
-	}*/
 }

@@ -382,6 +382,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         		join.optifine = delayedFile(JAR_OPTIFINE_FRESH);
         		join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
         		join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
+        		join.srg = delayedFile(SRG_NOTCH_TO_MCP);
         		join.dependsOn(dlClient);
         	}
         	mergeClientJar = JAR_CLIENT_JOINED;
