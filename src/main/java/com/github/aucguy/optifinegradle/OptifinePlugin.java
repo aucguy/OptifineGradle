@@ -3,8 +3,11 @@ package com.github.aucguy.optifinegradle;
 import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 
 import java.io.File;
+import java.util.Scanner;
 
+import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.bundling.Zip;
 
@@ -21,6 +24,8 @@ public class OptifinePlugin extends ForgePlugin {
 	@Override
 	public void applyUserPlugin() {
 		super.applyUserPlugin();
+		
+		project.getExtensions().create(EXTENSION, OptifineExtension.class);
 		
 		String global = getGlobalPattern();
         String local = getLocalPattern();
@@ -63,10 +68,35 @@ public class OptifinePlugin extends ForgePlugin {
 		setupPatchEnviro.setGroup(GROUP_OPTIFINE);
 		setupPatchEnviro.setDescription("Sets up the enviroment for making optifine patches");
 		setupPatchEnviro.dependsOn(extractSource, extractResource);
+		setupPatchEnviro.doFirst(new Action<Task>() {
+			@Override
+			public void execute(Task arg0) {
+				askPermission();
+			}
+		});
 		
 		Task createPatches = makeTask(TASK_CREATE_PATCHES, DefaultTask.class);
 		createPatches.setGroup(GROUP_OPTIFINE);
 		createPatches.setDescription("Generates a zip containing patches");
 		createPatches.dependsOn(zipPatches);
+		
+		project.afterEvaluate(new Action<Project>() {
+			@Override
+			public void execute(Project project) {
+				OptifineExtension ext = (OptifineExtension) project.getExtensions().getByName(EXTENSION);
+				replacer.putReplacement(REPLACE_PATCH_ARCHIVE, ext.getPatchArchive());
+				replacer.putReplacement(REPLACE_PATCH_URL, ext.getPatchURL());
+			}
+		});
+	}
+	
+	public void askPermission() {
+		project.getLogger().warn("WARNING. This will overwrite you workspace. Continue (Y/N");
+		Scanner scanner = new Scanner(System.in);
+		String response = scanner.nextLine();
+		scanner.close();
+		if(!response.toLowerCase().startsWith("y")) {
+			throw(new RuntimeException("Failure to continue"));
+		}
 	}
 }

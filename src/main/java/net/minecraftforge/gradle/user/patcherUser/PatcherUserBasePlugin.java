@@ -157,13 +157,13 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             {
         		Download dlPatches = makeTask(TASK_DL_PATCHES, Download.class);
         		{
-        			dlPatches.setOutput(delayedFile(PATCHES_ZIP));
-        			dlPatches.setUrl(delayedString(URL_PATCHES));
+        			dlPatches.setOutput(delayedFile(PATCH_ZIP));
+        			dlPatches.setUrl(delayedString(PATCH_URL));
         		}
             	
                 PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
                 {
-                	optifinePatch.setPatches(delayedFile(PATCHES_ZIP));
+                	optifinePatch.setPatches(delayedFile(PATCH_ZIP));
                 	optifinePatch.setFailOnError(true);
                 	optifinePatch.setMakeRejects(false);
                 	optifinePatch.setPatchStrip(1);

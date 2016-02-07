@@ -20,11 +20,11 @@
 package net.minecraftforge.gradle.tasks;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.nio.channels.Channels;
@@ -51,19 +51,29 @@ public class Download extends CachedTask
     private Object output;
 
     @TaskAction
-    public void doTask() throws IOException
+    public void doTask() throws IOException, URISyntaxException
     {
         File outputFile = getProject().file(getOutput());
         outputFile.getParentFile().mkdirs();
         outputFile.createNewFile();
+        
+        URL url = new URL(getUrl());
+        ReadableByteChannel  inChannel;
+        if(url.getProtocol().equals("file"))
+        {
+        	File file = new File(url.toString().replace("file://", ""));
+        	inChannel = Channels.newChannel(new FileInputStream(file));
+        } 
+        else
+        {
+        	getLogger().info("Downloading " + getUrl() + " to " + outputFile);
 
-        getLogger().info("Downloading " + getUrl() + " to " + outputFile);
+        	HttpURLConnection connect = (HttpURLConnection) (url).openConnection();
+        	connect.setRequestProperty("User-Agent", Constants.USER_AGENT);
+        	connect.setInstanceFollowRedirects(true);
 
-        HttpURLConnection connect = (HttpURLConnection) (new URL(getUrl())).openConnection();
-        connect.setRequestProperty("User-Agent", Constants.USER_AGENT);
-        connect.setInstanceFollowRedirects(true);
-
-        ReadableByteChannel  inChannel  = Channels.newChannel(connect.getInputStream());
+        	inChannel  = Channels.newChannel(connect.getInputStream());
+        }
         FileChannel          outChannel = new FileOutputStream(outputFile).getChannel();
 
         // If length is longer than what is available, it copies what is available according to java docs.

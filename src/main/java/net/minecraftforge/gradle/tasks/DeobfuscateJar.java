@@ -56,6 +56,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import com.github.aucguy.optifinegradle.Patching;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -167,7 +168,9 @@ public class DeobfuscateJar extends CachedTask
         // load mapping
         JarMapping mapping = new JarMapping();
         mapping.loadMappings(srg);
-                
+        
+        Patching.deobfuscatedList(this, obfClasses, deobfClasses, mapping.classes);
+        
         // load in ATs
         ErroringRemappingAccessMap accessMap = new ErroringRemappingAccessMap(new File[] { getMethodCsv(), getFieldCsv() });
 
