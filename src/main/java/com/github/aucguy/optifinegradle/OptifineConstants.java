@@ -14,7 +14,7 @@ public class OptifineConstants
     public static final String TASK_JOIN_JARS         = "joinJars";
     public static final String TASK_DL_PATCHES        = "dlPatches";
     public static final String TASK_ASK_PERMISSION    = "askPermission";
-    public static final String JAR_OPTIFINE_FRESH     = "{BUILD_DIR}/OptiFine_1.8.0_HD_U_D5.jar";
+    public static final String JAR_OPTIFINE_FRESH     = "{optifineJar}";
     public static final String JAR_CLIENT_JOINED      = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
             + "/minecraft-" + REPLACE_MC_VERSION + "-joined.jar";
     public static final String OBFUSCATED_CLASSES     = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
@@ -26,8 +26,10 @@ public class OptifineConstants
     public static final String PATCH_URL              = "{patchUrl}";
     public static final String DEFAULT_PATCH_URL      = "http://localhost:4000/downloads/optifinegradle/patches/{patchArchive}";
     public static final String DEFAULT_PATCH_ARCHIVE  = "patches-1.8.0-D5-0.zip";
+    public static final String DEFAULT_OPTIFINE_JAR   = "{BUILD_DIR}/OptiFine_1.8.0_HD_U_D5.jar";
     public static final String REPLACE_PATCH_ARCHIVE  = "{patchArchive}";
     public static final String REPLACE_PATCH_URL      = "{patchUrl}";
+    public static final String REPLACE_OPTIFINE_JAR   = "{optifineJar}";
 
     // patch making
     public static final String TASK_EXTRACT_SOURCES   = "extractOptifineSrc";

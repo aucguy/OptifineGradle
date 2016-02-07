@@ -93,6 +93,7 @@ public class OptifinePlugin extends ForgePlugin
                 OptifineExtension ext = (OptifineExtension) project.getExtensions().getByName(EXTENSION);
                 replacer.putReplacement(REPLACE_PATCH_ARCHIVE, ext.getPatchArchive());
                 replacer.putReplacement(REPLACE_PATCH_URL, ext.getPatchURL());
+                replacer.putReplacement(REPLACE_OPTIFINE_JAR, ext.getOptifineJar());
             }
         });
     }

@@ -6,6 +6,7 @@ public class OptifineExtension
 {
     private String patchURL;
     private String patchArchive;
+    private String optifineJar;
 
     public String getPatchURL()
     {
@@ -25,5 +26,15 @@ public class OptifineExtension
     public void setPatchArchive(String x)
     {
         patchArchive = x;
+    }
+    
+    public String getOptifineJar()
+    {
+        return optifineJar == null ? REPLACE_OPTIFINE_JAR : optifineJar;
+    }
+    
+    public void setOptifineJar(String x)
+    {
+        optifineJar = x;
     }
 }
