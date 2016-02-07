@@ -56,11 +56,11 @@ public class CacheCheckSpec implements Spec<Task>
         {
             try
             {
-            	Object f = field.getValue(task);
-            	if(f == null)
-            	{
-            		return true;
-            	}
+                Object f = field.getValue(task);
+                if(f == null)
+                {
+                    return true;
+                }
                 File file = task.getProject().file(f);
 
                 // not there? do the task.

@@ -54,11 +54,11 @@ public class WriteCacheAction implements Action<Task>
 
         try
         {
-        	Object f = annot.getValue(task);
-        	if(f == null)
-        	{
-        		return;
-        	}
+            Object f = annot.getValue(task);
+            if(f == null)
+            {
+                return;
+            }
             File outFile = task.getProject().file(f);
             if (outFile.exists())
             {

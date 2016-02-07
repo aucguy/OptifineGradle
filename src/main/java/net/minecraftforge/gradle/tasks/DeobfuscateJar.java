@@ -113,7 +113,7 @@ public class DeobfuscateJar extends CachedTask
 
     @Input
     private boolean           applyMarkers  = false;
-
+    
     @Optional
     @Input
     private boolean           stripSynthetics = false;
@@ -154,7 +154,7 @@ public class DeobfuscateJar extends CachedTask
         // apply exceptor
         getLogger().lifecycle("Applying Exceptor...");
         applyExceptor(tempObfJar, tempExcJar, getExceptorCfg(), log, ats);
-
+        
         if (stripSynthetics)
         {
             // strip out synthetics that arnt from enums..
@@ -372,7 +372,7 @@ public class DeobfuscateJar extends CachedTask
             zip.close();
         }
     }
-
+    
     private void stripSynthetics(File inJar, File outJar) throws IOException
     {
         ZipFile in = new ZipFile(inJar);
@@ -544,7 +544,7 @@ public class DeobfuscateJar extends CachedTask
             }
         };
     }
-
+    
     /**
      * adds an access transformer to the deobfuscation of this
      * @param obj access transformers
@@ -553,7 +553,7 @@ public class DeobfuscateJar extends CachedTask
     {
         ats.add(obj);
     }
-
+    
     /**
      * adds access transformers to the deobfuscation of this
      * @param objs access transformers
@@ -565,7 +565,7 @@ public class DeobfuscateJar extends CachedTask
             ats.add(object);
         }
     }
-
+    
     /**
      * adds access transformers to the deobfuscation of this
      * @param objs access transformers
@@ -577,7 +577,7 @@ public class DeobfuscateJar extends CachedTask
             ats.add(object);
         }
     }
-
+    
     public FileCollection getAts()
     {
         return getProject().files(ats.toArray());
@@ -602,7 +602,7 @@ public class DeobfuscateJar extends CachedTask
     {
         this.methodCsv = methodCsv;
     }
-
+    
     public boolean getStripSynthetics()
     {
         return stripSynthetics;
