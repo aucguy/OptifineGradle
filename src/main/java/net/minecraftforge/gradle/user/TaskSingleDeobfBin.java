@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -95,6 +96,25 @@ public class TaskSingleDeobfBin extends CachedTask
 
         while ((entry = zin.getNextEntry()) != null)
         {
+            if (entry.getName().contains("META-INF"))
+            {
+                // Skip signature files
+                if (entry.getName().endsWith(".SF") || entry.getName().endsWith(".DSA"))
+                {
+                    continue;
+                }
+                // Strip out file signatures from manifest
+                else if (entry.getName().equals("META-INF/MANIFEST.MF"))
+                {
+                    Manifest mf = new Manifest(zin);
+                    mf.getEntries().clear();
+                    zout.putNextEntry(new JarEntry(entry.getName()));
+                    mf.write(zout);
+                    zout.closeEntry();
+                    continue;
+                }
+            }
+
             // resources or directories.
             if (entry.isDirectory() || !entry.getName().endsWith(".class"))
             {

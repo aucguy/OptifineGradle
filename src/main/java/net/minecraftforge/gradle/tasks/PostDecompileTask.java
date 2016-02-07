@@ -44,6 +44,7 @@ import net.minecraftforge.gradle.util.patching.ContextualPatch.PatchStatus;
 
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.LogLevel;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
@@ -81,7 +82,7 @@ public class PostDecompileTask extends AbstractEditJarTask
     private static final Pattern         AFTER       = Pattern.compile("(?m)(?:\\r\\n|\\r|\\n)((?:\\r\\n|\\r|\\n)[ \\t]+(case|default))");
 
     private final Multimap<String, File> patchesMap  = ArrayListMultimap.create();
-    private final List<PatchReport>      patchErrors = Lists.newArrayList();
+    private final List<PatchAttempt>      patchErrors = Lists.newArrayList();
     private final ASFormatter            formatter   = new ASFormatter();
     private GLConstantFixer              oglFixer;
 
@@ -93,9 +94,6 @@ public class PostDecompileTask extends AbstractEditJarTask
         for (File f : getPatches())
         {
             String name = f.getName();
-
-            if (name.contains("Enum")) // because version of FF is awesome and dont need dat
-                continue;
 
             if(Patching.shouldSkip(name, ignoredPatches, false)) continue;
 
@@ -113,11 +111,19 @@ public class PostDecompileTask extends AbstractEditJarTask
 
         oglFixer = new GLConstantFixer();
     }
-
+    class PatchAttempt {
+        public PatchAttempt(List<PatchReport> report, String file) {
+            super();
+            this.report = report;
+            this.file = file;
+        }
+        final List<PatchReport> report;
+        final String file;
+    }
     @Override
     public String asRead(String name, String file) throws Exception
     {
-        getLogger().debug("Processing file: " + file);
+        getLogger().debug("Processing file: " + name);
 
         file = FFPatcher.processFile(file);
 
@@ -127,9 +133,11 @@ public class PostDecompileTask extends AbstractEditJarTask
         {
             getLogger().debug("applying MCP patches");
             ContextProvider provider = new ContextProvider(file);
-            ContextualPatch patch = findPatch(patchFiles, provider);
-            patchErrors.addAll(patch.patch(false));
-            file = provider.getAsString();
+            ContextualPatch patch = findPatch(patchFiles, provider,getLogger());
+            if (patch != null) {
+                patchErrors.add(new PatchAttempt(patch.patch(false),file));
+                file = provider.getAsString();
+            }
         }
 
         getLogger().debug("processing comments");
@@ -153,10 +161,10 @@ public class PostDecompileTask extends AbstractEditJarTask
         writer.close();
         file = writer.toString();
 
-        getLogger().debug("applying FML transformations");
-        file = BEFORE.matcher(file).replaceAll("$1");
-        file = AFTER.matcher(file).replaceAll("$1");
-        file = FmlCleanup.renameClass(file);
+//        getLogger().debug("applying FML transformations");
+//        file = BEFORE.matcher(file).replaceAll("$1");
+//        file = AFTER.matcher(file).replaceAll("$1");
+//        file = FmlCleanup.renameClass(file);
 
         return file;
     }
@@ -165,61 +173,80 @@ public class PostDecompileTask extends AbstractEditJarTask
     public void doStuffAfter() throws Exception
     {
         boolean fuzzed = false;
-        for (PatchReport report : patchErrors)
+        Throwable error = null;
+        for (PatchAttempt attempt: patchErrors)
         {
-            if (!report.getStatus().isSuccess())
-            {
-                //getLogger().log(LogLevel.ERROR, "Patching failed: " + report.getTarget(), report.getFailure());
-                getLogger().error("Patching failed: " + report.getTarget());
-
-                for (HunkReport hunk : report.getHunks())
+            for (PatchReport report : attempt.report) {
+                if (!report.getStatus().isSuccess())
                 {
-                    if (!hunk.getStatus().isSuccess())
+                    //getLogger().log(LogLevel.ERROR, "Patching failed: " + report.getTarget(), report.getFailure());
+                    getLogger().error("Patching failed: " + report.getTarget());
+
+                    for (HunkReport hunk : report.getHunks())
                     {
-                        getLogger().error("Hunk " + hunk.getHunkID() + " failed!");
+                        if (!hunk.getStatus().isSuccess())
+                        {
+                            getLogger().error("Hunk " + hunk.getHunkID() + " failed! " + report.getFailure().getMessage());
+                            getLogger().error(Joiner.on("\n").join(hunk.hunk.lines));
+                            getLogger().error("File state");
+                            getLogger().error(attempt.file);
+                        }
+                    }
+
+                    error = report.getFailure();
+                }
+                else if (report.getStatus() == PatchStatus.Fuzzed) // catch fuzzed patches
+                {
+                    getLogger().log(LogLevel.INFO, "Patching fuzzed: " + report.getTarget(), report.getFailure());
+                    fuzzed = true;
+
+                    for (HunkReport hunk : report.getHunks())
+                    {
+                        if (!hunk.getStatus().isSuccess())
+                        {
+                            getLogger().info("Hunk " + hunk.getHunkID() + " fuzzed " + hunk.getFuzz() + "!");
+                        }
                     }
                 }
-
-                Throwables.propagate(report.getFailure());
-            }
-            else if (report.getStatus() == PatchStatus.Fuzzed) // catch fuzzed patches
-            {
-                getLogger().log(LogLevel.INFO, "Patching fuzzed: " + report.getTarget(), report.getFailure());
-                fuzzed = true;
-
-                for (HunkReport hunk : report.getHunks())
+                else
                 {
-                    if (!hunk.getStatus().isSuccess())
-                    {
-                        getLogger().info("Hunk " + hunk.getHunkID() + " fuzzed " + hunk.getFuzz() + "!");
-                    }
+                    getLogger().debug("Patch succeeded: " + report.getTarget());
                 }
-            }
-            else
-            {
-                getLogger().debug("Patch succeeded: " + report.getTarget());
             }
         }
         if (fuzzed)
             getLogger().lifecycle("Patches Fuzzed!");
+        if (error != null) {
+            Throwables.propagate(error);
+        }
     }
 
-    private static ContextualPatch findPatch(Collection<File> files, ContextProvider provider) throws Exception
+    private static ContextualPatch findPatch(Collection<File> files, ContextProvider provider, Logger logger) throws Exception
     {
         ContextualPatch patch = null;
+        File lastFile = null;
+        boolean success = true;
         for (File f : files)
         {
-            patch = ContextualPatch.create(Files.toString(f, Constants.CHARSET), provider);
+            logger.debug("trying MCP patch " + f.getName());
+            lastFile = f;
+            patch = ContextualPatch.create(Files.toString(f, Constants.CHARSET), provider).setAccessC14N(true);
+
             List<PatchReport> errors = patch.patch(true);
 
-            boolean success = true;
+            success = true;
             for (PatchReport rep : errors)
             {
                 if (!rep.getStatus().isSuccess())
                     success = false;
             }
-            if (success)
+            if (success) {
+                logger.debug("accepted MCP patch " + f.getName());
                 break;
+            }
+        }
+        if (!success && lastFile != null) {
+            logger.debug("candidate MCP patch may fuzz " + lastFile.getName());
         }
         return patch;
     }

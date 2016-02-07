@@ -122,9 +122,9 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         {
             decompileJar.setInJar(delayedFile(JAR_DEOBF));
             decompileJar.setOutJar(delayedFile(JAR_DECOMP));
-            decompileJar.setFernflower(delayedFile(Constants.JAR_FERNFLOWER));
             decompileJar.setDoesCache(false);
-            decompileJar.dependsOn(TASK_DL_FERNFLOWER, deobfJar);
+            decompileJar.setClasspath(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS));
+            decompileJar.dependsOn(deobfJar);
         }
 
         PostDecompileTask postDecompileJar = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);

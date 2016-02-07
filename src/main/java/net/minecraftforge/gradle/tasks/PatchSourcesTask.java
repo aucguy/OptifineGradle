@@ -47,6 +47,7 @@ import org.gradle.api.tasks.ParallelizableTask;
 
 import com.cloudbees.diff.PatchException;
 import com.github.aucguy.optifinegradle.Patching;
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -95,7 +96,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
         getLogger().info("Reading patches");
 
         // create context provider
-        context = new ContextProvider(null, patchStrip); // add in the map later. 
+        context = new ContextProvider(null, patchStrip); // add in the map later.
         final int fuzz = getMaxFuzz();
 
         // collect patchFiles and add them to the listing
@@ -266,6 +267,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
                         {
                             reject.delete();
                         }
+                        Files.append(rejectBuilder.toString(),reject, Charsets.UTF_8);
                         getLogger().log(LogLevel.ERROR, "  Rejects written to {}", reject.getAbsolutePath());
                     }
 

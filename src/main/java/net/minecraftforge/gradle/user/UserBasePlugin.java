@@ -87,6 +87,7 @@ import com.google.common.collect.Maps;
 
 import groovy.lang.Closure;
 import net.minecraftforge.gradle.common.BasePlugin;
+import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.tasks.ApplyFernFlowerTask;
 import net.minecraftforge.gradle.tasks.ApplyS2STask;
 import net.minecraftforge.gradle.tasks.CreateStartTask;
@@ -300,7 +301,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
     @SuppressWarnings("unchecked")
     protected void makeDecompTasks(final String globalPattern, final String localPattern, Object inputJar, String inputTask, Object mcpPatchSet)
     {
-        madeDecompTasks = true; // to gaurd against stupid programmers
+        madeDecompTasks = true; // to guard against stupid programmers
 
         final DeobfuscateJar deobfBin = makeTask(TASK_DEOBF_BIN, DeobfuscateJar.class);
         {
@@ -315,10 +316,10 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             deobfBin.setFieldCsv(delayedFile(CSV_FIELD));
             deobfBin.setMethodCsv(delayedFile(CSV_METHOD));
             deobfBin.setApplyMarkers(false);
-            deobfBin.setStripSynthetics(true);
             deobfBin.setInJar(inputJar);
+
             deobfBin.setOutJar(chooseDeobfOutput(globalPattern, localPattern, "Bin", "", true));
-            deobfBin.dependsOn(inputTask, TASK_GENERATE_SRGS, TASK_EXTRACT_DEP_ATS);
+            deobfBin.dependsOn(inputTask, TASK_GENERATE_SRGS, TASK_EXTRACT_DEP_ATS, TASK_DD_COMPILE, TASK_DD_PROVIDED);
         }
 
         final Object deobfDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "srgBin", true);
@@ -340,15 +341,15 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             deobfDecomp.setApplyMarkers(true);
             deobfDecomp.setInJar(inputJar);
             deobfDecomp.setOutJar(deobfDecompJar);
-            deobfDecomp.dependsOn(inputTask, TASK_GENERATE_SRGS, TASK_EXTRACT_DEP_ATS); // todo grab correct task to depend on
+            deobfDecomp.dependsOn(inputTask, TASK_GENERATE_SRGS, TASK_EXTRACT_DEP_ATS, TASK_DD_COMPILE, TASK_DD_PROVIDED); // todo grab correct task to depend on
         }
 
         final ApplyFernFlowerTask decompile = makeTask(TASK_DECOMPILE, ApplyFernFlowerTask.class);
         {
             decompile.setInJar(deobfDecompJar);
             decompile.setOutJar(decompJar);
-            decompile.setFernflower(delayedFile(JAR_FERNFLOWER));
-            decompile.dependsOn(TASK_DL_FERNFLOWER, deobfDecomp);
+            decompile.setClasspath(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS));
+            decompile.dependsOn(deobfDecomp);
         }
 
         final PostDecompileTask postDecomp = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
@@ -642,7 +643,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
         final Task compileDummy = getDummyDep("compile", delayedFile(DIR_DEOBF_DEPS + "/compileDummy.jar"), TASK_DD_COMPILE);
         final Task providedDummy = getDummyDep("compile", delayedFile(DIR_DEOBF_DEPS + "/providedDummy.jar"), TASK_DD_PROVIDED);
 
-        // die wih error if I find invalid types...
+        // die with error if I find invalid types...
         project.afterEvaluate(new Action<Project>() {
             @Override
             public void execute(Project project)
@@ -680,7 +681,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                 for (ResolvedArtifact artifact : config.getResolvedConfiguration().getResolvedArtifacts())
                 {
                     ModuleVersionIdentifier module = artifact.getModuleVersion().getId();
-                    String group = "deobf." + module.getGroup();
+                    String group = delayedString("deobf." + REPLACE_MCP_CHANNEL + "." + REPLACE_MCP_VERSION + "." + module.getGroup()).call();
 
                     // Add artifacts that will be remapped to get their sources
                     idMap.put(artifact.getId().getComponentIdentifier(), module);
@@ -709,7 +710,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                 for (ComponentArtifactsResult comp : result.getResolvedComponents())
                 {
                     ModuleVersionIdentifier module = idMap.get(comp.getId());
-                    String group = "deobf." + module.getGroup();
+                    String group = delayedString("deobf." + REPLACE_MCP_CHANNEL + "." + REPLACE_MCP_VERSION + "." + module.getGroup()).call();
 
                     for (ArtifactResult art : comp.getArtifacts(SourcesArtifact.class))
                     {
