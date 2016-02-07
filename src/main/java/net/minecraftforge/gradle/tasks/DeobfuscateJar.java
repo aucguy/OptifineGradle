@@ -544,7 +544,7 @@ public class DeobfuscateJar extends CachedTask
             }
         };
     }
-    
+
     /**
      * adds an access transformer to the deobfuscation of this
      * @param obj access transformers

@@ -352,7 +352,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             dlServer.setOutput(delayedFile(JAR_SERVER_FRESH));
             dlServer.setUrl(delayedString(URL_MC_SERVER));
         }
-
+        
         SplitJarTask splitServer = makeTask(TASK_SPLIT_SERVER, SplitJarTask.class);
         {
             splitServer.setInJar(delayedFile(JAR_SERVER_FRESH));
