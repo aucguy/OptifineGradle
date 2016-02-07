@@ -88,12 +88,12 @@ import net.minecraftforge.gradle.util.json.fgversion.FGVersionWrapper;
 import net.minecraftforge.gradle.util.json.version.Version;
 public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Project>
 {
-	public boolean isOptifine = false;
-	
+    public boolean isOptifine = false;
+
     public Project       project;
     public BasePlugin<?> otherPlugin;
     public ReplacementProvider replacer = new ReplacementProvider();
-    
+
     public Set<String> optifineFiles = new HashSet<String>();
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -105,7 +105,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         // check for gradle version
         {
             List<String> split = Splitter.on('.').splitToList(project.getGradle().getGradleVersion());
-            
+
             int major = Integer.parseInt(split.get(0));
             int minor = Integer.parseInt(split.get(1).split("-")[0]);
 
@@ -290,12 +290,12 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         FGVersionWrapper wrapper = JsonFactory.GSON.fromJson(getWithEtag(checkUrl, jsonCache, etagFile), FGVersionWrapper.class);
         FGVersion webVersion = wrapper.versionObjects.get(version);
         String latestVersion = wrapper.versions.get(wrapper.versions.size()-1);
-        
+
         if (webVersion == null || webVersion.status == FGBuildStatus.FINE)
         {
             return;
         }
-        
+
         // broken implies outdated
         if (webVersion.status == FGBuildStatus.BROKEN)
         {
@@ -313,7 +313,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         {
             outLines.add("ForgeGradle "+latestVersion + " is out! You should update!");
             outLines.add(" Features:");
-            
+
             for (int i = webVersion.index; i < wrapper.versions.size(); i++)
             {
                 for (String feature : wrapper.versionObjects.get(wrapper.versions.get(i)).changes)
@@ -323,7 +323,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             }
             outLines.add("****************************");
         }
-        
+
         onVersionCheck(webVersion, wrapper);
     }
 
@@ -352,13 +352,13 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             dlServer.setOutput(delayedFile(JAR_SERVER_FRESH));
             dlServer.setUrl(delayedString(URL_MC_SERVER));
         }
-        
+
         SplitJarTask splitServer = makeTask(TASK_SPLIT_SERVER, SplitJarTask.class);
         {
             splitServer.setInJar(delayedFile(JAR_SERVER_FRESH));
             splitServer.setOutFirst(delayedFile(JAR_SERVER_PURE));
             splitServer.setOutSecond(delayedFile(JAR_SERVER_DEPS));
-            
+
             splitServer.exclude("org/bouncycastle", "org/bouncycastle/*", "org/bouncycastle/**");
             splitServer.exclude("org/apache", "org/apache/*", "org/apache/**");
             splitServer.exclude("com/google", "com/google/*", "com/google/**");
@@ -368,30 +368,30 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             splitServer.exclude("io/netty", "io/netty/*", "io/netty/**");
             splitServer.exclude("javax/annotation", "javax/annotation/*", "javax/annotation/**");
             splitServer.exclude("argo", "argo/*", "argo/**");
-            
+
             splitServer.dependsOn(dlServer);
         }
-        
+
         String mergeClientJar;
         Task mergeDependency;
         if(isOptifine)
         {
-        	JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
-        	{
-        		join.client = delayedFile(JAR_CLIENT_FRESH);
-        		join.optifine = delayedFile(JAR_OPTIFINE_FRESH);
-        		join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
-        		join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
-        		join.srg = delayedFile(SRG_NOTCH_TO_MCP);
-        		join.dependsOn(dlClient);
-        	}
-        	mergeClientJar = JAR_CLIENT_JOINED;
-        	mergeDependency = join;
+            JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
+            {
+                join.client = delayedFile(JAR_CLIENT_FRESH);
+                join.optifine = delayedFile(JAR_OPTIFINE_FRESH);
+                join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
+                join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
+                join.srg = delayedFile(SRG_NOTCH_TO_MCP);
+                join.dependsOn(dlClient);
+            }
+            mergeClientJar = JAR_CLIENT_JOINED;
+            mergeDependency = join;
         }
         else
         {
-        	mergeClientJar = JAR_CLIENT_FRESH;
-        	mergeDependency = dlClient;
+            mergeClientJar = JAR_CLIENT_FRESH;
+            mergeDependency = dlClient;
         }
 
         MergeJars merge = makeTask(TASK_MERGE_JARS, MergeJars.class);
@@ -552,7 +552,6 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
     public static <T extends Task> T makeTask(Project proj, String name, Class<T> type, boolean optifine)
     {
-    	//name = optifine ? name + "_optifine" : name;
         return (T) proj.getTasks().create(name, type);
     }
 
@@ -799,20 +798,20 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
     {
         return stringCache.getUnchecked(path);
     }
-    
+
     public DelayedFile delayedFile(String path)
     {
-    	return delayedFile(path, false);
+        return delayedFile(path, false);
     }
 
     public DelayedFile delayedFile(String path, boolean optifine)
     {
-    	String modpath = path.replace(".jar", "-optifine.jar");
-    	if((isOptifine && optifine) || optifineFiles.contains(path))
-    	{
-    		optifineFiles.add(path);
-    		path = modpath;
-    	}
+        String modpath = path.replace(".jar", "-optifine.jar");
+        if((isOptifine && optifine) || optifineFiles.contains(path))
+        {
+            optifineFiles.add(path);
+            path = modpath;
+        }
         return fileCache.getUnchecked(path);
     }
 

@@ -68,11 +68,11 @@ public class PostDecompileTask extends AbstractEditJarTask
 
     @InputFile
     private Object                       astyleConfig;
-    
+
     @InputFile
     @Optional
     private Object                       deobfuscatedClasses;
-    
+
     @OutputFile
     @Cached
     private Object                       outJar;
@@ -88,17 +88,17 @@ public class PostDecompileTask extends AbstractEditJarTask
     @Override
     public void doStuffBefore() throws Exception
     {
-    	Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
-    	
+        Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
+
         for (File f : getPatches())
         {
             String name = f.getName();
 
             if (name.contains("Enum")) // because version of FF is awesome and dont need dat
                 continue;
-            
+
             if(Patching.shouldSkip(name, ignoredPatches, false)) continue;
-            
+
             int patchIndex = name.indexOf(".patch");
 
             // 6 is the length of ".patch" + 3 to account for .## at the end of the file.
@@ -233,7 +233,7 @@ public class PostDecompileTask extends AbstractEditJarTask
     {
         this.astyleConfig = astyleConfig;
     }
-    
+
     public File getDeobfuscatedClasses()
     {
         return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);

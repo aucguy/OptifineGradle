@@ -129,11 +129,11 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             final Object patchedJar = chooseDeobfOutput(global, local, "", "patched", true);
             final Object remappedJar = chooseDeobfOutput(global, local, "", "remapped", true);
             final Object optifinePatchedJar = chooseDeobfOutput(global, local, "Src", "sources", true);
-            
+
             PatchSourcesTask patch = makeTask(TASK_PATCH, PatchSourcesTask.class);
             if(isOptifine)
             {
-            	patch.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+                patch.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
             }
             patch.setPatches(delayedFile(ZIP_UD_PATCHES));
             patch.addInject(delayedFile(ZIP_UD_SRC));
@@ -148,28 +148,28 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             RemapSources remap = (RemapSources) project.getTasks().getByName(TASK_REMAP);
             if(isOptifine)
             {
-            	remap.setOutJar(remappedJar);
+                remap.setOutJar(remappedJar);
             }
             remap.setInJar(patchedJar);
             remap.dependsOn(patch);
-            
+
             if(isOptifine)
             {
-        		Download dlPatches = makeTask(TASK_DL_PATCHES, Download.class);
-        		{
-        			dlPatches.setOutput(delayedFile(PATCH_ZIP));
-        			dlPatches.setUrl(delayedString(PATCH_URL));
-        		}
-            	
+                Download dlPatches = makeTask(TASK_DL_PATCHES, Download.class);
+                {
+                    dlPatches.setOutput(delayedFile(PATCH_ZIP));
+                    dlPatches.setUrl(delayedString(PATCH_URL));
+                }
+
                 PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
                 {
-                	optifinePatch.setPatches(delayedFile(PATCH_ZIP));
-                	optifinePatch.setFailOnError(true);
-                	optifinePatch.setMakeRejects(false);
-                	optifinePatch.setPatchStrip(1);
-                	optifinePatch.setInJar(remappedJar);
-                	optifinePatch.setOutJar(optifinePatchedJar);
-                	optifinePatch.dependsOn(TASK_REMAP, dlPatches);
+                    optifinePatch.setPatches(delayedFile(PATCH_ZIP));
+                    optifinePatch.setFailOnError(true);
+                    optifinePatch.setMakeRejects(false);
+                    optifinePatch.setPatchStrip(1);
+                    optifinePatch.setInJar(remappedJar);
+                    optifinePatch.setOutJar(optifinePatchedJar);
+                    optifinePatch.dependsOn(TASK_REMAP, dlPatches);
                 }
             }
         }
@@ -233,7 +233,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         String artifact = getApiName(exten) + (isDecomp ? "Src" : "Bin");
         String version = getApiVersion(exten) + (useLocalCache ? "-PROJECT(" + project.getName() + ")" : "");
         String classifier = isOptifine ? "optifine" : "";
-        
+
         project.getDependencies().add(CONFIG_MC, ImmutableMap.of("group", group, "name", artifact, "version", version, "classifier", classifier));
     }
 
@@ -242,17 +242,17 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
     {
         return delayedFile(DIR_API_BASE + "/start");
     }
-    
+
     public String getGlobalPattern()
     {
-    	return DIR_API_JAR_BASE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION;
+        return DIR_API_JAR_BASE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION;
     }
-    
+
     public String getLocalPattern()
     {
         return DIR_LOCAL_CACHE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION + "-PROJECT(" + project.getName() + ")";
     }
-    
+
     public SourceSet getSourceSet(String name)
     {
         JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");

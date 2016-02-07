@@ -68,7 +68,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private int                    maxFuzz       = 0;
 
     @Input
-	protected int                    patchStrip    = 3;
+    protected int                  patchStrip    = 3;
 
     @Input
     private boolean                makeRejects   = true;
@@ -82,13 +82,13 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private List<Object>           injects       = Lists.newArrayList();
 
     // stateful pieces of this task
-    protected ContextProvider        context;
+    protected ContextProvider      context;
     private ArrayList<PatchedFile> loadedPatches = Lists.newArrayList();
-    
+
     @InputFile
     @Optional
-	private Object deobfuscatedClasses;
-    
+    private Object deobfuscatedClasses;
+
     @Override
     public void doStuffBefore() throws IOException
     {
@@ -97,12 +97,12 @@ public class PatchSourcesTask extends AbstractEditJarTask
         // create context provider
         context = new ContextProvider(null, patchStrip); // add in the map later. 
         final int fuzz = getMaxFuzz();
-        
+
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
-        
+
         if(patchThingy == null) return;
-        
+
         final Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
 
         if (patchThingy.isDirectory())
@@ -133,8 +133,8 @@ public class PatchSourcesTask extends AbstractEditJarTask
                 @Override
                 public void visitFile(FileVisitDetails details)
                 {
-                	if(Patching.shouldSkip(details.getPath(), ignoredPatches, true)) return;
-                	
+                    if(Patching.shouldSkip(details.getPath(), ignoredPatches, true)) return;
+
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     details.copyTo(stream);
                     String file = new String(stream.toByteArray(), Constants.CHARSET);
@@ -489,7 +489,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
             return new File(fileToPatch.getParentFile(), fileToPatch.getName() + ".rej");
         }
     }
-    
+
     public File getDeobfuscatedClasses()
     {
         return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);

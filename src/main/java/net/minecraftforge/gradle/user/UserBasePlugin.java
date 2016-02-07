@@ -298,17 +298,17 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
     }
 
     @SuppressWarnings("unchecked")
-	protected void makeDecompTasks(final String globalPattern, final String localPattern, Object inputJar, String inputTask, Object mcpPatchSet)
+    protected void makeDecompTasks(final String globalPattern, final String localPattern, Object inputJar, String inputTask, Object mcpPatchSet)
     {
         madeDecompTasks = true; // to gaurd against stupid programmers
 
         final DeobfuscateJar deobfBin = makeTask(TASK_DEOBF_BIN, DeobfuscateJar.class);
         {
-        	if(isOptifine)
-        	{
-        		deobfBin.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
+            if(isOptifine)
+            {
+                deobfBin.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
                 deobfBin.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
-        	}
+            }
             deobfBin.setSrg(delayedFile(SRG_NOTCH_TO_MCP));
             deobfBin.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfBin.setExceptorCfg(delayedFile(EXC_MCP));
@@ -329,11 +329,11 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         final DeobfuscateJar deobfDecomp = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
-        	if(isOptifine)
-        	{
-        		deobfDecomp.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
+            if(isOptifine)
+            {
+                deobfDecomp.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
                 deobfDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
-        	}
+            }
             deobfDecomp.setSrg(delayedFile(SRG_NOTCH_TO_SRG));
             deobfDecomp.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfDecomp.setExceptorCfg(delayedFile(EXC_SRG));
@@ -353,10 +353,10 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         final PostDecompileTask postDecomp = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
-        	if(isOptifine)
-        	{
-        		postDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
-        	}
+            if(isOptifine)
+            {
+                postDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+            }
             postDecomp.setInJar(decompJar);
             postDecomp.setOutJar(postDecompJar);
             postDecomp.setPatches(mcpPatchSet);
@@ -477,12 +477,11 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             }
         };
     }
-    
+
     protected final Object chooseDeobfOutput(String globalPattern, String localPattern, String appendage, String classifier)
     {
-    	return chooseDeobfOutput(globalPattern, localPattern, appendage, classifier, false);
+        return chooseDeobfOutput(globalPattern, localPattern, appendage, classifier, false);
     }
-
 
     /**
      * A boolean used to cache the output of useLocalCache;
@@ -789,7 +788,6 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                 retromap.dependsOn(TASK_GENERATE_SRGS, extractRangemap);
 
                 // TODO: add replacing extract task
-
 
                 // for replaced sources
                 rangeMap = delayedFile(getSourceSetFormatted(set, TMPL_RANGEMAP_RPL));

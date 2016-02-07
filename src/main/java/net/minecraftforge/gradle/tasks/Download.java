@@ -56,23 +56,23 @@ public class Download extends CachedTask
         File outputFile = getProject().file(getOutput());
         outputFile.getParentFile().mkdirs();
         outputFile.createNewFile();
-        
+
         URL url = new URL(getUrl());
         ReadableByteChannel  inChannel;
         if(url.getProtocol().equals("file"))
         {
-        	File file = new File(url.toString().replace("file://", ""));
-        	inChannel = Channels.newChannel(new FileInputStream(file));
-        } 
+            File file = new File(url.toString().replace("file://", ""));
+            inChannel = Channels.newChannel(new FileInputStream(file));
+        }
         else
         {
-        	getLogger().info("Downloading " + getUrl() + " to " + outputFile);
+            getLogger().info("Downloading " + getUrl() + " to " + outputFile);
 
-        	HttpURLConnection connect = (HttpURLConnection) (url).openConnection();
-        	connect.setRequestProperty("User-Agent", Constants.USER_AGENT);
-        	connect.setInstanceFollowRedirects(true);
+            HttpURLConnection connect = (HttpURLConnection) (url).openConnection();
+            connect.setRequestProperty("User-Agent", Constants.USER_AGENT);
+            connect.setInstanceFollowRedirects(true);
 
-        	inChannel  = Channels.newChannel(connect.getInputStream());
+            inChannel  = Channels.newChannel(connect.getInputStream());
         }
         FileChannel          outChannel = new FileOutputStream(outputFile).getChannel();
 
