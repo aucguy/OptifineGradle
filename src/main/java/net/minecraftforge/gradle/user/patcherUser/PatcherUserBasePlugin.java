@@ -138,7 +138,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             patch.setPatches(delayedFile(ZIP_UD_PATCHES));
             patch.addInject(delayedFile(ZIP_UD_SRC));
             patch.addInject(delayedFile(ZIP_UD_RES)); // injecting teh resources too... the src jar needs them afterall.
-            patch.setFailOnError(true);
+            patch.setFailOnError(!isOptifine); //false because the patches are broken
             patch.setMakeRejects(false);
             patch.setPatchStrip(1);
             patch.setInJar(postDecompJar);
@@ -164,7 +164,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
                 PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
                 {
                     optifinePatch.setPatches(delayedFile(PATCH_ZIP));
-                    optifinePatch.setFailOnError(true);
+                    optifinePatch.setFailOnError(false);
                     optifinePatch.setMakeRejects(false);
                     optifinePatch.setPatchStrip(1);
                     optifinePatch.setInJar(remappedJar);

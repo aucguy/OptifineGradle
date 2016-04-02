@@ -54,15 +54,15 @@ public class FFPatcher
     private static final String TRAILINGZERO = "([0-9]+\\.[0-9]*[1-9])0+([DdFfEe])";
 
     // new regexes
-    private static final String CLASS_REGEX = "(?<modifiers>(?:(?:" + MODIFIERS + ") )*)(?<type>enum|class|interface) (?<name>[\\w$]+)(?: (extends|implements) (?:[\\w$.]+(?:, [\\w$.]+)*))* \\{";
+    private static final String CLASS_REGEX = "(?<modifiers>(?:(?:" + MODIFIERS + ") )*)(?<type>enum|class|interface) (?<name>[\\w$]+)";
     private static final String ENUM_ENTRY_REGEX = "(?<name>[\\w$]+)\\(\"(?:[\\w$]+)\", [0-9]+(?:, (?<body>.*?))?\\)(?<end> *(?:;|,|\\{)$)";
     private static final String CONSTRUCTOR_REGEX = "(?<modifiers>(?:(?:" + MODIFIERS + ") )*)%s\\((?<parameters>.*?)\\)(?<end>(?: throws (?<throws>[\\w$.]+(?:, [\\w$.]+)*))? *(?:\\{\\}| \\{))";
     private static final String CONSTRUCTOR_CALL_REGEX = "(?<name>this|super)\\((?<body>.*?)\\)(?<end>;)";
-    private static final String VALUE_FIELD_REGEX = "private static final %s\\[\\] [$\\w\\d]+ = new %s\\[\\]\\{.*?\\};";
-
+    private static final String VALUE_FIELD_REGEX = "private static final %s\\[\\] [$\\w\\d]+ = new %s\\[\\]\\{.*?\\};"; 
+    
     public static String processFile(String text)
     {
-        StringBuffer out = new StringBuffer();
+        //StringBuffer out = new StringBuffer();
 //        Matcher m = SYNTHETICS.matcher(text);
 //        while(m.find())
 //        {
@@ -86,7 +86,19 @@ public class FFPatcher
         if(text.contains("class CrashReport ")) {
             text = text.replaceAll(CRASH_REPORT_FIELD, "");
         }
+        Matcher matcher = Pattern.compile(CLASS_REGEX).matcher(text);
+        while(matcher.find())
+        {
+            String oldName = matcher.group("name");
+            if(oldName.equals("1") || oldName.equals("2"))
+            {
+                String newName = "Custom" + oldName;
+                text = text.replace("class " + oldName, "class " + newName);
+                text = text.replace("." + oldName + ".", "." + newName + ".");
+            }
+        }
         return text;
+        
 //        text = text.replaceAll(EMPTY_SUPER, "");
 //
         // fix interfaces (added 1.7.10+)

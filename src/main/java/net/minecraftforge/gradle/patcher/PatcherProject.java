@@ -48,6 +48,8 @@ public class PatcherProject implements Serializable
 
     private File rootDir;
     private File patchDir;
+    private File outputPatchDir;
+    private File optifinePatchDir;
     private File sourcesDir;
     private File resourcesDir;
     private File testSourcesDir;
@@ -65,6 +67,7 @@ public class PatcherProject implements Serializable
     
     private boolean genMcpPatches = false;
     private boolean applyMcpPatches = false;
+    private boolean modified = true;
 
     protected PatcherProject(String name, PatcherPlugin plugin)
     {
@@ -233,6 +236,26 @@ public class PatcherProject implements Serializable
         this.patchDir = project.file(patchDir);
     }
     
+    public File getOptifinePatchDir()
+    {
+        return optifinePatchDir;
+    }
+    
+    public void setOptifinePatchDir(Object optifinePatchDir)
+    {
+       this.optifinePatchDir = optifinePatchDir == null ? null : project.file(optifinePatchDir);
+    }
+    
+    public File getOutputPatchDir()
+    {
+        return outputPatchDir != null ? outputPatchDir : getPatchDir();
+    }
+    
+    public void setOutputPatchDir(Object outputPatchDir)
+    {
+        this.outputPatchDir = outputPatchDir == null ? null : project.file(outputPatchDir);
+    }
+    
     /**
      * The directory where the patches are found, and to witch generated patches should be saved.
      * By default this is rootDir/patches
@@ -241,6 +264,16 @@ public class PatcherProject implements Serializable
     public void patchDir(Object patchDir)
     {
         setPatchDir(patchDir);
+    }
+    
+    public void optifinePatchDir(Object optifinePatchDir)
+    {
+        setOptifinePatchDir(optifinePatchDir);
+    }
+    
+    public void outputPatchDir(Object outputPatchDir)
+    {
+        setOutputPatchDir(outputPatchDir);
     }
 
     public File getSourcesDir()
@@ -536,6 +569,16 @@ public class PatcherProject implements Serializable
         this.applyMcpPatches = applyMcpPatches;
     }
     
+    public boolean getsModified()
+    {
+        return modified || (getGenPatchesFrom() != null && "clean".equals(getGenPatchesFrom().toLowerCase()));
+    }
+    
+    public void setModified(boolean modified)
+    {
+        this.modified = modified;
+    }
+    
     // ------------------------
     // DELAYED GETTERS
     // ------------------------
@@ -657,6 +700,28 @@ public class PatcherProject implements Serializable
             public File call()
             {
                 return getPatchDir();
+            }
+        };
+    }
+    
+    @SuppressWarnings("serial")
+    protected Closure<File> getDelayedOptifinePatchDir()
+    {
+        return new Closure<File>(project, this) {
+            public File call()
+            {
+                return getOptifinePatchDir();
+            }
+        };
+    }
+    
+    @SuppressWarnings("serial")
+    public Closure<Boolean> getDelayedHasOptifinePatches()
+    {
+        return new Closure<Boolean>(project, this) {
+            public Boolean call()
+            {
+                return optifinePatchDir != null;
             }
         };
     }

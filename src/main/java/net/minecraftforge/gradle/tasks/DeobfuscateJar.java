@@ -44,7 +44,7 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
-import com.github.aucguy.optifinegradle.Patching;
+import com.github.aucguy.optifinegradle.user.Patching;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;

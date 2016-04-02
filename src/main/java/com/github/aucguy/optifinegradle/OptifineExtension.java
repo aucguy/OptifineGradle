@@ -30,7 +30,7 @@ public class OptifineExtension
     
     public String getOptifineJar()
     {
-        return optifineJar == null ? REPLACE_OPTIFINE_JAR : optifineJar;
+        return optifineJar == null ? DEFAULT_OPTIFINE_JAR : optifineJar;
     }
     
     public void setOptifineJar(String x)

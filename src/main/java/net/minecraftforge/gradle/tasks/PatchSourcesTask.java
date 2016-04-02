@@ -46,12 +46,14 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.ParallelizableTask;
 
 import com.cloudbees.diff.PatchException;
-import com.github.aucguy.optifinegradle.Patching;
+import com.github.aucguy.optifinegradle.user.Patching;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+
+import groovy.lang.Closure;
 
 @ParallelizableTask
 public class PatchSourcesTask extends AbstractEditJarTask
@@ -78,7 +80,14 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private boolean                failOnError   = false;
 
     private Object                 patches;
-
+    
+    @Input
+    @Optional
+    private Object                 optifinePatches;
+    
+    @Input
+    private Closure<Boolean>       hasOptifinePatches;
+    
     @InputFiles
     private List<Object>           injects       = Lists.newArrayList();
 
@@ -102,19 +111,27 @@ public class PatchSourcesTask extends AbstractEditJarTask
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
 
-        if(patchThingy == null) return;
-
         final Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
-
+        addPatchThingy(patchThingy, fuzz, ignoredPatches);
+        addPatchThingy(getOptifinePatches(), fuzz, null);
+    }
+    
+    protected void addPatchThingy(File patchThingy, final int fuzz, final Set<String> ignoredPatches) throws IOException
+    {
+        if(patchThingy == null || !patchThingy.exists()) return;
         if (patchThingy.isDirectory())
         {
-            for (File f : getProject().fileTree(getPatches()))
+            for (File f : getProject().fileTree(patchThingy))
             {
                 if (!f.exists() || f.isDirectory() || !f.getName().endsWith("patch"))
                 {
                     continue;
                 }
-
+                File path = patchThingy.toPath().relativize(f.toPath()).toFile();
+                if(Patching.shouldSkip(path.getPath(), ignoredPatches, true)) {
+                    continue;
+                }
+                
                 loadedPatches.add(new PatchedFile(f, context, fuzz));
             }
         }
@@ -500,5 +517,25 @@ public class PatchSourcesTask extends AbstractEditJarTask
     public void setDeobfuscatedClasses(Object deobfuscatedClasses)
     {
         this.deobfuscatedClasses = deobfuscatedClasses;
+    }
+    
+    public File getOptifinePatches()
+    {
+        return getHasOptifinePatches() ? getProject().file(optifinePatches) : null;
+    }
+
+    public void setOptifinePatches(Object optifinePatches)
+    {
+        this.optifinePatches = optifinePatches;
+    }
+    
+    public boolean getHasOptifinePatches()
+    {
+        return hasOptifinePatches.call();
+    }
+    
+    public void setHasOptifinePatches(Closure<Boolean> hasOptifinePatches)
+    {
+        this.hasOptifinePatches = hasOptifinePatches;
     }
 }

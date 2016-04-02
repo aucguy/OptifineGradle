@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraftforge.gradle.util.NormalizingInputSupplier;
 import net.minecraftforge.gradle.util.SequencedInputSupplier;
 import net.minecraftforge.srg2source.util.io.FolderSupplier;
 import net.minecraftforge.srg2source.util.io.InputSupplier;
@@ -98,7 +99,8 @@ public class TaskGenPatches extends DefaultTask
             }
         }
         
-        return supplier;
+        NormalizingInputSupplier supplier2 = new NormalizingInputSupplier(supplier, '/');
+        return supplier2;
     }
 
     private void removeOld(File dir) throws IOException
@@ -162,7 +164,6 @@ public class TaskGenPatches extends DefaultTask
         List<String> paths = original.gatherAll("");
         for (String path : paths)
         {
-            path = path.replace('\\', '/');
             InputStream o = original.getInput(path);
             InputStream c = changed.getInput(path);
             try

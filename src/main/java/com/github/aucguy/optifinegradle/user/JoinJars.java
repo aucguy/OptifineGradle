@@ -1,4 +1,4 @@
-package com.github.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle.user;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -17,6 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -25,6 +26,9 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingClassAdapter;
 import org.objectweb.asm.commons.SimpleRemapper;
+
+import com.github.aucguy.optifinegradle.FieldRemover;
+import com.github.aucguy.optifinegradle.IOManager;
 
 import net.md_5.specialsource.JarMapping;
 import net.minecraftforge.gradle.util.caching.Cached;
@@ -49,6 +53,9 @@ public class JoinJars extends CachedTask
     @OutputFile
     @Cached
     public Object      outJar;
+    
+    @Input
+    private Set<String> exclusions = new HashSet<String>();
 
     @TaskAction
     public void doAction() throws IOException {
@@ -83,9 +90,9 @@ public class JoinJars extends CachedTask
         for (ZipFile input : inputs) {
             for (Enumeration<ZipEntry> iter = (Enumeration<ZipEntry>) input.entries(); iter.hasMoreElements();) {
                 ZipEntry entry = iter.nextElement();
-                if (!entry.isDirectory() && !copiedEntries.contains(entry.getName())) {
+                if (!entry.isDirectory() && !copiedEntries.contains(entry.getName()) && acceptsFile(entry.getName())) {
                     copiedEntries.add(entry.getName());
-
+                    
                     output.putNextEntry(new JarEntry(entry.getName()));
                     InputStream stream = new BufferedInputStream(input.getInputStream(entry));
                     byte[] bytes = IOManager.readAll(stream);
@@ -111,5 +118,19 @@ public class JoinJars extends CachedTask
         FieldRemover transformer2 = new FieldRemover(transformer1);
         reader.accept(transformer2, ClassReader.EXPAND_FRAMES);
         return writer.toByteArray();
+    }
+    
+    protected boolean acceptsFile(String file)
+    {
+        for(String i : exclusions)
+        {
+            if(file.startsWith(i)) return false;
+        }
+        return true;
+    }
+    
+    public void exclude(String excl)
+    {
+        exclusions.add(excl);
     }
 }

@@ -19,6 +19,8 @@
  */
 package net.minecraftforge.gradle.patcher;
 
+import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OBFUSCATED_CLASSES;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
 import groovy.lang.Closure;
@@ -107,6 +109,11 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
     {
         DeobfuscateJar deobfJar = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
+            if(isOptifine)
+            {
+                deobfJar.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
+                deobfJar.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+            }
             deobfJar.setInJar(delayedFile(Constants.JAR_MERGED));
             deobfJar.setOutJar(delayedFile(JAR_DEOBF));
             deobfJar.setSrg(delayedFile(SRG_NOTCH_TO_SRG));
@@ -114,6 +121,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             deobfJar.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfJar.setApplyMarkers(true);
             deobfJar.setDoesCache(false);
+            deobfJar.setFailOnAtError(!isOptifine);
             // access transformers are added afterEvaluate
             deobfJar.dependsOn(TASK_MERGE_JARS, TASK_GENERATE_SRGS);
         }
@@ -129,6 +137,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
         PostDecompileTask postDecompileJar = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
+            if(isOptifine)
+            {
+                postDecompileJar.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+            }
             postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
             postDecompileJar.setOutJar(delayedFile(JAR_DECOMP_POST));
             postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
@@ -141,7 +153,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         {
             createProjects.setWorkspaceDir(getExtension().getDelayedWorkspaceDir());
             createProjects.addRepo("minecraft", Constants.URL_LIBRARY);
-            createProjects.putProject("Clean", null, null, null, null);
+            if(!isOptifine)
+            {
+                createProjects.putProject("Clean", null, null, null, null);
+            }
             createProjects.setJavaLevel("1.6");
         }
 
@@ -415,9 +430,15 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
     {
         PatchSourcesTask patch = makeTask(projectString(TASK_PROJECT_PATCH, patcher), PatchSourcesTask.class);
         {
+            if(isOptifine)
+            {
+                patch.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+            }
             // inJar is set afterEvaluate depending on the patch order.
             patch.setOutJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
             patch.setPatches(patcher.getDelayedPatchDir());
+            patch.setOptifinePatches(patcher.getDelayedOptifinePatchDir());
+            patch.setHasOptifinePatches(patcher.getDelayedHasOptifinePatches());
             patch.setDoesCache(false);
             patch.setMaxFuzz(2);
             patch.setFailOnError(false);
@@ -752,7 +773,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             }
 
             // configure patching input and injects
-            if (lastPatcher != null)
+            if (lastPatcher != null && !isOptifine)
             {
                 PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(projectString(TASK_PROJECT_PATCH, patcher));
                 patch.dependsOn(projectString(TASK_PROJECT_PATCH, lastPatcher));
@@ -806,7 +827,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             if (patcher.doesGenPatches())
             {
                 TaskGenPatches genPatches = makeTask(projectString(TASK_PROJECT_GEN_PATCHES, patcher), TaskGenPatches.class);
-                genPatches.setPatchDir(patcher.getPatchDir());
+                genPatches.setPatchDir(patcher.getOutputPatchDir());
                 genPatches.setOriginalPrefix(patcher.getPatchPrefixOriginal());
                 genPatches.setChangedPrefix(patcher.getPatchPrefixChanged());
                 //genPatches.getOutputs().upToDateWhen(CALL_FALSE);
@@ -843,9 +864,18 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                     else
                     {
                         PatcherProject genFrom = getExtension().getProjects().getByName(patcher.getGenPatchesFrom());
-                        genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETROMAPPED, genFrom)));
-                        genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETRO_NONMC, genFrom)));
-                        genPatches.dependsOn(projectString(TASK_PROJECT_RETROMAP, genFrom), projectString(TASK_PROJECT_RETRO_NONMC, genFrom));
+                        if(genFrom.getsModified())
+                        {
+                            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETROMAPPED, genFrom)));
+                            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETRO_NONMC, genFrom)));
+                            genPatches.dependsOn(projectString(TASK_PROJECT_RETROMAP, genFrom), projectString(TASK_PROJECT_RETRO_NONMC, genFrom));
+                        }
+                        else
+                        {
+                            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_PATCHED, genFrom)));
+                            genPatches.dependsOn(projectString(TASK_PROJECT_PATCH, genFrom));
+                        }
+
                     }
                 }
 

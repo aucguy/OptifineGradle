@@ -49,7 +49,7 @@ import org.gradle.api.plugins.ExtraPropertiesExtension;
 import org.gradle.api.tasks.Delete;
 import org.gradle.testfixtures.ProjectBuilder;
 
-import com.github.aucguy.optifinegradle.JoinJars;
+import com.github.aucguy.optifinegradle.user.JoinJars;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -410,6 +410,8 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
                 join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
                 join.srg = delayedFile(SRG_NOTCH_TO_MCP);
+                join.exclude("javax/");
+                join.exclude("net/minecraftforge/");
                 join.dependsOn(dlClient);
             }
             mergeClientJar = JAR_CLIENT_JOINED;

@@ -24,12 +24,13 @@ public class OptifineConstants
     public static final String PATCH_ZIP              = "{CACHE_DIR}/com/github/aucguy/optifinegradle/{patchArchive}";
     public static final String PATCH_ARCHIVE          = "{patchArchive}";
     public static final String PATCH_URL              = "{patchUrl}";
-    public static final String DEFAULT_PATCH_URL      = "http://localhost:4000/downloads/optifinegradle/patches/{patchArchive}";
+    public static final String DEFAULT_PATCH_URL      = "https://aucguy.github.io/downloads/optifinegradle/patches/{patchArchive}";
     public static final String DEFAULT_PATCH_ARCHIVE  = "patches-1.8.0-D5-0.zip";
-    public static final String DEFAULT_OPTIFINE_JAR   = "{BUILD_DIR}/OptiFine_1.8.0_HD_U_D5.jar";
+    public static final String DEFAULT_OPTIFINE_JAR   = "{mainDir}/OptiFine_1.8.9_HD_U_H2.jar";
     public static final String REPLACE_PATCH_ARCHIVE  = "{patchArchive}";
     public static final String REPLACE_PATCH_URL      = "{patchUrl}";
     public static final String REPLACE_OPTIFINE_JAR   = "{optifineJar}";
+    public static final String REPLACE_MAIN_DIR       = "{mainDir}";
 
     // patch making
     public static final String TASK_EXTRACT_SOURCES   = "extractOptifineSrc";

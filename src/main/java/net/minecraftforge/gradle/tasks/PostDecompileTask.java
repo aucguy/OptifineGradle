@@ -52,7 +52,7 @@ import org.gradle.api.tasks.OutputFile;
 
 import com.github.abrarsyed.jastyle.ASFormatter;
 import com.github.abrarsyed.jastyle.OptParser;
-import com.github.aucguy.optifinegradle.Patching;
+import com.github.aucguy.optifinegradle.user.Patching;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;

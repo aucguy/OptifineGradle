@@ -1,4 +1,4 @@
-package com.github.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle.user;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.gradle.api.Task;
+
+import com.github.aucguy.optifinegradle.IOManager;
 
 public class Patching
 {
@@ -70,7 +72,7 @@ public class Patching
         if (ignoredPatches == null)
             return false;
         name = name.endsWith(".java.patch") ? name.substring(0, name.length() - 11) : name;
-        name = replace ? name.replace('/', '.') : name;
+        name = replace ? name.replace('/', '.').replace('\\', '.') : name;
         return ignoredPatches.contains(name);
     }
 }
