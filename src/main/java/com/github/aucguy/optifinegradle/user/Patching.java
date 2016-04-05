@@ -17,18 +17,17 @@ import com.github.aucguy.optifinegradle.IOManager;
 
 public class Patching
 {
-    public static void addObfClass(String name, OutputStream obfClasses)
-            throws UnsupportedEncodingException, IOException
+    public static void addObfClass(String name, OutputStream obfClasses) throws UnsupportedEncodingException, IOException
     {
-        if (name.endsWith(".class")) {
+        if (name.endsWith(".class"))
+        {
             name = name.substring(0, name.length() - 6);
         }
         obfClasses.write(name.getBytes("UTF-8"));
         obfClasses.write('\n');
     }
 
-    public static Set<String> deobfuscatedList(Task task, File obfClasses, File deobfClasses,
-            Map<String, String> mapping) throws IOException
+    public static Set<String> deobfuscatedList(Task task, File obfClasses, File deobfClasses, Map<String, String> mapping) throws IOException
     {
         if (obfClasses == null || deobfClasses == null)
             return null;
@@ -39,17 +38,21 @@ public class Patching
         Set<String> classes = new HashSet<String>();
 
         String name;
-        while ((name = obf.readLine()) != null) {
-            if (mapping.containsKey(name)) {
+        while ((name = obf.readLine()) != null)
+        {
+            if (mapping.containsKey(name))
+            {
                 name = mapping.get(name);
-                if (name.contains("$")) {
+                if (name.contains("$"))
+                {
                     name = name.split("\\$")[0];
                 }
                 classes.add(name.replace('/', '.'));
             }
         }
 
-        for (String i : classes) {
+        for (String i : classes)
+        {
             deobf.write(i.getBytes("UTF-8"));
             deobf.write('\n');
         }
@@ -61,7 +64,8 @@ public class Patching
     {
         IOManager manager = new IOManager(task);
         Set<String> IPS = null;
-        if (deobfClasses != null) {
+        if (deobfClasses != null)
+        {
             IPS = IOManager.readLines(manager.openFileForReading(deobfClasses));
         }
         return IPS;

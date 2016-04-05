@@ -36,9 +36,11 @@ public class IOManager
     public ZipFile openZipForReading(Object file) throws IOException
     {
         ZipFile f;
-        try {
+        try
+        {
             f = new ZipFile(this.getFile(file));
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new IOException("Couldn't open input zip: " + e.getMessage());
         }
         this.handles.add(f);
@@ -48,9 +50,11 @@ public class IOManager
     public ZipOutputStream openZipForWriting(Object file) throws IOException
     {
         ZipOutputStream f;
-        try {
+        try
+        {
             f = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(this.getFile(file))));
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new IOException("Couldn't open output zip: " + e.getMessage());
         }
         this.handles.add(f);
@@ -61,9 +65,11 @@ public class IOManager
     {
         ZipFile z = this.openZipForReading(zip);
         InputStream f;
-        try {
+        try
+        {
             f = z.getInputStream(z.getEntry((String) file));
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new IOException("Couldn't open input file in zip: " + e.getMessage());
         }
         this.handles.add(f);
@@ -74,9 +80,11 @@ public class IOManager
     public BufferedInputStream openFileForReading(Object file) throws IOException
     {
         BufferedInputStream f;
-        try {
+        try
+        {
             f = new BufferedInputStream(new FileInputStream(this.getFile(file)));
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new IOException("Couldn't open input file: " + e.getMessage());
         }
         this.handles.add(f);
@@ -86,9 +94,11 @@ public class IOManager
     public BufferedOutputStream openFileForWriting(Object file) throws IOException
     {
         BufferedOutputStream f;
-        try {
+        try
+        {
             f = new BufferedOutputStream(new FileOutputStream(this.getFile(file)));
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new IOException("Couldn't open input file: " + e.getMessage());
         }
         this.handles.add(f);
@@ -112,10 +122,13 @@ public class IOManager
 
     public void closeAll() throws IOException
     {
-        for (Closeable i : this.handles) {
-            try {
+        for (Closeable i : this.handles)
+        {
+            try
+            {
                 i.close();
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 throw new IOException("Couldn't close file: " + e.getMessage());
             }
         }
@@ -133,8 +146,10 @@ public class IOManager
         Set<String> ret = new HashSet<String>();
 
         String line;
-        if (reader.ready()) {
-            while ((line = reader.readLine()) != null) {
+        if (reader.ready())
+        {
+            while ((line = reader.readLine()) != null)
+            {
                 line = line.split("#")[0].trim();
                 ret.add(line);
             }

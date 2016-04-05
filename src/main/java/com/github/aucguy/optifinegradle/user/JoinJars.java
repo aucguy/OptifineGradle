@@ -38,66 +38,74 @@ import net.minecraftforge.gradle.util.delayed.DelayedFile;
 public class JoinJars extends CachedTask
 {
     @InputFile
-    public Object      client;
+    public Object       client;
 
     @InputFile
-    public Object      optifine;
+    public Object       optifine;
 
     @InputFile
-    public DelayedFile srg;
+    public DelayedFile  srg;
 
     @OutputFile
     @Cached
-    public Object      obfuscatedClasses;
+    public Object       obfuscatedClasses;
 
     @OutputFile
     @Cached
-    public Object      outJar;
-    
+    public Object       outJar;
+
     @Input
     private Set<String> exclusions = new HashSet<String>();
 
     @TaskAction
-    public void doAction() throws IOException {
+    public void doAction() throws IOException
+    {
         IOManager manager = new IOManager(this);
-        try {
+        try
+        {
             JarMapping m = new JarMapping(); // load renames
             BufferedReader reader = new BufferedReader(new FileReader(getProject().file(srg)));
             m.loadMappings(reader, null, null, true);
             Map<String, String> renames = new HashMap<String, String>();
-            for (Entry<String, String> entry : m.fields.entrySet()) {
+            for (Entry<String, String> entry : m.fields.entrySet())
+            {
                 String[] parts = entry.getKey().split("/(?=[^/]*$)");
                 renames.put(m.classes.get(parts[0]) + ".val$" + parts[1], entry.getValue());
             }
-            for (Entry<String, String> entry : m.classes.entrySet()) {
+            for (Entry<String, String> entry : m.classes.entrySet())
+            {
                 renames.put(entry.getValue() + ".this$0", "c");
             }
             Remapper mapping = new SimpleRemapper(renames);
 
-            copyJarsInto(manager.openFileForWriting(obfuscatedClasses), manager.openZipForWriting(outJar), mapping,
-                    manager.openZipForReading(optifine), manager.openZipForReading(client));
-        } finally {
+            copyJarsInto(manager.openFileForWriting(obfuscatedClasses), manager.openZipForWriting(outJar), mapping, manager.openZipForReading(optifine), manager.openZipForReading(client));
+        } finally
+        {
             manager.closeAll();
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void copyJarsInto(OutputStream obfClasses, ZipOutputStream output, Remapper mapping, ZipFile... inputs)
-            throws IOException {
+    private void copyJarsInto(OutputStream obfClasses, ZipOutputStream output, Remapper mapping, ZipFile... inputs) throws IOException
+    {
         Set<String> copiedEntries = new HashSet<String>();
         boolean optifine = true;
 
-        for (ZipFile input : inputs) {
-            for (Enumeration<ZipEntry> iter = (Enumeration<ZipEntry>) input.entries(); iter.hasMoreElements();) {
+        for (ZipFile input : inputs)
+        {
+            for (Enumeration<ZipEntry> iter = (Enumeration<ZipEntry>) input.entries(); iter.hasMoreElements();)
+            {
                 ZipEntry entry = iter.nextElement();
-                if (!entry.isDirectory() && !copiedEntries.contains(entry.getName()) && acceptsFile(entry.getName())) {
+                if (!entry.isDirectory() && !copiedEntries.contains(entry.getName()) && acceptsFile(entry.getName()))
+                {
                     copiedEntries.add(entry.getName());
-                    
+
                     output.putNextEntry(new JarEntry(entry.getName()));
                     InputStream stream = new BufferedInputStream(input.getInputStream(entry));
                     byte[] bytes = IOManager.readAll(stream);
 
-                    if (optifine && entry.getName().endsWith(".class")) {
+                    if (optifine && entry.getName().endsWith(".class"))
+                    {
                         Patching.addObfClass(entry.getName(), obfClasses);
                         bytes = processOptifine(bytes, mapping);
                     }
@@ -111,7 +119,8 @@ public class JoinJars extends CachedTask
         }
     }
 
-    public static byte[] processOptifine(byte[] data, Remapper mapping) {
+    public static byte[] processOptifine(byte[] data, Remapper mapping)
+    {
         ClassReader reader = new ClassReader(data);
         ClassWriter writer = new ClassWriter(reader, 0);
         RemappingClassAdapter transformer1 = new RemappingClassAdapter(writer, mapping);
@@ -119,16 +128,17 @@ public class JoinJars extends CachedTask
         reader.accept(transformer2, ClassReader.EXPAND_FRAMES);
         return writer.toByteArray();
     }
-    
+
     protected boolean acceptsFile(String file)
     {
-        for(String i : exclusions)
+        for (String i : exclusions)
         {
-            if(file.startsWith(i)) return false;
+            if (file.startsWith(i))
+                return false;
         }
         return true;
     }
-    
+
     public void exclude(String excl)
     {
         exclusions.add(excl);
