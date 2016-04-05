@@ -21,4 +21,11 @@ public class OptifineUserPlugin extends ForgePlugin
         super.applyUserPlugin();
         delegate.applyPlugin();
     }
+    
+    @Override
+    public void afterEvaluate()
+    {
+        super.afterEvaluate();
+        delegate.afterEvaluate();
+    }
 }

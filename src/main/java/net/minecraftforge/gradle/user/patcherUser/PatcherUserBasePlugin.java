@@ -56,12 +56,13 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
     protected void applyUserPlugin()
     {
         // add the MC setup tasks..
-        String global = getGlobalPattern();
-        String local = getLocalPattern();
+        String global = DIR_API_JAR_BASE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION;
+        String local = DIR_LOCAL_CACHE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION + "-PROJECT(" + project.getName() + ")";
 
         // grab ATs from resource dirs
-        SourceSet main = getSourceSet("main");
-        SourceSet api = getSourceSet("api");
+        JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
+        SourceSet main = javaConv.getSourceSets().getByName("main");
+        SourceSet api = javaConv.getSourceSets().getByName("api");
 
         getExtension().atSources(main, api);
 
@@ -127,13 +128,22 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         {
             final Object postDecompJar = chooseDeobfOutput(global, local, "", "decompFixed");
             final Object patchedJar = chooseDeobfOutput(global, local, "", "patched", true);
-            final Object remappedJar = chooseDeobfOutput(global, local, "", "remapped", true);
-            final Object optifinePatchedJar = chooseDeobfOutput(global, local, "Src", "sources", true);
-
+            
+            if(isOptifine)
+            {
+                Download dlPatches = makeTask(TASK_DL_PATCHES, Download.class);
+                {
+                    dlPatches.setOutput(delayedFile(PATCH_ZIP));
+                    dlPatches.setUrl(delayedString(PATCH_URL));
+                }
+            }
+            
             PatchSourcesTask patch = makeTask(TASK_PATCH, PatchSourcesTask.class);
             if(isOptifine)
             {
                 patch.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+                patch.setOptifinePatches(delayedFile(PATCH_ZIP));
+                patch.dependsOn(TASK_DL_PATCHES);
             }
             patch.setPatches(delayedFile(ZIP_UD_PATCHES));
             patch.addInject(delayedFile(ZIP_UD_SRC));
@@ -146,32 +156,8 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             patch.dependsOn(TASK_POST_DECOMP);
 
             RemapSources remap = (RemapSources) project.getTasks().getByName(TASK_REMAP);
-            if(isOptifine)
-            {
-                remap.setOutJar(remappedJar);
-            }
             remap.setInJar(patchedJar);
             remap.dependsOn(patch);
-
-            if(isOptifine)
-            {
-                Download dlPatches = makeTask(TASK_DL_PATCHES, Download.class);
-                {
-                    dlPatches.setOutput(delayedFile(PATCH_ZIP));
-                    dlPatches.setUrl(delayedString(PATCH_URL));
-                }
-
-                PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
-                {
-                    optifinePatch.setPatches(delayedFile(PATCH_ZIP));
-                    optifinePatch.setFailOnError(false);
-                    optifinePatch.setMakeRejects(false);
-                    optifinePatch.setPatchStrip(1);
-                    optifinePatch.setInJar(remappedJar);
-                    optifinePatch.setOutJar(optifinePatchedJar);
-                    optifinePatch.dependsOn(TASK_REMAP, dlPatches);
-                }
-            }
         }
 
         // setup reobf
@@ -241,22 +227,6 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
     protected Object getStartDir()
     {
         return delayedFile(DIR_API_BASE + "/start");
-    }
-
-    public String getGlobalPattern()
-    {
-        return DIR_API_JAR_BASE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION;
-    }
-
-    public String getLocalPattern()
-    {
-        return DIR_LOCAL_CACHE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION + "-PROJECT(" + project.getName() + ")";
-    }
-
-    public SourceSet getSourceSet(String name)
-    {
-        JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
-        return javaConv.getSourceSets().getByName(name);
     }
 
     public abstract String getApiGroup(T ext);

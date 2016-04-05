@@ -381,7 +381,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             recompile.setClasspath(CONFIG_MC_DEPS);
             recompile.setOutJar(recompiledJar);
 
-            recompile.dependsOn(isOptifine ? TASK_OPTIFINE_PATCH : remap, TASK_DL_VERSION_JSON);
+            recompile.dependsOn(remap, TASK_DL_VERSION_JSON);
         }
 
         // create GradleStart

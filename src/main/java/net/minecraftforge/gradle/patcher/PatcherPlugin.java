@@ -55,6 +55,8 @@ import com.google.common.io.Resources;
 
 public class PatcherPlugin extends BasePlugin<PatcherExtension>
 {
+    protected List<PatcherProject> patchersList;
+    
     @Override
     public void applyPlugin()
     {
@@ -438,7 +440,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             patch.setOutJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
             patch.setPatches(patcher.getDelayedPatchDir());
             patch.setOptifinePatches(patcher.getDelayedOptifinePatchDir());
-            patch.setHasOptifinePatches(patcher.getDelayedHasOptifinePatches());
             patch.setDoesCache(false);
             patch.setMaxFuzz(2);
             patch.setFailOnError(false);
@@ -721,7 +722,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             }
         }
 
-        List<PatcherProject> patchersList = sortByPatching(getExtension().getProjects());
+        patchersList = sortByPatching(getExtension().getProjects());
 
         // tasks to be configured
         Task setupTask = project.getTasks().getByName(TASK_SETUP);
@@ -996,7 +997,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         return getExtension().getDelayedSubWorkspaceDir(path);
     }
 
-    private String projectString(String str, PatcherProject project)
+    protected String projectString(String str, PatcherProject project)
     {
         return str.replace("{CAPNAME}", project.getCapName()).replace("{NAME}", project.getName());
     }

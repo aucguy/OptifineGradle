@@ -714,15 +714,4 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
-    @SuppressWarnings("serial")
-    public Closure<Boolean> getDelayedHasOptifinePatches()
-    {
-        return new Closure<Boolean>(project, this) {
-            public Boolean call()
-            {
-                return optifinePatchDir != null;
-            }
-        };
-    }
 }

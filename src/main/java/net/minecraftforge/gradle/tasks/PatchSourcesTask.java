@@ -85,9 +85,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
     @Optional
     private Object                 optifinePatches;
     
-    @Input
-    private Closure<Boolean>       hasOptifinePatches;
-    
     @InputFiles
     private List<Object>           injects       = Lists.newArrayList();
 
@@ -521,21 +518,24 @@ public class PatchSourcesTask extends AbstractEditJarTask
     
     public File getOptifinePatches()
     {
-        return getHasOptifinePatches() ? getProject().file(optifinePatches) : null;
+        Object patches;
+        if (optifinePatches == null)
+        {
+            patches = null;
+        }
+        else if (optifinePatches instanceof Closure)
+        {
+            patches = ((Closure<?>) optifinePatches).call();
+        }
+        else
+        {
+            patches = optifinePatches;
+        }
+        return patches != null ? getProject().file(patches) : null;
     }
 
     public void setOptifinePatches(Object optifinePatches)
     {
         this.optifinePatches = optifinePatches;
-    }
-    
-    public boolean getHasOptifinePatches()
-    {
-        return hasOptifinePatches.call();
-    }
-    
-    public void setHasOptifinePatches(Closure<Boolean> hasOptifinePatches)
-    {
-        this.hasOptifinePatches = hasOptifinePatches;
     }
 }
