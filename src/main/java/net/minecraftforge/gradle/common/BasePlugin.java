@@ -30,11 +30,13 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import net.minecraftforge.gradle.util.json.version.ManifestVersion;
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
@@ -96,7 +98,11 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
     public BasePlugin<?> otherPlugin;
     public ReplacementProvider replacer = new ReplacementProvider();
 
+
     public Set<String> optifineFiles = new HashSet<String>();
+
+    private Map<String, ManifestVersion> mcManifest;
+    private Version                      mcVersionJson;
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
@@ -172,13 +178,17 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         });
 
         // do Mcp Snapshots Stuff
-        setVersionInfoJson();
+        getRemoteJsons();
         project.getConfigurations().maybeCreate(CONFIG_MCP_DATA);
         project.getConfigurations().maybeCreate(CONFIG_MAPPINGS);
 
         // set other useful configs
         project.getConfigurations().maybeCreate(CONFIG_MC_DEPS);
+        project.getConfigurations().maybeCreate(CONFIG_MC_DEPS_CLIENT);
         project.getConfigurations().maybeCreate(CONFIG_NATIVES);
+
+        // should be assumed until specified otherwise
+        project.getConfigurations().getByName(CONFIG_MC_DEPS).extendsFrom(project.getConfigurations().getByName(CONFIG_MC_DEPS_CLIENT));
 
         // after eval
         project.afterEvaluate(new Action<Project>() {
@@ -204,34 +214,17 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
     private static boolean displayBanner = true;
 
-    private void setVersionInfoJson()
+    private void getRemoteJsons()
     {
+        // MCP json
         File jsonCache = cacheFile("McpMappings.json");
         File etagFile = new File(jsonCache.getAbsolutePath() + ".etag");
+        getExtension().mcpJson = JsonFactory.GSON.fromJson(getWithEtag(URL_MCP_JSON, jsonCache, etagFile), new TypeToken<Map<String, Map<String, int[]>>>() {}.getType());
 
-        Map<String, Map<String, int[]>> json = JsonFactory.GSON.fromJson(getWithEtag(URL_MCP_JSON, jsonCache, etagFile), new TypeToken<Map<String, Map<String, int[]>>>() {}.getType());
-        Map<String, TIntObjectHashMap<String>> mcpJson = Maps.newHashMap();
-
-        for (Entry<String, Map<String, int[]>> entry1 : json.entrySet()) // <mcVersion, -->
-        {
-            for (Entry<String, int[]> entry2 : entry1.getValue().entrySet()) // <channel, versions>
-            {
-                TIntObjectHashMap<String> intMap = mcpJson.get(entry2.getKey());
-                if (intMap == null)
-                {
-                    intMap = new TIntObjectHashMap<String>();
-                }
-                
-                for (int mappingVersion : entry2.getValue())
-                {
-                    intMap.put(mappingVersion, entry1.getKey());
-                }
-                
-                mcpJson.put(entry2.getKey(), intMap);
-            }
-        }
-        
-        getExtension().mcpJson = mcpJson;
+        // MC manifest json
+        jsonCache = cacheFile("McManifest.json");
+        etagFile = new File(jsonCache.getAbsolutePath() + ".etag");
+        mcManifest = JsonFactory.GSON.fromJson(getWithEtag(URL_MC_MANIFEST, jsonCache, etagFile), new TypeToken<Map<String, ManifestVersion>>() {}.getType());
     }
 
     protected void afterEvaluate()
@@ -368,75 +361,15 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
     @SuppressWarnings("serial")
     private void makeCommonTasks()
     {
-        Download dlClient = makeTask(TASK_DL_CLIENT, Download.class);
-        {
-            dlClient.setOutput(delayedFile(JAR_CLIENT_FRESH));
-            dlClient.setUrl(delayedString(URL_MC_CLIENT));
-        }
-
-        Download dlServer = makeTask(TASK_DL_SERVER, Download.class);
-        {
-            dlServer.setOutput(delayedFile(JAR_SERVER_FRESH));
-            dlServer.setUrl(delayedString(URL_MC_SERVER));
-        }
-
-        SplitJarTask splitServer = makeTask(TASK_SPLIT_SERVER, SplitJarTask.class);
-        {
-            splitServer.setInJar(delayedFile(JAR_SERVER_FRESH));
-            splitServer.setOutFirst(delayedFile(JAR_SERVER_PURE));
-            splitServer.setOutSecond(delayedFile(JAR_SERVER_DEPS));
-
-            splitServer.exclude("org/bouncycastle", "org/bouncycastle/*", "org/bouncycastle/**");
-            splitServer.exclude("org/apache", "org/apache/*", "org/apache/**");
-            splitServer.exclude("com/google", "com/google/*", "com/google/**");
-            splitServer.exclude("com/mojang/authlib", "com/mojang/authlib/*", "com/mojang/authlib/**");
-            splitServer.exclude("com/mojang/util", "com/mojang/util/*", "com/mojang/util/**");
-            splitServer.exclude("gnu/trove", "gnu/trove/*", "gnu/trove/**");
-            splitServer.exclude("io/netty", "io/netty/*", "io/netty/**");
-            splitServer.exclude("javax/annotation", "javax/annotation/*", "javax/annotation/**");
-            splitServer.exclude("argo", "argo/*", "argo/**");
-
-            splitServer.dependsOn(dlServer);
-        }
-
-        String mergeClientJar;
-        Task mergeDependency;
-        if(isOptifine)
-        {
-            JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
-            {
-                join.client = delayedFile(JAR_CLIENT_FRESH);
-                join.optifine = delayedFile(JAR_OPTIFINE_FRESH);
-                join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
-                join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
-                join.srg = delayedFile(SRG_NOTCH_TO_MCP);
-                join.exclude("javax/");
-                join.exclude("net/minecraftforge/");
-                join.dependsOn(dlClient);
-            }
-            mergeClientJar = JAR_CLIENT_JOINED;
-            mergeDependency = join;
-        }
-        else
-        {
-            mergeClientJar = JAR_CLIENT_FRESH;
-            mergeDependency = dlClient;
-        }
-
-        MergeJars merge = makeTask(TASK_MERGE_JARS, MergeJars.class);
-        {
-            merge.setClient(delayedFile(mergeClientJar));
-            merge.setServer(delayedFile(JAR_SERVER_PURE));
-            merge.setOutJar(delayedFile(JAR_MERGED, true));
-            merge.dependsOn(mergeDependency, splitServer);
-
-            merge.setGroup(null);
-            merge.setDescription(null);
-        }
-
         EtagDownloadTask getVersionJson = makeTask(TASK_DL_VERSION_JSON, EtagDownloadTask.class);
         {
-            getVersionJson.setUrl(delayedString(URL_MC_JSON));
+            getVersionJson.setUrl(new Closure<String>(null, null) {
+                @Override
+                public String call()
+                {
+                    return mcManifest.get(getExtension().getVersion()).url;
+                }
+            });
             getVersionJson.setFile(delayedFile(JSON_VERSION));
             getVersionJson.setDieWithError(false);
             getVersionJson.doLast(new Closure<Boolean>(project) // normalizes to linux endings
@@ -485,7 +418,13 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
         EtagDownloadTask getAssetsIndex = makeTask(TASK_DL_ASSET_INDEX, EtagDownloadTask.class);
         {
-            getAssetsIndex.setUrl(delayedString(ASSETS_INDEX_URL));
+            getAssetsIndex.setUrl(new Closure<String>(null, null) {
+                @Override
+                public String call()
+                {
+                    return mcVersionJson.assetIndex.url;
+                }
+            });
             getAssetsIndex.setFile(delayedFile(JSON_ASSET_INDEX));
             getAssetsIndex.setDieWithError(false);
             getAssetsIndex.dependsOn(getVersionJson);
@@ -496,6 +435,88 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             getAssets.setAssetsDir(delayedFile(DIR_ASSETS));
             getAssets.setAssetsIndex(delayedFile(JSON_ASSET_INDEX));
             getAssets.dependsOn(getAssetsIndex);
+        }
+
+        Download dlClient = makeTask(TASK_DL_CLIENT, Download.class);
+        {
+            dlClient.setOutput(delayedFile(JAR_CLIENT_FRESH));
+            dlClient.setUrl(new Closure<String>(null, null) {
+                @Override
+                public String call()
+                {
+                    return mcVersionJson.getClientUrl();
+                }
+            });
+
+            dlClient.dependsOn(getVersionJson);
+        }
+
+        Download dlServer = makeTask(TASK_DL_SERVER, Download.class);
+        {
+            dlServer.setOutput(delayedFile(JAR_SERVER_FRESH));
+            dlServer.setUrl(new Closure<String>(null, null) {
+                @Override
+                public String call()
+                {
+                    return mcVersionJson.getServerUrl();
+                }
+            });
+
+            dlServer.dependsOn(getVersionJson);
+        }
+
+        SplitJarTask splitServer = makeTask(TASK_SPLIT_SERVER, SplitJarTask.class);
+        {
+            splitServer.setInJar(delayedFile(JAR_SERVER_FRESH));
+            splitServer.setOutFirst(delayedFile(JAR_SERVER_PURE));
+            splitServer.setOutSecond(delayedFile(JAR_SERVER_DEPS));
+
+            splitServer.exclude("org/bouncycastle", "org/bouncycastle/*", "org/bouncycastle/**");
+            splitServer.exclude("org/apache", "org/apache/*", "org/apache/**");
+            splitServer.exclude("com/google", "com/google/*", "com/google/**");
+            splitServer.exclude("com/mojang/authlib", "com/mojang/authlib/*", "com/mojang/authlib/**");
+            splitServer.exclude("com/mojang/util", "com/mojang/util/*", "com/mojang/util/**");
+            splitServer.exclude("gnu/trove", "gnu/trove/*", "gnu/trove/**");
+            splitServer.exclude("io/netty", "io/netty/*", "io/netty/**");
+            splitServer.exclude("javax/annotation", "javax/annotation/*", "javax/annotation/**");
+            splitServer.exclude("argo", "argo/*", "argo/**");
+
+            splitServer.dependsOn(dlServer);
+        }
+        
+        String mergeClientJar;
+        Task mergeDependency;
+        if(isOptifine)
+        {
+            JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
+            {
+                join.client = delayedFile(JAR_CLIENT_FRESH);
+                join.optifine = delayedFile(JAR_OPTIFINE_FRESH);
+                join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
+                join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
+                join.srg = delayedFile(SRG_NOTCH_TO_MCP);
+                join.exclude("javax/");
+                join.exclude("net/minecraftforge/");
+                join.dependsOn(dlClient);
+            }
+            mergeClientJar = JAR_CLIENT_JOINED;
+            mergeDependency = join;
+        }
+        else
+        {
+            mergeClientJar = JAR_CLIENT_FRESH;
+            mergeDependency = dlClient;
+        }
+
+        MergeJars merge = makeTask(TASK_MERGE_JARS, MergeJars.class);
+        {
+            merge.setClient(delayedFile(JAR_CLIENT_FRESH));
+            merge.setServer(delayedFile(JAR_SERVER_PURE));
+            merge.setOutJar(delayedFile(JAR_MERGED));
+            merge.dependsOn(mergeDependency, splitServer);
+
+            merge.setGroup(null);
+            merge.setDescription(null);
         }
 
         ExtractConfigTask extractMcpData = makeTask(TASK_EXTRACT_MCP, ExtractConfigTask.class);
@@ -745,7 +766,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         {
             try
             {
-                version = JsonFactory.loadVersion(file, inheritanceDirs);
+                version = JsonFactory.loadVersion(file, delayedString(REPLACE_MC_VERSION).call(), inheritanceDirs);
             }
             catch (Exception e)
             {
@@ -763,7 +784,19 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             for (net.minecraftforge.gradle.util.json.version.Library lib : version.getLibraries())
             {
                 if (lib.natives == null)
-                    handler.add(CONFIG_MC_DEPS, lib.getArtifactName());
+                {
+                    String configName = CONFIG_MC_DEPS;
+                    if (lib.name.contains("java3d")
+                            || lib.name.contains("paulscode")
+                            || lib.name.contains("lwjgl")
+                            || lib.name.contains("twitch")
+                            || lib.name.contains("jinput"))
+                    {
+                        configName = CONFIG_MC_DEPS_CLIENT;
+                    }
+
+                    handler.add(configName, lib.getArtifactName());
+                }
             }
         }
         else
@@ -782,7 +815,9 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             project.getLogger().debug("RESOLVED: " + CONFIG_NATIVES);
 
         // set asset index
-        replacer.putReplacement(REPLACE_ASSET_INDEX, version.getAssets());
+        replacer.putReplacement(REPLACE_ASSET_INDEX, version.assetIndex.id);
+
+        this.mcVersionJson = version;
 
         return version;
     }

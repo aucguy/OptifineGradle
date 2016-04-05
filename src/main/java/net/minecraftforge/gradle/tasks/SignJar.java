@@ -20,6 +20,8 @@
 package net.minecraftforge.gradle.tasks;
 
 import static net.minecraftforge.gradle.common.Constants.resolveString;
+
+import com.google.common.base.Strings;
 import groovy.lang.Closure;
 import groovy.util.MapEntry;
 
@@ -35,8 +37,6 @@ import java.util.Set;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import net.minecraftforge.gradle.util.ZipFileTree;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileTreeElement;
@@ -81,15 +81,18 @@ public class SignJar extends DefaultTask implements PatternFilterable
         processInputJar(input, toSign, ignoredStuff);
 
         // SIGN!
-        getProject().getAnt().invokeMethod("signjar", ImmutableMap.builder()
-                .put("alias", getAlias())
-                .put("storepass", getStorePass())
-                .put("keypass", getKeyPass())
-                .put("keystore", getKeyStore())
-                .put("jar", toSign.getAbsolutePath())
-                .put("signedjar", signed.getAbsolutePath())
-                .build()
-                );
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("alias", getAlias());
+        map.put("storePass", getStorePass());
+        map.put("jar", toSign.getAbsolutePath());
+        map.put("signedJar", signed.getAbsolutePath());
+
+        if (!Strings.isNullOrEmpty(getKeyPass()))
+            map.put("keypass", getKeyPass());
+        if (!Strings.isNullOrEmpty(getKeyStore()))
+            map.put("keyStore", getKeyStore());
+
+        getProject().getAnt().invokeMethod("signjar", map);
 
         // write out
         writeOutputJar(signed, output, ignoredStuff);
@@ -102,12 +105,21 @@ public class SignJar extends DefaultTask implements PatternFilterable
         toSign.getParentFile().mkdirs();
         final JarOutputStream outs = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(toSign)));
 
-        (new ZipFileTree(inputJar)).visit(new FileVisitor() {
+        getProject().zipTree(inputJar).visit(new FileVisitor() {
 
             @Override
             public void visitDir(FileVisitDetails details)
             {
-                // nothing
+                try
+                {
+                    String path = details.getPath();
+                    ZipEntry entry = new ZipEntry(path.endsWith("/") ? path : path + "/");
+                    outs.putNextEntry(entry);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             }
 
             @Override

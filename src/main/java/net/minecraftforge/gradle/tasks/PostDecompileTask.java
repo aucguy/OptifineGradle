@@ -106,6 +106,7 @@ public class PostDecompileTask extends AbstractEditJarTask
             patchesMap.put(name.substring(0, patchIndex), f);
         }
 
+        formatter.setUseProperInnerClassIndenting(false);
         OptParser parser = new OptParser(formatter);
         parser.parseOptionFile(getAstyleConfig());
 

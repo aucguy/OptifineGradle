@@ -30,7 +30,6 @@ import java.util.Set;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
-import net.minecraftforge.gradle.util.ZipFileTree;
 import net.minecraftforge.gradle.util.patching.ContextualPatch;
 import net.minecraftforge.gradle.util.patching.ContextualPatch.PatchStatus;
 
@@ -137,7 +136,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
             // no rejects from a jar
             makeRejects = false;
 
-            (new ZipFileTree(patchThingy)).visit(new FileVisitor() {
+            getProject().zipTree(patchThingy).visit(new FileVisitor() {
 
                 @Override
                 public void visitDir(FileVisitDetails arg0)
@@ -220,7 +219,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
             }
             else if (inject.getName().endsWith(".jar") || inject.getName().endsWith(".zip"))
             {
-                (new ZipFileTree(inject)).visit(visitor);
+                getProject().zipTree(inject).visit(visitor);
             }
             else if (inject.getName().endsWith(".java"))
             {
