@@ -22,6 +22,7 @@ package net.minecraftforge.gradle.user.patcherUser;
 import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.common.Constants.DIR_JSONS;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
+import static net.minecraftforge.gradle.common.Constants.MCP_INJECT;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 import static net.minecraftforge.gradle.common.Constants.TASK_DL_VERSION_JSON;
 import static net.minecraftforge.gradle.common.Constants.TASK_GENERATE_SRGS;
@@ -66,7 +67,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
 
         getExtension().atSources(main, api);
 
-        this.makeDecompTasks(global, local, delayedFile(JAR_MERGED), TASK_MERGE_JARS, delayedFile(MCP_PATCHES_MERGED));
+        this.makeDecompTasks(global, local, delayedFile(JAR_MERGED), TASK_MERGE_JARS, delayedFile(MCP_PATCHES_MERGED), delayedFile(MCP_INJECT));
 
         // setup userdev
         {

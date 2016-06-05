@@ -61,20 +61,21 @@ public class PatcherProject implements Serializable
     private String tweakClassServer = "";
     private String runArgsClient = "";
     private String runArgsServer = "";
-    
+
     private String patchPrefixOriginal = "";
     private String patchPrefixChanged = "";
-    
+
     private boolean genMcpPatches = false;
     private boolean applyMcpPatches = false;
     private boolean modified = true;
+    private boolean s2sKeepImports = true;
 
     protected PatcherProject(String name, PatcherPlugin plugin)
     {
         this.name = name;
         this.project = plugin.project;
         rootDir = project.getProjectDir();
-        
+
         // make capName
         char char1 = name.charAt(0);
         capName = Character.toUpperCase(char1) + name.substring(1);
@@ -84,7 +85,7 @@ public class PatcherProject implements Serializable
     {
         return name;
     }
-    
+
     public String getCapName()
     {
         return capName;
@@ -181,7 +182,7 @@ public class PatcherProject implements Serializable
     {
         setGenPatchesFrom(generateFrom);
     }
-    
+
     protected boolean doesGenPatches()
     {
         return genPatchesFrom != null;
@@ -211,7 +212,7 @@ public class PatcherProject implements Serializable
     {
         this.rootDir = project.file(rootDir);
     }
-    
+
     /**
      * The root directory of the project. This may or may not be actually used depending on the other directories.
      * @param rootDir root directory of the project
@@ -290,7 +291,7 @@ public class PatcherProject implements Serializable
     {
         this.sourcesDir = project.file(sourcesDir);
     }
-    
+
     /**
      * The directory where the non-patch sources for this project are.
      * By default this is rootDir/src/main/java
@@ -315,7 +316,7 @@ public class PatcherProject implements Serializable
     {
         this.resourcesDir = project.file(resourcesDir);
     }
-    
+
     /**
      * The directory where the non-patch resources for this project are.
      * By default this is rootDir/src/main/resources
@@ -325,7 +326,7 @@ public class PatcherProject implements Serializable
     {
         setResourcesDir(resourcesDir);
     }
-    
+
     public File getTestSourcesDir()
     {
         return getFile(testSourcesDir,DEFAULT_TEST_SRC_DIR);
@@ -340,7 +341,7 @@ public class PatcherProject implements Serializable
     {
         this.testSourcesDir = project.file(testSourcesDir);
     }
-    
+
     /**
      * The directory where the test sourcess for this project are.
      * By default this is rootDir/src/test/sources
@@ -365,7 +366,7 @@ public class PatcherProject implements Serializable
     {
         this.testResourcesDir = project.file(testResourcesDir);
     }
-    
+
     /**
      * The directory where the non-patch resources for this project are.
      * By default this is rootDir/src/test/resources
@@ -389,7 +390,7 @@ public class PatcherProject implements Serializable
     {
         this.mainClassClient = Constants.resolveString(mainClass);
     }
-    
+
     public void mainClassClient(Object mainClass)
     {
         setMainClassClient(mainClass);
@@ -408,12 +409,12 @@ public class PatcherProject implements Serializable
     {
         this.tweakClassClient = Constants.resolveString(tweakClass);
     }
-    
+
     public void tweakClassClient(Object mainClass)
     {
         setTweakClassClient(mainClass);
     }
-    
+
     public String getRunArgsClient()
     {
         return runArgsClient;
@@ -427,12 +428,12 @@ public class PatcherProject implements Serializable
     {
         this.runArgsClient = Constants.resolveString(runArgs);
     }
-    
+
     public void runArgsClient(Object mainClass)
     {
         setRunArgsClient(mainClass);
     }
-    
+
     public String getMainClassServer()
     {
         return mainClassServer;
@@ -446,7 +447,7 @@ public class PatcherProject implements Serializable
     {
         this.mainClassServer = Constants.resolveString(mainClass);
     }
-    
+
     public void mainClassServer(Object mainClass)
     {
         setMainClassServer(mainClass);
@@ -465,12 +466,12 @@ public class PatcherProject implements Serializable
     {
         this.tweakClassServer = Constants.resolveString(tweakClass);
     }
-    
+
     public void tweakClassServer(Object mainClass)
     {
         setTweakClassServer(mainClass);
     }
-    
+
     public String getRunArgsServer()
     {
         return runArgsServer;
@@ -484,12 +485,12 @@ public class PatcherProject implements Serializable
     {
         this.runArgsServer = Constants.resolveString(runArgs);
     }
-    
+
     public void runArgsServer(Object mainClass)
     {
         setRunArgsServer(mainClass);
     }
-    
+
     public String getPatchPrefixOriginal()
     {
         return patchPrefixOriginal;
@@ -503,12 +504,12 @@ public class PatcherProject implements Serializable
     {
         this.patchPrefixOriginal = Constants.resolveString(patchPrefixOriginal);
     }
-    
+
     public void patchPrefixOriginal(Object patchPrefixOriginal)
     {
         setPatchPrefixOriginal(patchPrefixOriginal);
     }
-    
+
     public String getPatchPrefixChanged()
     {
         return patchPrefixChanged;
@@ -522,16 +523,16 @@ public class PatcherProject implements Serializable
     {
         this.patchPrefixChanged = Constants.resolveString(patchPrefixChanged);
     }
-    
+
     public void patchPrefixChanged(Object patchPrefixChanged)
     {
         setPatchPrefixChanged(patchPrefixChanged);
     }
-    
+
     // ------------------------
     // HELPERS
     // ------------------------
-    
+
     /**
      * Validates the object to ensure its been configured correctly and isnt missing something.
      */
@@ -540,7 +541,7 @@ public class PatcherProject implements Serializable
         if (rootDir == null && patchDir == null)
             throw new GradleConfigurationException("PatchDir not specified for project '"+ name +"'");
     }
-    
+
     private File getFile(File field, String defaultPath)
     {
         if (field == null && rootDir != null)
@@ -578,11 +579,21 @@ public class PatcherProject implements Serializable
     {
         this.modified = modified;
     }
-    
+
+    public boolean isS2sKeepImports()
+    {
+        return s2sKeepImports;
+    }
+
+    public void setS2sKeepImports(boolean value)
+    {
+        this.s2sKeepImports = value;
+    }
+
     // ------------------------
     // DELAYED GETTERS
     // ------------------------
-    
+
     @SuppressWarnings("serial")
     protected Closure<String> getDelayedMainClassClient()
     {
@@ -593,7 +604,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<String> getDelayedTweakClassClient()
     {
@@ -604,7 +615,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<String> getDelayedRunArgsClient()
     {
@@ -615,7 +626,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<String> getDelayedMainClassServer()
     {
@@ -626,7 +637,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<String> getDelayedTweakClassServer()
     {
@@ -637,7 +648,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<String> getDelayedRunArgsServer()
     {
@@ -648,7 +659,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<File> getDelayedSourcesDir()
     {
@@ -659,7 +670,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<File> getDelayedResourcesDir()
     {
@@ -670,7 +681,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<File> getDelayedTestSourcesDir()
     {
@@ -681,7 +692,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<File> getDelayedTestResourcesDir()
     {
@@ -692,7 +703,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<File> getDelayedPatchDir()
     {

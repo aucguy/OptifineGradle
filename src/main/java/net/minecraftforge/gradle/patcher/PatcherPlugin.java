@@ -146,6 +146,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
             postDecompileJar.setOutJar(delayedFile(JAR_DECOMP_POST));
             postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
+            postDecompileJar.setInjects(delayedFile(MCP_INJECT));
             postDecompileJar.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
             postDecompileJar.setDoesCache(false);
             postDecompileJar.dependsOn(decompileJar);
@@ -798,6 +799,9 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             // get EXCs and SRGs for retromapping
             ApplyS2STask retromap = (ApplyS2STask) project.getTasks().getByName(projectString(TASK_PROJECT_RETROMAP, patcher));
             ApplyS2STask retromapNonMc = (ApplyS2STask) project.getTasks().getByName(projectString(TASK_PROJECT_RETRO_NONMC, patcher));
+
+            retromap.setS2sKeepImports(patcher.isS2sKeepImports());
+            retromapNonMc.setS2sKeepImports(patcher.isS2sKeepImports());
 
             // add from previous projects
             for (File f : addedExcs)

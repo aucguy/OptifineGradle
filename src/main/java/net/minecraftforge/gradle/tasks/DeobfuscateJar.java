@@ -467,7 +467,7 @@ public class DeobfuscateJar extends CachedTask
     {
         ats.add(obj);
     }
-    
+
     /**
      * adds access transformers to the deobfuscation of this
      * @param objs access transformers
@@ -479,7 +479,7 @@ public class DeobfuscateJar extends CachedTask
             ats.add(object);
         }
     }
-    
+
     /**
      * adds access transformers to the deobfuscation of this
      * @param objs access transformers
@@ -491,7 +491,7 @@ public class DeobfuscateJar extends CachedTask
             ats.add(object);
         }
     }
-    
+
     public FileCollection getAts()
     {
         return getProject().files(ats.toArray());
@@ -540,7 +540,7 @@ public class DeobfuscateJar extends CachedTask
     public static final class ErroringRemappingAccessMap extends AccessMap
     {
         private final Map<String, String> renames     = Maps.newHashMap();
-        public final Map<String, String>  brokenLines = Maps.newHashMap();
+        public final Map<String, String>  brokenLines = Maps.newTreeMap();
 
         public ErroringRemappingAccessMap(File[] renameCsvs) throws IOException
         {
