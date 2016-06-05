@@ -1,0 +1,60 @@
+--- ../src-base/minecraft/net/minecraft/src/GuiOtherSettingsOF.java
++++ ../src-work/minecraft/net/minecraft/src/GuiOtherSettingsOF.java
+@@ -50,23 +50,23 @@
+         this.field_146292_n.add(new GuiButton(200, this.field_146294_l / 2 - 100, this.field_146295_m / 6 + 168 + 11, I18n.func_135052_a("gui.done", new Object[0])));
+     }
+ 
+-    protected void func_146284_a(GuiButton p_146284_1_)
++    protected void func_146284_a(GuiButton button)
+     {
+-        if (p_146284_1_.field_146124_l)
++        if (button.field_146124_l)
+         {
+-            if (p_146284_1_.field_146127_k < 200 && p_146284_1_ instanceof GuiOptionButton)
++            if (button.field_146127_k < 200 && button instanceof GuiOptionButton)
+             {
+-                this.settings.func_74306_a(((GuiOptionButton)p_146284_1_).func_146136_c(), 1);
+-                p_146284_1_.field_146126_j = this.settings.func_74297_c(GameSettings.Options.func_74379_a(p_146284_1_.field_146127_k));
++                this.settings.func_74306_a(((GuiOptionButton)button).func_146136_c(), 1);
++                button.field_146126_j = this.settings.func_74297_c(GameSettings.Options.func_74379_a(button.field_146127_k));
+             }
+ 
+-            if (p_146284_1_.field_146127_k == 200)
++            if (button.field_146127_k == 200)
+             {
+                 this.field_146297_k.field_71474_y.func_74303_b();
+                 this.field_146297_k.func_147108_a(this.prevScreen);
+             }
+ 
+-            if (p_146284_1_.field_146127_k == 210)
++            if (button.field_146127_k == 210)
+             {
+                 this.field_146297_k.field_71474_y.func_74303_b();
+                 GuiYesNo guiyesno = new GuiYesNo(this, I18n.func_135052_a("of.message.other.reset", new Object[0]), "", 9999);
+@@ -75,9 +75,9 @@
+         }
+     }
+ 
+-    public void func_73878_a(boolean p_73878_1_, int p_73878_2_)
++    public void func_73878_a(boolean result, int id)
+     {
+-        if (p_73878_1_)
++        if (result)
+         {
+             this.field_146297_k.field_71474_y.resetSettings();
+         }
+@@ -85,11 +85,11 @@
+         this.field_146297_k.func_147108_a(this);
+     }
+ 
+-    public void func_73863_a(int p_73863_1_, int p_73863_2_, float p_73863_3_)
++    public void func_73863_a(int mouseX, int mouseY, float partialTicks)
+     {
+         this.func_146276_q_();
+         this.func_73732_a(this.field_146289_q, this.title, this.field_146294_l / 2, 15, 16777215);
+-        super.func_73863_a(p_73863_1_, p_73863_2_, p_73863_3_);
+-        this.tooltipManager.drawTooltips(p_73863_1_, p_73863_2_, this.field_146292_n);
++        super.func_73863_a(mouseX, mouseY, partialTicks);
++        this.tooltipManager.drawTooltips(mouseX, mouseY, this.field_146292_n);
+     }
+ }

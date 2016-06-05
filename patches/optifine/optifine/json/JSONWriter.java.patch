@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/optifine/json/JSONWriter.java
++++ ../src-work/minecraft/optifine/json/JSONWriter.java
+@@ -78,7 +78,7 @@
+     {
+         this.writeLine("{");
+         this.indentAdd();
+-        Set set = jObj.keySet();
++        Set<String> set = jObj.keySet();
+         int i = set.size();
+         int j = 0;
+ 

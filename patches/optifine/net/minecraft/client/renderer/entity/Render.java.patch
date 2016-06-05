@@ -1,0 +1,25 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/entity/Render.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/entity/Render.java
+@@ -25,7 +25,7 @@
+ import shadersmod.client.Shaders;
+ 
+ @SideOnly(Side.CLIENT)
+-public abstract class Render
++public abstract class Render<T extends Entity>
+ {
+     private static final ResourceLocation field_110778_a = new ResourceLocation("textures/misc/shadow.png");
+     protected final RenderManager field_76990_c;
+@@ -72,11 +72,11 @@
+         this.func_147906_a(p_177069_1_, p_177069_8_, p_177069_2_, p_177069_4_, p_177069_6_, 64);
+     }
+ 
+-    protected abstract ResourceLocation func_110775_a(Entity p_110775_1_);
++    protected abstract ResourceLocation func_110775_a(T p_110775_1_);
+ 
+     protected boolean func_180548_c(Entity p_180548_1_)
+     {
+-        ResourceLocation resourcelocation = this.func_110775_a(p_180548_1_);
++        ResourceLocation resourcelocation = this.func_110775_a((T) p_180548_1_);
+ 
+         if (resourcelocation == null)
+         {

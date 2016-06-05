@@ -1,0 +1,111 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/block/model/FaceBakery.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/block/model/FaceBakery.java
+@@ -22,22 +22,17 @@
+     private static final float field_178418_a = 1.0F / (float)Math.cos(0.39269909262657166D) - 1.0F;
+     private static final float field_178417_b = 1.0F / (float)Math.cos((Math.PI / 4D)) - 1.0F;
+ 
+-    public BakedQuad func_178414_a(Vector3f p_178414_1_, Vector3f p_178414_2_, BlockPartFace p_178414_3_, TextureAtlasSprite p_178414_4_, EnumFacing p_178414_5_, ModelRotation p_178414_6_, BlockPartRotation p_178414_7_, boolean p_178414_8_, boolean p_178414_9_)
++    public BakedQuad makeBakedQuad(Vector3f p_178414_1_, Vector3f p_178414_2_, BlockPartFace p_178414_3_, TextureAtlasSprite p_178414_4_, EnumFacing p_178414_5_, ITransformation p_178414_6_, BlockPartRotation p_178414_7_, boolean p_178414_8_, boolean p_178414_9_)
+     {
+-        return this.makeBakedQuad(p_178414_1_, p_178414_2_, p_178414_3_, p_178414_4_, p_178414_5_, p_178414_6_, p_178414_7_, p_178414_8_, p_178414_9_);
+-    }
+-
+-    public BakedQuad makeBakedQuad(Vector3f p_makeBakedQuad_1_, Vector3f p_makeBakedQuad_2_, BlockPartFace p_makeBakedQuad_3_, TextureAtlasSprite p_makeBakedQuad_4_, EnumFacing p_makeBakedQuad_5_, ITransformation p_makeBakedQuad_6_, BlockPartRotation p_makeBakedQuad_7_, boolean p_makeBakedQuad_8_, boolean p_makeBakedQuad_9_)
+-    {
+-        int[] aint = this.makeQuadVertexData(p_makeBakedQuad_3_, p_makeBakedQuad_4_, p_makeBakedQuad_5_, this.func_178403_a(p_makeBakedQuad_1_, p_makeBakedQuad_2_), p_makeBakedQuad_6_, p_makeBakedQuad_7_, p_makeBakedQuad_8_, p_makeBakedQuad_9_);
++        int[] aint = this.makeQuadVertexData(p_178414_3_, p_178414_4_, p_178414_5_, this.func_178403_a(p_178414_1_, p_178414_2_), p_178414_6_, p_178414_7_, p_178414_8_, p_178414_9_);
+         EnumFacing enumfacing = func_178410_a(aint);
+ 
+-        if (p_makeBakedQuad_8_)
++        if (p_178414_8_)
+         {
+-            this.func_178409_a(aint, enumfacing, p_makeBakedQuad_3_.field_178243_e, p_makeBakedQuad_4_);
++            this.func_178409_a(aint, enumfacing, p_178414_3_.field_178243_e, p_178414_4_);
+         }
+ 
+-        if (p_makeBakedQuad_7_ == null)
++        if (p_178414_7_ == null)
+         {
+             this.func_178408_a(aint, enumfacing);
+         }
+@@ -47,10 +42,10 @@
+             Reflector.callVoid(Reflector.ForgeHooksClient_fillNormal, new Object[] {aint, enumfacing});
+         }
+ 
+-        return new BakedQuad(aint, p_makeBakedQuad_3_.field_178245_c, enumfacing, p_makeBakedQuad_4_);
++        return new BakedQuad(aint, p_178414_3_.field_178245_c, enumfacing, p_178414_4_);
+     }
+ 
+-    private int[] makeQuadVertexData(BlockPartFace p_makeQuadVertexData_1_, TextureAtlasSprite p_makeQuadVertexData_2_, EnumFacing p_makeQuadVertexData_3_, float[] p_makeQuadVertexData_4_, ITransformation p_makeQuadVertexData_5_, BlockPartRotation p_makeQuadVertexData_6_, boolean p_makeQuadVertexData_7_, boolean p_makeQuadVertexData_8_)
++    private int[] makeQuadVertexData(BlockPartFace p_178405_1_, TextureAtlasSprite p_178405_2_, EnumFacing p_178405_3_, float[] p_178405_4_, ITransformation p_178405_5_, BlockPartRotation p_178405_6_, boolean p_178405_7_, boolean p_178405_8_)
+     {
+         int i = 28;
+ 
+@@ -63,7 +58,7 @@
+ 
+         for (int j = 0; j < 4; ++j)
+         {
+-            this.fillVertexData(aint, j, p_makeQuadVertexData_3_, p_makeQuadVertexData_1_, p_makeQuadVertexData_4_, p_makeQuadVertexData_2_, p_makeQuadVertexData_5_, p_makeQuadVertexData_6_, p_makeQuadVertexData_7_, p_makeQuadVertexData_8_);
++            this.fillVertexData(aint, j, p_178405_3_, p_178405_1_, p_178405_4_, p_178405_2_, p_178405_5_, p_178405_6_, p_178405_7_, p_178405_8_);
+         }
+ 
+         return aint;
+@@ -125,15 +120,15 @@
+         return afloat;
+     }
+ 
+-    private void fillVertexData(int[] p_fillVertexData_1_, int p_fillVertexData_2_, EnumFacing p_fillVertexData_3_, BlockPartFace p_fillVertexData_4_, float[] p_fillVertexData_5_, TextureAtlasSprite p_fillVertexData_6_, ITransformation p_fillVertexData_7_, BlockPartRotation p_fillVertexData_8_, boolean p_fillVertexData_9_, boolean p_fillVertexData_10_)
++    private void fillVertexData(int[] p_178402_1_, int p_178402_2_, EnumFacing p_178402_3_, BlockPartFace p_178402_4_, float[] p_178402_5_, TextureAtlasSprite p_178402_6_, ITransformation p_178402_7_, BlockPartRotation p_178402_8_, boolean p_178402_9_, boolean p_178402_10_)
+     {
+-        EnumFacing enumfacing = p_fillVertexData_7_.rotate(p_fillVertexData_3_);
+-        int i = p_fillVertexData_10_ ? this.func_178413_a(enumfacing) : -1;
+-        EnumFaceDirection.VertexInformation enumfacedirection$vertexinformation = EnumFaceDirection.func_179027_a(p_fillVertexData_3_).func_179025_a(p_fillVertexData_2_);
+-        Vector3f vector3f = new Vector3f(p_fillVertexData_5_[enumfacedirection$vertexinformation.field_179184_a], p_fillVertexData_5_[enumfacedirection$vertexinformation.field_179182_b], p_fillVertexData_5_[enumfacedirection$vertexinformation.field_179183_c]);
+-        this.func_178407_a(vector3f, p_fillVertexData_8_);
+-        int j = this.rotateVertex(vector3f, p_fillVertexData_3_, p_fillVertexData_2_, p_fillVertexData_7_, p_fillVertexData_9_);
+-        this.func_178404_a(p_fillVertexData_1_, j, p_fillVertexData_2_, vector3f, i, p_fillVertexData_6_, p_fillVertexData_4_.field_178243_e);
++        EnumFacing enumfacing = p_178402_7_.rotate(p_178402_3_);
++        int i = p_178402_10_ ? this.func_178413_a(enumfacing) : -1;
++        EnumFaceDirection.VertexInformation enumfacedirection$vertexinformation = EnumFaceDirection.func_179027_a(p_178402_3_).func_179025_a(p_178402_2_);
++        Vector3f vector3f = new Vector3f(p_178402_5_[enumfacedirection$vertexinformation.field_179184_a], p_178402_5_[enumfacedirection$vertexinformation.field_179182_b], p_178402_5_[enumfacedirection$vertexinformation.field_179183_c]);
++        this.func_178407_a(vector3f, p_178402_8_);
++        int j = this.rotateVertex(vector3f, p_178402_3_, p_178402_2_, p_178402_7_, p_178402_9_);
++        this.func_178404_a(p_178402_1_, j, p_178402_2_, vector3f, i, p_178402_6_, p_178402_4_.field_178243_e);
+     }
+ 
+     private void func_178404_a(int[] p_178404_1_, int p_178404_2_, int p_178404_3_, Vector3f p_178404_4_, int p_178404_5_, TextureAtlasSprite p_178404_6_, BlockFaceUV p_178404_7_)
+@@ -194,27 +189,27 @@
+ 
+     public int func_178415_a(Vector3f p_178415_1_, EnumFacing p_178415_2_, int p_178415_3_, ModelRotation p_178415_4_, boolean p_178415_5_)
+     {
+-        return this.rotateVertex(p_178415_1_, p_178415_2_, p_178415_3_, p_178415_4_, p_178415_5_);
++        return this.func_178415_a(p_178415_1_, p_178415_2_, p_178415_3_, p_178415_4_, p_178415_5_);
+     }
+ 
+-    public int rotateVertex(Vector3f p_rotateVertex_1_, EnumFacing p_rotateVertex_2_, int p_rotateVertex_3_, ITransformation p_rotateVertex_4_, boolean p_rotateVertex_5_)
++    public int rotateVertex(Vector3f p_178415_1_, EnumFacing p_178415_2_, int p_178415_3_, ITransformation p_178415_4_, boolean p_178415_5_)
+     {
+-        if (p_rotateVertex_4_ == ModelRotation.X0_Y0)
++        if (p_178415_4_ == ModelRotation.X0_Y0)
+         {
+-            return p_rotateVertex_3_;
++            return p_178415_3_;
+         }
+         else
+         {
+             if (Reflector.ForgeHooksClient_transform.exists())
+             {
+-                Reflector.call(Reflector.ForgeHooksClient_transform, new Object[] {p_rotateVertex_1_, p_rotateVertex_4_.getMatrix()});
++                Reflector.call(Reflector.ForgeHooksClient_transform, new Object[] {p_178415_1_, p_178415_4_.getMatrix()});
+             }
+             else
+             {
+-                this.func_178406_a(p_rotateVertex_1_, new Vector3f(0.5F, 0.5F, 0.5F), ((ModelRotation)p_rotateVertex_4_).func_177525_a(), new Vector3f(1.0F, 1.0F, 1.0F));
++                this.func_178406_a(p_178415_1_, new Vector3f(0.5F, 0.5F, 0.5F), ((ModelRotation)p_178415_4_).func_177525_a(), new Vector3f(1.0F, 1.0F, 1.0F));
+             }
+ 
+-            return p_rotateVertex_4_.rotate(p_rotateVertex_2_, p_rotateVertex_3_);
++            return p_178415_4_.rotate(p_178415_2_, p_178415_3_);
+         }
+     }
+ 

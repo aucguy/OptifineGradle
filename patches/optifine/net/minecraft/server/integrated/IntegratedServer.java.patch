@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/server/integrated/IntegratedServer.java
++++ ../src-work/minecraft/net/minecraft/server/integrated/IntegratedServer.java
+@@ -112,7 +112,7 @@
+         else
+         {
+             this.field_71305_c = new WorldServer[3];
+-            this.field_71312_k = new long[this.field_71305_c.length][100];
++            //this.timeOfLastDimensionTick = new long[this.worldServers.length][100];
+             this.func_175584_a(this.func_71270_I(), isavehandler);
+ 
+             if (worldinfo == null)

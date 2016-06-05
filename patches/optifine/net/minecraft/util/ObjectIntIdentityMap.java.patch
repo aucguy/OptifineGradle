@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/util/ObjectIntIdentityMap.java
++++ ../src-work/minecraft/net/minecraft/util/ObjectIntIdentityMap.java
+@@ -9,7 +9,7 @@
+ import net.minecraftforge.fml.relauncher.Side;
+ import net.minecraftforge.fml.relauncher.SideOnly;
+ 
+-public class ObjectIntIdentityMap implements IObjectIntIterable
++public class ObjectIntIdentityMap<T> implements IObjectIntIterable<T>
+ {
+     protected final IdentityHashMap field_148749_a = new IdentityHashMap(512);
+     protected final List field_148748_b = Lists.newArrayList();

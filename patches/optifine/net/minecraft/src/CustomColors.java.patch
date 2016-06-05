@@ -1,0 +1,56 @@
+--- ../src-base/minecraft/net/minecraft/src/CustomColors.java
++++ ../src-work/minecraft/net/minecraft/src/CustomColors.java
+@@ -371,7 +371,7 @@
+         String s = "palette.block.";
+         Map map = new HashMap();
+ 
+-        for (String s1 : p_readCustomColormaps_0_.keySet())
++        for (String s1 : p_readCustomColormaps_0_.stringPropertyNames())
+         {
+             String s2 = p_readCustomColormaps_0_.getProperty(s1);
+ 
+@@ -1339,7 +1339,7 @@
+     private static int[] readSpawnEggColors(Properties p_readSpawnEggColors_0_, String p_readSpawnEggColors_1_, String p_readSpawnEggColors_2_, String p_readSpawnEggColors_3_)
+     {
+         List<Integer> list = new ArrayList();
+-        Set set = p_readSpawnEggColors_0_.keySet();
++        Set<String> set = p_readSpawnEggColors_0_.stringPropertyNames();
+         int i = 0;
+ 
+         for (String s : set)
+@@ -1434,7 +1434,7 @@
+         float[][] afloat1 = new float[aenumdyecolor.length][];
+         int k = 0;
+ 
+-        for (String s : p_readDyeColors_0_.keySet())
++        for (String s : p_readDyeColors_0_.stringPropertyNames())
+         {
+             String s1 = p_readDyeColors_0_.getProperty(s);
+ 
+@@ -1507,7 +1507,7 @@
+         Arrays.fill((int[])aint, (int) - 1);
+         int i = 0;
+ 
+-        for (String s : p_readTextColors_0_.keySet())
++        for (String s : p_readTextColors_0_.stringPropertyNames())
+         {
+             String s1 = p_readTextColors_0_.getProperty(s);
+ 
+@@ -1563,7 +1563,7 @@
+         Arrays.fill((int[])aint, (int) - 1);
+         int i = 0;
+ 
+-        for (String s : p_readMapColors_0_.keySet())
++        for (String s : p_readMapColors_0_.stringPropertyNames())
+         {
+             String s1 = p_readMapColors_0_.getProperty(s);
+ 
+@@ -1602,7 +1602,7 @@
+         Arrays.fill((int[])aint, (int) - 1);
+         int i = 0;
+ 
+-        for (String s : p_readPotionColors_0_.keySet())
++        for (String s : p_readPotionColors_0_.stringPropertyNames())
+         {
+             String s1 = p_readPotionColors_0_.getProperty(s);
+ 

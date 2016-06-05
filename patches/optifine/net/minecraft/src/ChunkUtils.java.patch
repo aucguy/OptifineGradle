@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/src/ChunkUtils.java
++++ ../src-work/minecraft/net/minecraft/src/ChunkUtils.java
+@@ -48,7 +48,7 @@
+     {
+         try
+         {
+-            List list = new ArrayList();
++            List<Field> list = new ArrayList();
+             List list1 = new ArrayList();
+             Field[] afield = Chunk.class.getDeclaredFields();
+ 

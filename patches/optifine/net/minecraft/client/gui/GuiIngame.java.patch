@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/gui/GuiIngame.java
++++ ../src-work/minecraft/net/minecraft/client/gui/GuiIngame.java
+@@ -542,7 +542,7 @@
+                 return this.apply((Score)p_apply_1_);
+             }
+         }));
+-        ArrayList arraylist1;
++        ArrayList<Score> arraylist1;
+ 
+         if (arraylist.size() > 15)
+         {

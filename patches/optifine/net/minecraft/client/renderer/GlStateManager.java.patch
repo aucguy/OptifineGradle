@@ -1,0 +1,192 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/GlStateManager.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/GlStateManager.java
+@@ -11,25 +11,25 @@
+ @SideOnly(Side.CLIENT)
+ public class GlStateManager
+ {
+-    private static GlStateManager.AlphaState field_179160_a = new GlStateManager.AlphaState((GlStateManager.1)null);
++    private static GlStateManager.AlphaState field_179160_a = new GlStateManager.AlphaState((GlStateManager.Custom1)null);
+     private static GlStateManager.BooleanState field_179158_b = new GlStateManager.BooleanState(2896);
+     private static GlStateManager.BooleanState[] field_179159_c = new GlStateManager.BooleanState[8];
+-    private static GlStateManager.ColorMaterialState field_179156_d = new GlStateManager.ColorMaterialState((GlStateManager.1)null);
+-    private static GlStateManager.BlendState field_179157_e = new GlStateManager.BlendState((GlStateManager.1)null);
+-    private static GlStateManager.DepthState field_179154_f = new GlStateManager.DepthState((GlStateManager.1)null);
+-    private static GlStateManager.FogState field_179155_g = new GlStateManager.FogState((GlStateManager.1)null);
+-    private static GlStateManager.CullState field_179167_h = new GlStateManager.CullState((GlStateManager.1)null);
+-    private static GlStateManager.PolygonOffsetState field_179168_i = new GlStateManager.PolygonOffsetState((GlStateManager.1)null);
+-    private static GlStateManager.ColorLogicState field_179165_j = new GlStateManager.ColorLogicState((GlStateManager.1)null);
+-    private static GlStateManager.TexGenState field_179166_k = new GlStateManager.TexGenState((GlStateManager.1)null);
+-    private static GlStateManager.ClearState field_179163_l = new GlStateManager.ClearState((GlStateManager.1)null);
+-    private static GlStateManager.StencilState field_179164_m = new GlStateManager.StencilState((GlStateManager.1)null);
++    private static GlStateManager.ColorMaterialState field_179156_d = new GlStateManager.ColorMaterialState((GlStateManager.Custom1)null);
++    private static GlStateManager.BlendState field_179157_e = new GlStateManager.BlendState((GlStateManager.Custom1)null);
++    private static GlStateManager.DepthState field_179154_f = new GlStateManager.DepthState((GlStateManager.Custom1)null);
++    private static GlStateManager.FogState field_179155_g = new GlStateManager.FogState((GlStateManager.Custom1)null);
++    private static GlStateManager.CullState field_179167_h = new GlStateManager.CullState((GlStateManager.Custom1)null);
++    private static GlStateManager.PolygonOffsetState field_179168_i = new GlStateManager.PolygonOffsetState((GlStateManager.Custom1)null);
++    private static GlStateManager.ColorLogicState field_179165_j = new GlStateManager.ColorLogicState((GlStateManager.Custom1)null);
++    private static GlStateManager.TexGenState field_179166_k = new GlStateManager.TexGenState((GlStateManager.Custom1)null);
++    private static GlStateManager.ClearState field_179163_l = new GlStateManager.ClearState((GlStateManager.Custom1)null);
++    private static GlStateManager.StencilState field_179164_m = new GlStateManager.StencilState((GlStateManager.Custom1)null);
+     private static GlStateManager.BooleanState field_179161_n = new GlStateManager.BooleanState(2977);
+     private static int field_179162_o = 0;
+     private static GlStateManager.TextureState[] field_179174_p = new GlStateManager.TextureState[32];
+     private static int field_179173_q = 7425;
+     private static GlStateManager.BooleanState field_179172_r = new GlStateManager.BooleanState(32826);
+-    private static GlStateManager.ColorMask field_179171_s = new GlStateManager.ColorMask((GlStateManager.1)null);
++    private static GlStateManager.ColorMask field_179171_s = new GlStateManager.ColorMask((GlStateManager.Custom1)null);
+     private static GlStateManager.Color field_179170_t = new GlStateManager.Color();
+     public static boolean clearEnabled = true;
+ 
+@@ -577,7 +577,7 @@
+ 
+         for (int j = 0; j < field_179174_p.length; ++j)
+         {
+-            field_179174_p[j] = new GlStateManager.TextureState((GlStateManager.1)null);
++            field_179174_p[j] = new GlStateManager.TextureState((GlStateManager.Custom1)null);
+         }
+     }
+ 
+@@ -640,7 +640,7 @@
+                 this.field_179207_c = -1.0F;
+             }
+ 
+-            AlphaState(GlStateManager.1 p_i46489_1_)
++            AlphaState(GlStateManager.Custom1 p_i46489_1_)
+             {
+                 this();
+             }
+@@ -664,7 +664,7 @@
+                 this.field_179210_e = 0;
+             }
+ 
+-            BlendState(GlStateManager.1 p_i46488_1_)
++            BlendState(GlStateManager.Custom1 p_i46488_1_)
+             {
+                 this();
+             }
+@@ -723,7 +723,7 @@
+                 this.field_179204_c = 0;
+             }
+ 
+-            ClearState(GlStateManager.1 p_i46487_1_)
++            ClearState(GlStateManager.Custom1 p_i46487_1_)
+             {
+                 this();
+             }
+@@ -762,7 +762,7 @@
+                 this.field_179196_b = 5379;
+             }
+ 
+-            ColorLogicState(GlStateManager.1 p_i46486_1_)
++            ColorLogicState(GlStateManager.Custom1 p_i46486_1_)
+             {
+                 this();
+             }
+@@ -784,7 +784,7 @@
+                 this.field_179185_d = true;
+             }
+ 
+-            ColorMask(GlStateManager.1 p_i46485_1_)
++            ColorMask(GlStateManager.Custom1 p_i46485_1_)
+             {
+                 this();
+             }
+@@ -804,7 +804,7 @@
+                 this.field_179190_c = 5634;
+             }
+ 
+-            ColorMaterialState(GlStateManager.1 p_i46484_1_)
++            ColorMaterialState(GlStateManager.Custom1 p_i46484_1_)
+             {
+                 this();
+             }
+@@ -822,7 +822,7 @@
+                 this.field_179053_b = 1029;
+             }
+ 
+-            CullState(GlStateManager.1 p_i46483_1_)
++            CullState(GlStateManager.Custom1 p_i46483_1_)
+             {
+                 this();
+             }
+@@ -842,7 +842,7 @@
+                 this.field_179051_c = 513;
+             }
+ 
+-            DepthState(GlStateManager.1 p_i46482_1_)
++            DepthState(GlStateManager.Custom1 p_i46482_1_)
+             {
+                 this();
+             }
+@@ -866,7 +866,7 @@
+                 this.field_179046_e = 1.0F;
+             }
+ 
+-            FogState(GlStateManager.1 p_i46481_1_)
++            FogState(GlStateManager.Custom1 p_i46481_1_)
+             {
+                 this();
+             }
+@@ -888,7 +888,7 @@
+                 this.field_179041_d = 0.0F;
+             }
+ 
+-            PolygonOffsetState(GlStateManager.1 p_i46480_1_)
++            PolygonOffsetState(GlStateManager.Custom1 p_i46480_1_)
+             {
+                 this();
+             }
+@@ -908,7 +908,7 @@
+                 this.field_179080_c = -1;
+             }
+ 
+-            StencilFunc(GlStateManager.1 p_i46479_1_)
++            StencilFunc(GlStateManager.Custom1 p_i46479_1_)
+             {
+                 this();
+             }
+@@ -925,14 +925,14 @@
+ 
+             private StencilState()
+             {
+-                this.field_179078_a = new GlStateManager.StencilFunc((GlStateManager.1)null);
++                this.field_179078_a = new GlStateManager.StencilFunc((GlStateManager.Custom1)null);
+                 this.field_179076_b = -1;
+                 this.field_179077_c = 7680;
+                 this.field_179074_d = 7680;
+                 this.field_179075_e = 7680;
+             }
+ 
+-            StencilState(GlStateManager.1 p_i46478_1_)
++            StencilState(GlStateManager.Custom1 p_i46478_1_)
+             {
+                 this();
+             }
+@@ -948,7 +948,7 @@
+ 
+         private static final GlStateManager.TexGen[] $VALUES = new GlStateManager.TexGen[]{S, T, R, Q};
+ 
+-        private TexGen(String p_i11_3_, int p_i11_4_)
++        private TexGen(String p_i46255_1_, int p_i46255_2_)
+         {
+         }
+     }
+@@ -983,7 +983,7 @@
+                 this.field_179061_d = new GlStateManager.TexGenCoord(8195, 3171);
+             }
+ 
+-            TexGenState(GlStateManager.1 p_i46477_1_)
++            TexGenState(GlStateManager.Custom1 p_i46477_1_)
+             {
+                 this();
+             }
+@@ -1001,7 +1001,7 @@
+                 this.field_179059_b = 0;
+             }
+ 
+-            TextureState(GlStateManager.1 p_i46476_1_)
++            TextureState(GlStateManager.Custom1 p_i46476_1_)
+             {
+                 this();
+             }

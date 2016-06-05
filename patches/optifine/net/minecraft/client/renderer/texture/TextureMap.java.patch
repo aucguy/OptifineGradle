@@ -1,0 +1,32 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/texture/TextureMap.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/texture/TextureMap.java
+@@ -32,9 +32,9 @@
+     private static final Logger field_147635_d = LogManager.getLogger();
+     public static final ResourceLocation field_174945_f = new ResourceLocation("missingno");
+     public static final ResourceLocation field_110575_b = new ResourceLocation("textures/atlas/blocks.png");
+-    private final List field_94258_i;
++    private final List<TextureAtlasSprite> field_94258_i;
+     private final Map field_110574_e;
+-    private final Map field_94252_e;
++    private final Map<Object, TextureAtlasSprite> field_94252_e;
+     private final String field_94254_c;
+     private final IIconCreator field_174946_m;
+     private int field_147636_j;
+@@ -123,7 +123,7 @@
+         this.func_110571_b(p_174943_1_);
+     }
+ 
+-    public void func_110571_b(IResourceManager param1)
++    public void func_110571_b(IResourceManager p_110571_1_)
+     {
+     }
+ 
+@@ -310,7 +310,7 @@
+         return j;
+     }
+ 
+-    private int detectMinimumSpriteSize(Map p_detectMinimumSpriteSize_1_, IResourceManager p_detectMinimumSpriteSize_2_, int p_detectMinimumSpriteSize_3_)
++    private int detectMinimumSpriteSize(Map<Object, Object> p_detectMinimumSpriteSize_1_, IResourceManager p_detectMinimumSpriteSize_2_, int p_detectMinimumSpriteSize_3_)
+     {
+         Map map = new HashMap();
+ 

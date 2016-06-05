@@ -1,0 +1,43 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/RenderGlobal.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/RenderGlobal.java
+@@ -123,8 +123,8 @@
+     private final RenderManager field_175010_j;
+     private WorldClient field_72769_h;
+     private Set field_175009_l = Sets.newLinkedHashSet();
+-    private List field_72755_R = Lists.newArrayListWithCapacity(69696);
+-    private final Set field_181024_n = Sets.newHashSet();
++    private List<ContainerLocalRenderInformation> field_72755_R = Lists.newArrayListWithCapacity(69696);
++    private final Set<TileEntity> field_181024_n = Sets.newHashSet();
+     private ViewFrustum field_175008_n;
+     private int field_72772_v = -1;
+     private int field_72771_w = -1;
+@@ -134,7 +134,7 @@
+     private VertexBuffer field_175012_t;
+     private VertexBuffer field_175011_u;
+     private int field_72773_u;
+-    public final Map field_72738_E = Maps.newHashMap();
++    public final Map<Object, DestroyBlockProgress> field_72738_E = Maps.newHashMap();
+     private final Map field_147593_P = Maps.newHashMap();
+     private final TextureAtlasSprite[] field_94141_F = new TextureAtlasSprite[10];
+     private Framebuffer field_175015_z;
+@@ -173,7 +173,7 @@
+     public Set chunksToUpdateForced = new LinkedHashSet();
+     private Deque visibilityDeque = new ArrayDeque();
+     private List renderInfosEntities = new ArrayList(1024);
+-    private List renderInfosTileEntities = new ArrayList(1024);
++    private List<ContainerLocalRenderInformation> renderInfosTileEntities = new ArrayList(1024);
+     private List renderInfosNormal = new ArrayList(1024);
+     private List renderInfosEntitiesNormal = new ArrayList(1024);
+     private List renderInfosTileEntitiesNormal = new ArrayList(1024);
+@@ -3139,9 +3139,9 @@
+             this.field_178032_d = p_i46248_4_;
+         }
+ 
+-        ContainerLocalRenderInformation(RenderChunk p_i41_2_, EnumFacing p_i41_3_, int p_i41_4_, Object p_i41_5_)
++        ContainerLocalRenderInformation(RenderChunk p_i46249_2_, EnumFacing p_i46249_3_, int p_i46249_4_, Object p_i46249_5_)
+         {
+-            this(p_i41_2_, p_i41_3_, p_i41_4_);
++            this(p_i46249_2_, p_i46249_3_, p_i46249_4_);
+         }
+     }
+ }

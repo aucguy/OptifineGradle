@@ -1,0 +1,35 @@
+--- ../src-base/minecraft/net/minecraft/src/GuiMessage.java
++++ ../src-work/minecraft/net/minecraft/src/GuiMessage.java
+@@ -16,7 +16,7 @@
+     private GuiScreen parentScreen;
+     private String messageLine1;
+     private String messageLine2;
+-    private final List listLines2 = Lists.newArrayList();
++    private final List<String> listLines2 = Lists.newArrayList();
+     protected String confirmButtonText;
+     private int ticksUntilEnable;
+ 
+@@ -35,12 +35,12 @@
+         this.listLines2.addAll(this.field_146289_q.func_78271_c(this.messageLine2, this.field_146294_l - 50));
+     }
+ 
+-    protected void func_146284_a(GuiButton p_146284_1_) throws IOException
++    protected void func_146284_a(GuiButton button) throws IOException
+     {
+         Config.getMinecraft().func_147108_a(this.parentScreen);
+     }
+ 
+-    public void func_73863_a(int p_73863_1_, int p_73863_2_, float p_73863_3_)
++    public void func_73863_a(int mouseX, int mouseY, float partialTicks)
+     {
+         this.func_146276_q_();
+         this.func_73732_a(this.field_146289_q, this.messageLine1, this.field_146294_l / 2, 70, 16777215);
+@@ -52,7 +52,7 @@
+             i += this.field_146289_q.field_78288_b;
+         }
+ 
+-        super.func_73863_a(p_73863_1_, p_73863_2_, p_73863_3_);
++        super.func_73863_a(mouseX, mouseY, partialTicks);
+     }
+ 
+     public void setButtonDelay(int p_setButtonDelay_1_)

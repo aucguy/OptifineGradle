@@ -1,0 +1,10 @@
+++++ REJECTED PATCH 2
+         this.func_110571_b(p_174943_1_);
+     }
+ 
+-    public void func_110571_b(IResourceManager param1)
++    public void func_110571_b(IResourceManager p_110571_1_)
+     {
+     }
+ 
+++++ END PATCH

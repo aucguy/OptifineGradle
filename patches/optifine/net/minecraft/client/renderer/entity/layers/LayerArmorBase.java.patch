@@ -1,0 +1,36 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/entity/layers/LayerArmorBase.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/entity/layers/LayerArmorBase.java
+@@ -19,7 +19,7 @@
+ import shadersmod.client.ShadersRender;
+ 
+ @SideOnly(Side.CLIENT)
+-public abstract class LayerArmorBase implements LayerRenderer
++public abstract class LayerArmorBase<T extends ModelBase> implements LayerRenderer
+ {
+     protected static final ResourceLocation field_177188_b = new ResourceLocation("textures/misc/enchanted_item_glint.png");
+     protected ModelBase field_177189_c;
+@@ -64,10 +64,10 @@
+ 
+             if (Reflector.ForgeHooksClient.exists())
+             {
+-                modelbase = this.getArmorModelHook(p_177182_1_, itemstack, p_177182_9_, modelbase);
++                modelbase = this.getArmorModelHook(p_177182_1_, itemstack, p_177182_9_, (T) modelbase);
+             }
+ 
+-            this.func_177179_a(modelbase, p_177182_9_);
++            this.func_177179_a((T) modelbase, p_177182_9_);
+             boolean flag = this.func_177180_b(p_177182_9_);
+ 
+             if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(itemstack, flag ? 2 : 1, (String)null))
+@@ -230,9 +230,9 @@
+ 
+     protected abstract void func_177177_a();
+ 
+-    protected abstract void func_177179_a(ModelBase p_177179_1_, int p_177179_2_);
++    protected abstract void func_177179_a(T p_177179_1_, int p_177179_2_);
+ 
+-    protected ModelBase getArmorModelHook(EntityLivingBase p_getArmorModelHook_1_, ItemStack p_getArmorModelHook_2_, int p_getArmorModelHook_3_, ModelBase p_getArmorModelHook_4_)
++    protected ModelBase getArmorModelHook(EntityLivingBase p_getArmorModelHook_1_, ItemStack p_getArmorModelHook_2_, int p_getArmorModelHook_3_, T p_getArmorModelHook_4_)
+     {
+         return p_getArmorModelHook_4_;
+     }

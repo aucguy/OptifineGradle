@@ -1,0 +1,23 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/tileentity/RenderItemFrame.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/tileentity/RenderItemFrame.java
+@@ -38,7 +38,7 @@
+ import shadersmod.client.ShadersTex;
+ 
+ @SideOnly(Side.CLIENT)
+-public class RenderItemFrame extends Render
++public class RenderItemFrame extends Render<EntityItemFrame>
+ {
+     private static final ResourceLocation field_110789_a = new ResourceLocation("textures/map/map_background.png");
+     private final Minecraft field_147917_g = Minecraft.func_71410_x();
+@@ -244,11 +244,6 @@
+         }
+     }
+ 
+-    protected ResourceLocation func_110775_a(Entity p_110775_1_)
+-    {
+-        return this.func_110775_a((EntityItemFrame)p_110775_1_);
+-    }
+-
+     protected void func_177067_a(Entity p_177067_1_, double p_177067_2_, double p_177067_4_, double p_177067_6_)
+     {
+         this.func_177067_a((EntityItemFrame)p_177067_1_, p_177067_2_, p_177067_4_, p_177067_6_);

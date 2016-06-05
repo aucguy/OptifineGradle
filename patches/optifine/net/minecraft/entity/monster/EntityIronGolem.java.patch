@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/entity/monster/EntityIronGolem.java
++++ ../src-work/minecraft/net/minecraft/entity/monster/EntityIronGolem.java
+@@ -139,7 +139,7 @@
+         }
+     }
+ 
+-    public boolean func_70686_a(Class <? extends EntityLivingBase > p_70686_1_)
++    public boolean func_70686_a(Class p_70686_1_)
+     {
+         return this.func_70850_q() && EntityPlayer.class.isAssignableFrom(p_70686_1_) ? false : (p_70686_1_ == EntityCreeper.class ? false : super.func_70686_a(p_70686_1_));
+     }

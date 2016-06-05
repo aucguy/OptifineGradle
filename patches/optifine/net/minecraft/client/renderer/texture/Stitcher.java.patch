@@ -1,0 +1,29 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/texture/Stitcher.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/texture/Stitcher.java
+@@ -16,7 +16,7 @@
+ {
+     private final int field_147971_a;
+     private final Set field_94319_a = Sets.newHashSetWithExpectedSize(256);
+-    private final List field_94317_b = Lists.newArrayListWithCapacity(256);
++    private final List<Slot> field_94317_b = Lists.newArrayListWithCapacity(256);
+     private int field_94318_c;
+     private int field_94315_d;
+     private final int field_94316_e;
+@@ -78,7 +78,7 @@
+ 
+     public List func_94309_g()
+     {
+-        ArrayList arraylist = Lists.newArrayList();
++        ArrayList<Slot> arraylist = Lists.newArrayList();
+ 
+         for (Stitcher.Slot stitcher$slot : this.field_94317_b)
+         {
+@@ -303,7 +303,7 @@
+             private final int field_94190_b;
+             private final int field_94191_c;
+             private final int field_94188_d;
+-            private List field_94189_e;
++            private List<Slot> field_94189_e;
+             private Stitcher.Holder field_94187_f;
+ 
+             public Slot(int p_i1277_1_, int p_i1277_2_, int p_i1277_3_, int p_i1277_4_)

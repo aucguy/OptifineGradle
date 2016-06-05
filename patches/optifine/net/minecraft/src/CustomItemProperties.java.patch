@@ -1,0 +1,38 @@
+--- ../src-base/minecraft/net/minecraft/src/CustomItemProperties.java
++++ ../src-work/minecraft/net/minecraft/src/CustomItemProperties.java
+@@ -301,7 +301,7 @@
+         }
+         else
+         {
+-            Set set = map.keySet();
++            Set<String> set = map.keySet();
+             Map map1 = new LinkedHashMap();
+ 
+             for (String s1 : set)
+@@ -489,7 +489,7 @@
+     private NbtTagValue[] parseNbtTagValues(Properties p_parseNbtTagValues_1_)
+     {
+         String s = "nbt.";
+-        Map map = getMatchingProperties(p_parseNbtTagValues_1_, s);
++        Map<String, Object> map = getMatchingProperties(p_parseNbtTagValues_1_, s);
+ 
+         if (map.size() <= 0)
+         {
+@@ -516,7 +516,7 @@
+     {
+         Map map = new LinkedHashMap();
+ 
+-        for (String s : p_getMatchingProperties_0_.keySet())
++        for (String s : p_getMatchingProperties_0_.stringPropertyNames())
+         {
+             String s1 = p_getMatchingProperties_0_.getProperty(s);
+ 
+@@ -825,7 +825,7 @@
+     private static BakedQuad makeBakedQuad(BlockPart p_makeBakedQuad_0_, BlockPartFace p_makeBakedQuad_1_, TextureAtlasSprite p_makeBakedQuad_2_, EnumFacing p_makeBakedQuad_3_, ModelRotation p_makeBakedQuad_4_, boolean p_makeBakedQuad_5_)
+     {
+         FaceBakery facebakery = new FaceBakery();
+-        return facebakery.func_178414_a(p_makeBakedQuad_0_.field_178241_a, p_makeBakedQuad_0_.field_178239_b, p_makeBakedQuad_1_, p_makeBakedQuad_2_, p_makeBakedQuad_3_, p_makeBakedQuad_4_, p_makeBakedQuad_0_.field_178237_d, p_makeBakedQuad_5_, p_makeBakedQuad_0_.field_178238_e);
++        return facebakery.makeBakedQuad(p_makeBakedQuad_0_.field_178241_a, p_makeBakedQuad_0_.field_178239_b, p_makeBakedQuad_1_, p_makeBakedQuad_2_, p_makeBakedQuad_3_, p_makeBakedQuad_4_, p_makeBakedQuad_0_.field_178237_d, p_makeBakedQuad_5_, p_makeBakedQuad_0_.field_178238_e);
+     }
+ 
+     public String toString()

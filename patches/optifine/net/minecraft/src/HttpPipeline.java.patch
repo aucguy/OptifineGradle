@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/src/HttpPipeline.java
++++ ../src-work/minecraft/net/minecraft/src/HttpPipeline.java
+@@ -13,7 +13,7 @@
+ @SideOnly(Side.CLIENT)
+ public class HttpPipeline
+ {
+-    private static Map mapConnections = new HashMap();
++    private static Map<Object, HttpPipelineConnection> mapConnections = new HashMap();
+     public static final String HEADER_USER_AGENT = "User-Agent";
+     public static final String HEADER_HOST = "Host";
+     public static final String HEADER_ACCEPT = "Accept";

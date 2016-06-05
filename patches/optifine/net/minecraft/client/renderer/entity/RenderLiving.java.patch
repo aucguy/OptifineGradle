@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/entity/RenderLiving.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/entity/RenderLiving.java
+@@ -17,7 +17,7 @@
+ import shadersmod.client.Shaders;
+ 
+ @SideOnly(Side.CLIENT)
+-public abstract class RenderLiving extends RendererLivingEntity
++public abstract class RenderLiving<T extends EntityLiving> extends RendererLivingEntity<T>
+ {
+     public RenderLiving(RenderManager p_i46153_1_, ModelBase p_i46153_2_, float p_i46153_3_)
+     {

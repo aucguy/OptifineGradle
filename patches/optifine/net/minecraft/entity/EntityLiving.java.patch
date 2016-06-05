@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/entity/EntityLiving.java
++++ ../src-work/minecraft/net/minecraft/entity/EntityLiving.java
+@@ -1253,7 +1253,7 @@
+         private static final EntityLiving.SpawnPlacementType[] $VALUES = new EntityLiving.SpawnPlacementType[]{ON_GROUND, IN_AIR, IN_WATER};
+ 
+         @SideOnly(Side.CLIENT)
+-        private SpawnPlacementType(String p_i79_3_, int p_i79_4_)
++        private SpawnPlacementType(String p_i45893_1_, int p_i45893_2_)
+         {
+         }
+ 

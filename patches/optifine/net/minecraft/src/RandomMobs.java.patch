@@ -1,0 +1,21 @@
+--- ../src-base/minecraft/net/minecraft/src/RandomMobs.java
++++ ../src-work/minecraft/net/minecraft/src/RandomMobs.java
+@@ -96,15 +96,15 @@
+ 
+                 if (renderGlobal != null)
+                 {
+-                    Entity entity = renderGlobal.renderedEntity;
++                    Entity entity2 = renderGlobal.renderedEntity;
+ 
+-                    if (!(entity instanceof EntityLiving))
++                    if (!(entity2 instanceof EntityLiving))
+                     {
+                         ResourceLocation resourcelocation2 = p_getTextureLocation_0_;
+                         return resourcelocation2;
+                     }
+ 
+-                    EntityLiving entityliving = (EntityLiving)entity;
++                    EntityLiving entityliving = (EntityLiving)entity2;
+                     String s = p_getTextureLocation_0_.func_110623_a();
+ 
+                     if (!s.startsWith("textures/entity/"))

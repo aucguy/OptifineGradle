@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/src/HttpUtils.java
++++ ../src-work/minecraft/net/minecraft/src/HttpUtils.java
+@@ -75,7 +75,7 @@
+         return abyte1;
+     }
+ 
+-    public static String post(String p_post_0_, Map p_post_1_, byte[] p_post_2_) throws IOException
++    public static String post(String p_post_0_, Map<String, Object> p_post_1_, byte[] p_post_2_) throws IOException
+     {
+         HttpURLConnection httpurlconnection = null;
+         String s3;

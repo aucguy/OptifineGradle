@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/util/LongHashMap.java
++++ ../src-work/minecraft/net/minecraft/util/LongHashMap.java
+@@ -3,7 +3,7 @@
+ import net.minecraftforge.fml.relauncher.Side;
+ import net.minecraftforge.fml.relauncher.SideOnly;
+ 
+-public class LongHashMap
++public class LongHashMap<T>
+ {
+     private transient LongHashMap.Entry[] field_76169_a = new LongHashMap.Entry[4096];
+     private transient int field_76167_b;

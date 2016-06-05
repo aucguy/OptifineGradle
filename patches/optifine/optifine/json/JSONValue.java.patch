@@ -1,0 +1,21 @@
+--- ../src-base/minecraft/optifine/json/JSONValue.java
++++ ../src-work/minecraft/optifine/json/JSONValue.java
+@@ -162,15 +162,15 @@
+ 
+             if (c0 >= 0 && c0 <= 31 || c0 >= 127 && c0 <= 159 || c0 >= 8192 && c0 <= 8447)
+             {
+-                String s = Integer.toHexString(c0);
++                String s2 = Integer.toHexString(c0);
+                 sb.append("\\u");
+ 
+-                for (int j = 0; j < 4 - s.length(); ++j)
++                for (int j = 0; j < 4 - s2.length(); ++j)
+                 {
+                     sb.append('0');
+                 }
+ 
+-                sb.append(s.toUpperCase());
++                sb.append(s2.toUpperCase());
+             }
+             else
+             {

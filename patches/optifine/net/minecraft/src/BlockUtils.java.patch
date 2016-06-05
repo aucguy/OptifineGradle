@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/src/BlockUtils.java
++++ ../src-work/minecraft/net/minecraft/src/BlockUtils.java
+@@ -10,7 +10,7 @@
+ public class BlockUtils
+ {
+     private static ReflectorClass ForgeBlock = new ReflectorClass(Block.class);
+-    private static ReflectorMethod ForgeBlock_setLightOpacity = new ReflectorMethod(ForgeBlock, "func_149713_g");
++    private static ReflectorMethod ForgeBlock_setLightOpacity = new ReflectorMethod(ForgeBlock, "setLightOpacity");
+     private static boolean directAccessValid = true;
+     private static Map mapOriginalOpacity = new IdentityHashMap();
+ 

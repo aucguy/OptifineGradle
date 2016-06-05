@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/optifine/Utils.java
++++ ../src-work/minecraft/optifine/Utils.java
+@@ -37,7 +37,7 @@
+         String s = System.getProperty("user.home", ".");
+         File file1 = null;
+ 
+-        switch ($SWITCH_TABLE$optifine$Utils$OS()[getPlatform().ordinal()])
++        switch (getPlatform().ordinal())
+         {
+             case 1:
+             case 2:

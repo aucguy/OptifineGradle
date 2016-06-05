@@ -1,0 +1,47 @@
+--- ../src-base/minecraft/net/minecraft/src/BlockPosM.java
++++ ../src-work/minecraft/net/minecraft/src/BlockPosM.java
+@@ -65,11 +65,11 @@
+         this.setXyz(MathHelper.func_76128_c(p_setXyz_1_), MathHelper.func_76128_c(p_setXyz_3_), MathHelper.func_76128_c(p_setXyz_5_));
+     }
+ 
+-    public BlockPos func_177972_a(EnumFacing p_177972_1_)
++    public BlockPos func_177972_a(EnumFacing facing)
+     {
+         if (this.level <= 0)
+         {
+-            return super.func_177967_a(p_177972_1_, 1);
++            return super.func_177967_a(facing, 1);
+         }
+         else
+         {
+@@ -83,14 +83,14 @@
+                 this.update();
+             }
+ 
+-            int i = p_177972_1_.func_176745_a();
++            int i = facing.func_176745_a();
+             BlockPosM blockposm = this.facings[i];
+ 
+             if (blockposm == null)
+             {
+-                int j = this.mx + p_177972_1_.func_82601_c();
+-                int k = this.my + p_177972_1_.func_96559_d();
+-                int l = this.mz + p_177972_1_.func_82599_e();
++                int j = this.mx + facing.func_82601_c();
++                int k = this.my + facing.func_96559_d();
++                int l = this.mz + facing.func_82599_e();
+                 blockposm = new BlockPosM(j, k, l, this.level - 1);
+                 this.facings[i] = blockposm;
+             }
+@@ -99,9 +99,9 @@
+         }
+     }
+ 
+-    public BlockPos func_177967_a(EnumFacing p_177967_1_, int p_177967_2_)
++    public BlockPos func_177967_a(EnumFacing facing, int n)
+     {
+-        return p_177967_2_ == 1 ? this.func_177972_a(p_177967_1_) : super.func_177967_a(p_177967_1_, p_177967_2_);
++        return n == 1 ? this.func_177972_a(facing) : super.func_177967_a(facing, n);
+     }
+ 
+     private void update()

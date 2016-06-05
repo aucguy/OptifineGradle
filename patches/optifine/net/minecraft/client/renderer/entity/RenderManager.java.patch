@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/entity/RenderManager.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/entity/RenderManager.java
+@@ -490,7 +490,7 @@
+         this.field_178639_r = p_178632_1_;
+     }
+ 
+-    public Map getEntityRenderMap()
++    public Map<Object, Render> getEntityRenderMap()
+     {
+         return this.field_78729_o;
+     }

@@ -1,0 +1,49 @@
+--- ../src-base/minecraft/net/minecraft/client/settings/GameSettings.java
++++ ../src-work/minecraft/net/minecraft/client/settings/GameSettings.java
+@@ -83,7 +83,7 @@
+     public int field_74345_l = 2;
+     public boolean field_74347_j = true;
+     public int field_74348_k = 2;
+-    public List field_151453_l = Lists.newArrayList();
++    public List<String> field_151453_l = Lists.newArrayList();
+     public List field_183018_l = Lists.newArrayList();
+     public EntityPlayer.EnumChatVisibility field_74343_n = EntityPlayer.EnumChatVisibility.FULL;
+     public boolean field_74344_o = true;
+@@ -99,7 +99,7 @@
+     public boolean field_80005_w;
+     public boolean field_82882_x;
+     public boolean field_82881_y = true;
+-    private final Set field_178882_aU = Sets.newHashSet(EnumPlayerModelParts.values());
++    private final Set<EnumPlayerModelParts> field_178882_aU = Sets.newHashSet(EnumPlayerModelParts.values());
+     public boolean field_85185_A;
+     public int field_92118_B;
+     public int field_92119_C;
+@@ -3154,19 +3154,19 @@
+             return null;
+         }
+ 
+-        private Options(String p_i13_3_, int p_i13_4_, String p_i13_5_, boolean p_i13_6_, boolean p_i13_7_)
++        private Options(String p_i1015_1_, int p_i1015_2_, String p_i1015_3_, boolean p_i1015_4_, boolean p_i1015_5_)
+         {
+-            this(p_i13_3_, p_i13_4_, p_i13_5_, p_i13_6_, p_i13_7_, 0.0F, 1.0F, 0.0F);
++            this(p_i1015_1_, p_i1015_2_, p_i1015_3_, p_i1015_4_, p_i1015_5_, 0.0F, 1.0F, 0.0F);
+         }
+ 
+-        private Options(String p_i14_3_, int p_i14_4_, String p_i14_5_, boolean p_i14_6_, boolean p_i14_7_, float p_i14_8_, float p_i14_9_, float p_i14_10_)
++        private Options(String p_i45004_1_, int p_i45004_2_, String p_i45004_3_, boolean p_i45004_4_, boolean p_i45004_5_, float p_i45004_6_, float p_i45004_7_, float p_i45004_8_)
+         {
+-            this.field_74387_C = p_i14_5_;
+-            this.field_74385_A = p_i14_6_;
+-            this.field_74386_B = p_i14_7_;
+-            this.field_148271_N = p_i14_8_;
+-            this.field_148272_O = p_i14_9_;
+-            this.field_148270_M = p_i14_10_;
++            this.field_74387_C = p_i45004_3_;
++            this.field_74385_A = p_i45004_4_;
++            this.field_74386_B = p_i45004_5_;
++            this.field_148271_N = p_i45004_6_;
++            this.field_148272_O = p_i45004_7_;
++            this.field_148270_M = p_i45004_8_;
+         }
+ 
+         public boolean func_74380_a()

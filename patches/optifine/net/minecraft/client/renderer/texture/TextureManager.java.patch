@@ -1,0 +1,22 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/texture/TextureManager.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/texture/TextureManager.java
+@@ -27,7 +27,7 @@
+ {
+     private static final Logger field_147646_a = LogManager.getLogger();
+     private final Map field_110585_a = Maps.newHashMap();
+-    private final List field_110583_b = Lists.newArrayList();
++    private final List<ITickable> field_110583_b = Lists.newArrayList();
+     private final Map field_110584_c = Maps.newHashMap();
+     private IResourceManager field_110582_d;
+ 
+@@ -180,8 +180,9 @@
+             }
+         }
+ 
+-        for (Entry entry : this.field_110585_a.entrySet())
++        for (Object i : this.field_110585_a.entrySet())
+         {
++        	Entry entry = (Entry) i;
+             this.func_110579_a((ResourceLocation)entry.getKey(), (ITextureObject)entry.getValue());
+         }
+     }

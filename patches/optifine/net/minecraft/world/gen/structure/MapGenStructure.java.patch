@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/world/gen/structure/MapGenStructure.java
++++ ../src-work/minecraft/net/minecraft/world/gen/structure/MapGenStructure.java
+@@ -25,7 +25,7 @@
+ public abstract class MapGenStructure extends MapGenBase
+ {
+     private MapGenStructureData field_143029_e;
+-    protected Map field_75053_d = Maps.newHashMap();
++    protected Map<Object, StructureStart> field_75053_d = Maps.newHashMap();
+     @SideOnly(Side.CLIENT)
+     private LongHashMap structureLongMap = new LongHashMap();
+ 
+@@ -190,7 +190,7 @@
+         }
+         else
+         {
+-            List list = this.func_75052_o_();
++            List<BlockPos> list = this.func_75052_o_();
+ 
+             if (list != null)
+             {

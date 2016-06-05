@@ -1,0 +1,29 @@
+--- ../src-base/minecraft/net/minecraft/crash/CrashReport.java
++++ ../src-work/minecraft/net/minecraft/crash/CrashReport.java
+@@ -30,7 +30,7 @@
+     private final String field_71513_a;
+     private final Throwable field_71511_b;
+     private final CrashReportCategory field_85061_c = new CrashReportCategory(this, "System Details");
+-    private final List field_71512_c = Lists.newArrayList();
++    private final List<CrashReportCategory> field_71512_c = Lists.newArrayList();
+     private File field_71510_d;
+     private boolean field_85059_f = true;
+     private StackTraceElement[] field_85060_g = new StackTraceElement[0];
+@@ -101,7 +101,7 @@
+             public String call() throws Exception
+             {
+                 RuntimeMXBean runtimemxbean = ManagementFactory.getRuntimeMXBean();
+-                List list = runtimemxbean.getInputArguments();
++                List<String> list = runtimemxbean.getInputArguments();
+                 int i = 0;
+                 StringBuilder stringbuilder = new StringBuilder();
+ 
+@@ -123,7 +123,7 @@
+         });
+         this.field_85061_c.func_71500_a("IntCache", new Callable()
+         {
+-            public String a() throws Exception
++            public String call() throws Exception
+             {
+                 return IntCache.func_85144_b();
+             }
