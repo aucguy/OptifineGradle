@@ -19,7 +19,8 @@ public class FieldRemover extends ClassVisitor
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
     {
-        if (name.equals("__OBFID")) {
+        if (name.equals("__OBFID"))
+        {
             return null;
         }
         return super.visitField(access, name, desc, signature, value);

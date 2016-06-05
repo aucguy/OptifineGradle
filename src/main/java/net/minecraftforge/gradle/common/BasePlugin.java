@@ -510,7 +510,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
         MergeJars merge = makeTask(TASK_MERGE_JARS, MergeJars.class);
         {
-            merge.setClient(delayedFile(JAR_CLIENT_FRESH));
+            merge.setClient(delayedFile(mergeClientJar));
             merge.setServer(delayedFile(JAR_SERVER_PURE));
             merge.setOutJar(delayedFile(JAR_MERGED));
             merge.dependsOn(mergeDependency, splitServer);

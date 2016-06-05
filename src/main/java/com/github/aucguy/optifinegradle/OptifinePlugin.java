@@ -22,7 +22,7 @@ public class OptifinePlugin
 
     public void applyPlugin()
     {
-        plugin.project.getExtensions().create(EXTENSION, OptifineExtension.class);
+    	plugin.project.getExtensions().create(EXTENSION, OptifineExtension.class);
     }
 
     public void afterEvaluate()

@@ -44,20 +44,20 @@ public final class PatcherConstants
     static final String DIR_EXTRACTED_START      = "/src/main/start";
 
     static final String REPLACE_PROJECT_NAME     = "{NAME}";
-    static final String REPLACE_PROJECT_CAP_NAME = "{CAPNAME}";
+    public static final String REPLACE_PROJECT_CAP_NAME = "{CAPNAME}";
 
     // the only actually cached thing
     static final String DEOBF_DATA               = Constants.DIR_MCP_DATA + "/deobfuscation_data-" + Constants.REPLACE_MC_VERSION + ".lzma";
 
     // cached stuff
     static final String DIR_LOCAL_CACHE          = Constants.REPLACE_BUILD_DIR + "/localCache";
-    static final String JAR_DEOBF                = DIR_LOCAL_CACHE + "/deobfuscated.jar";
+    public static final String JAR_DEOBF                = DIR_LOCAL_CACHE + "/deobfuscated.jar";
     static final String JAR_DECOMP               = DIR_LOCAL_CACHE + "/decompiled.zip";
     static final String JAR_DECOMP_POST          = DIR_LOCAL_CACHE + "/decompiled-processed.zip";
     static final String JAR_REMAPPED             = DIR_LOCAL_CACHE + "/remapped-clean.zip";
 
     // cached project stuff
-    static final String DIR_PROJECT_CACHE        = DIR_LOCAL_CACHE + "/" + REPLACE_PROJECT_CAP_NAME;
+    public static final String DIR_PROJECT_CACHE        = DIR_LOCAL_CACHE + "/" + REPLACE_PROJECT_CAP_NAME;
     public static final String JAR_PROJECT_PATCHED      = DIR_PROJECT_CACHE + "/patched.zip";
     static final String JAR_PROJECT_RECOMPILED   = DIR_PROJECT_CACHE + "/recompiled.jar";
     static final String JAR_PROJECT_REMAPPED     = DIR_PROJECT_CACHE + "/mcp-named.zip";

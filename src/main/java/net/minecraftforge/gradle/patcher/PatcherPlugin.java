@@ -758,7 +758,9 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                     remap.setInJar(delayedFile(projectString(JAR_PROJECT_REMAPPED, lastPatcher)));
                     patch.addInject(lastPatcher.getDelayedSourcesDir());
                     patch.addInject(lastPatcher.getDelayedResourcesDir());
-                } else {
+                }
+                else
+                {
                     remap.setInJar(delayedFile(JAR_DECOMP_POST));
                 }
 
@@ -782,7 +784,9 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                     patch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, lastPatcher)));
                     patch.addInject(lastPatcher.getDelayedSourcesDir());
                     patch.addInject(lastPatcher.getDelayedResourcesDir());
-                } else {
+                }
+                else
+                {
                     patch.setInJar(delayedFile(JAR_DECOMP_POST));
                 }
 

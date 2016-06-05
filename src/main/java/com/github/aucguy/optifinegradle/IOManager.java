@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -64,17 +65,21 @@ public class IOManager
     public InputStream openFileInZipForReading(Object zip, Object file) throws IOException
     {
         ZipFile z = this.openZipForReading(zip);
+        return openFileInZipForReading(z, z.getEntry((String) file));
+    }
+    
+    public InputStream openFileInZipForReading(ZipFile z, ZipEntry file) throws IOException
+    {
         InputStream f;
         try
         {
-            f = z.getInputStream(z.getEntry((String) file));
+            f = z.getInputStream(file);
         } catch (IOException e)
         {
             throw new IOException("Couldn't open input file in zip: " + e.getMessage());
         }
         this.handles.add(f);
         return f;
-
     }
 
     public BufferedInputStream openFileForReading(Object file) throws IOException

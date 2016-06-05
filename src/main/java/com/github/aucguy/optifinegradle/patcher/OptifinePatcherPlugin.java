@@ -5,10 +5,9 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.JAR_PROJECT_PATCHED;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.JAR_PROJECT_RETROMAPPED;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_RETROMAP;
+import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_PATCH;
 
 import java.io.File;
-
-import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_PATCH;
 
 import org.gradle.api.Task;
 import org.gradle.api.tasks.bundling.Zip;

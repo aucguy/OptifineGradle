@@ -79,7 +79,8 @@ public class JoinJars extends CachedTask
             Remapper mapping = new SimpleRemapper(renames);
 
             copyJarsInto(manager.openFileForWriting(obfuscatedClasses), manager.openZipForWriting(outJar), mapping, manager.openZipForReading(optifine), manager.openZipForReading(client));
-        } finally
+        }
+        finally
         {
             manager.closeAll();
         }
