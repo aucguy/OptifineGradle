@@ -46,6 +46,7 @@ import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.Zip;
 
+import com.github.aucguy.optifinegradle.user.JoinJars;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -892,10 +893,8 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                             genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_PATCHED, genFrom)));
                             genPatches.dependsOn(projectString(TASK_PROJECT_PATCH, genFrom));
                         }
-
                     }
                 }
-
             }
 
             // add patch sets to bin patches

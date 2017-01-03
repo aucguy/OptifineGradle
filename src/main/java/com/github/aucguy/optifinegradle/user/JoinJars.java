@@ -1,41 +1,29 @@
 package com.github.aucguy.optifinegradle.user;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
-import org.objectweb.asm.commons.RemappingClassAdapter;
 import org.objectweb.asm.commons.SimpleRemapper;
 
-import com.github.aucguy.optifinegradle.FieldRemover;
-import com.github.aucguy.optifinegradle.IOManager;
+import com.github.aucguy.optifinegradle.AsmProcessingTask;
+import com.github.aucguy.optifinegradle.FieldRenamer;
 
-import net.md_5.specialsource.JarMapping;
 import net.minecraftforge.gradle.util.caching.Cached;
-import net.minecraftforge.gradle.util.caching.CachedTask;
-import net.minecraftforge.gradle.util.delayed.DelayedFile;
+import net.minecraftforge.gradle.util.delayed.DelayedString;
 
-public class JoinJars extends CachedTask
+public class JoinJars extends AsmProcessingTask
 {
     @InputFile
     public Object       client;
@@ -44,91 +32,60 @@ public class JoinJars extends CachedTask
     public Object       optifine;
 
     @InputFile
-    public DelayedFile  srg;
-
+    public Object       srg;
+    
+    @InputFile
+    public Object		renames;
+    
     @OutputFile
     @Cached
     public Object       obfuscatedClasses;
-
-    @OutputFile
-    @Cached
-    public Object       outJar;
-
+    
     @Input
     private Set<String> exclusions = new HashSet<String>();
+    
+    protected Remapper mapping;
+    protected OutputStream obfClasses;
 
-    @TaskAction
-    public void doAction() throws IOException
+    @Override
+    public void middle() throws IOException
     {
-        IOManager manager = new IOManager(this);
-        try
-        {
-            JarMapping m = new JarMapping(); // load renames
-            BufferedReader reader = new BufferedReader(new FileReader(getProject().file(srg)));
-            m.loadMappings(reader, null, null, true);
-            Map<String, String> renames = new HashMap<String, String>();
-            for (Entry<String, String> entry : m.fields.entrySet())
-            {
-                String[] parts = entry.getKey().split("/(?=[^/]*$)");
-                renames.put(m.classes.get(parts[0]) + ".val$" + parts[1], entry.getValue());
-            }
-            for (Entry<String, String> entry : m.classes.entrySet())
-            {
-                renames.put(entry.getValue() + ".this$0", "c");
-            }
-            Remapper mapping = new SimpleRemapper(renames);
-
-            copyJarsInto(manager.openFileForWriting(obfuscatedClasses), manager.openZipForWriting(outJar), mapping, manager.openZipForReading(optifine), manager.openZipForReading(client));
-        }
-        finally
-        {
-            manager.closeAll();
-        }
+    	InputStream stream = manager.openFileForReading(renames);
+    	Properties properties = new Properties();
+    	properties.load(stream);
+    	mapping = new SimpleRemapper((Map) properties);
+    	obfClasses = manager.openFileForWriting(obfuscatedClasses);
+    	copyJars(optifine, client);
     }
 
-    @SuppressWarnings("unchecked")
-    private void copyJarsInto(OutputStream obfClasses, ZipOutputStream output, Remapper mapping, ZipFile... inputs) throws IOException
-    {
-        Set<String> copiedEntries = new HashSet<String>();
-        boolean optifine = true;
-
-        for (ZipFile input : inputs)
+	@Override
+	protected byte[] asRead(Object inJar, final String name, byte[] data)
+	{
+        if (inJar == optifine && name.endsWith(".class"))
         {
-            for (Enumeration<ZipEntry> iter = (Enumeration<ZipEntry>) input.entries(); iter.hasMoreElements();)
+            try
             {
-                ZipEntry entry = iter.nextElement();
-                if (!entry.isDirectory() && !copiedEntries.contains(entry.getName()) && acceptsFile(entry.getName()))
-                {
-                    copiedEntries.add(entry.getName());
-
-                    output.putNextEntry(new JarEntry(entry.getName()));
-                    InputStream stream = new BufferedInputStream(input.getInputStream(entry));
-                    byte[] bytes = IOManager.readAll(stream);
-
-                    if (optifine && entry.getName().endsWith(".class"))
-                    {
-                        Patching.addObfClass(entry.getName(), obfClasses);
-                        bytes = processOptifine(bytes, mapping);
-                    }
-
-                    output.write(bytes);
-                    stream.close();
-                    output.closeEntry();
-                }
-            }
-            optifine = false;
+				Patching.addObfClass(name, obfClasses);
+			} catch (UnsupportedEncodingException e)
+            {
+				throw(new RuntimeException());
+			} catch (IOException e)
+            {
+				throw(new RuntimeException());
+			}
+            data = processAsm(data, new TransformerFactory()
+            {
+				@Override
+				public ClassVisitor create(ClassVisitor visitor)
+				{
+					ClassVisitor transformer = new FieldRenamer(visitor, name.substring(0, name.length() - 6));
+					transformer = new ClassRemapper(transformer, mapping);
+			        return transformer;
+				}
+            });
         }
-    }
-
-    public static byte[] processOptifine(byte[] data, Remapper mapping)
-    {
-        ClassReader reader = new ClassReader(data);
-        ClassWriter writer = new ClassWriter(reader, 0);
-        RemappingClassAdapter transformer1 = new RemappingClassAdapter(writer, mapping);
-        FieldRemover transformer2 = new FieldRemover(transformer1);
-        reader.accept(transformer2, ClassReader.EXPAND_FRAMES);
-        return writer.toByteArray();
-    }
+        return data;
+	}
 
     protected boolean acceptsFile(String file)
     {
@@ -143,5 +100,14 @@ public class JoinJars extends CachedTask
     public void exclude(String excl)
     {
         exclusions.add(excl);
+    }
+    
+    public static String resolveString(Object obj)
+    {
+    	if(obj instanceof DelayedString)
+    	{
+    		return ((DelayedString) obj).call();
+    	}
+    	return (String) obj;
     }
 }

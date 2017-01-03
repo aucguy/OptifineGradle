@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -58,7 +58,7 @@ public class Download extends CachedTask
         outputFile.createNewFile();
 
         URL url = new URL(getUrl());
-        ReadableByteChannel  inChannel;
+        ReadableByteChannel inChannel;
         if(url.getProtocol().equals("file"))
         {
             File file = new File(url.toString().replace("file://", ""));
@@ -74,14 +74,17 @@ public class Download extends CachedTask
 
             inChannel  = Channels.newChannel(connect.getInputStream());
         }
-        FileChannel          outChannel = new FileOutputStream(outputFile).getChannel();
+        FileOutputStream os = new FileOutputStream(outputFile);
+        FileChannel outChannel = os.getChannel();
 
         // If length is longer than what is available, it copies what is available according to java docs.
         // Therefore, I use Long.MAX_VALUE which is a theoretical maximum.
+        outChannel.write(ByteBuffer.wrap("hello".getBytes()));
         outChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
 
         outChannel.close();
         inChannel.close();
+        os.close();
 
         getLogger().info("Download complete");
     }

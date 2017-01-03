@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -39,7 +38,7 @@ public class IOManager
         ZipFile f;
         try
         {
-            f = new ZipFile(this.getFile(file));
+            f = new ZipFile(this.getFile(file, false));
         } catch (IOException e)
         {
             throw new IOException("Couldn't open input zip: " + e.getMessage());
@@ -62,10 +61,10 @@ public class IOManager
         return f;
     }
 
-    public InputStream openFileInZipForReading(Object zip, Object file) throws IOException
+    public InputStream openFileInZipForReading(Object zip, String file) throws IOException
     {
         ZipFile z = this.openZipForReading(zip);
-        return openFileInZipForReading(z, z.getEntry((String) file));
+        return openFileInZipForReading(z, z.getEntry(file));
     }
     
     public InputStream openFileInZipForReading(ZipFile z, ZipEntry file) throws IOException
@@ -81,13 +80,37 @@ public class IOManager
         this.handles.add(f);
         return f;
     }
+    
+    public InputStream openFileSomewhereForReading(Object obj) throws IOException
+    {
+    	File file = getFile(obj);
+    	if(file.exists()) //directly in filesystem
+    	{
+    		return openFileForReading(file);
+    	}
+    	
+    	File archive = file;
+    	while(archive != null && !archive.exists()) //nonexistant or in archive
+    	{
+    		archive = archive.getParentFile();
+    	}
+    	
+    	if(archive != null && archive.isFile()) //in archive
+    	{
+    		return openFileInZipForReading(archive, archive.toPath().relativize(file.toPath()).toString());
+    	}
+    	else //nonexistant
+    	{
+    		throw new IOException("file does not exist: " + file.getAbsolutePath());
+    	}
+    }
 
     public BufferedInputStream openFileForReading(Object file) throws IOException
     {
         BufferedInputStream f;
         try
         {
-            f = new BufferedInputStream(new FileInputStream(this.getFile(file)));
+            f = new BufferedInputStream(new FileInputStream(this.getFile(file, false)));
         } catch (IOException e)
         {
             throw new IOException("Couldn't open input file: " + e.getMessage());
@@ -117,12 +140,20 @@ public class IOManager
         this.handles.add(f);
         return f;
     }
-
-    protected File getFile(Object file)
+    
+    protected File getFile(Object file, boolean makeDirs)
     {
         File f = this.task.getProject().file(file);
-        f.getParentFile().mkdirs();
+        if(makeDirs)
+        {
+        	f.getParentFile().mkdirs();
+        }
         return f;
+    }
+    
+    protected File getFile(Object file)
+    {
+    	return getFile(file, false);
     }
 
     public void closeAll() throws IOException
@@ -141,8 +172,7 @@ public class IOManager
 
     public static BufferedReader toBufferedReader(InputStream inputStream)
     {
-        Reader reader = new InputStreamReader(inputStream);
-        return new BufferedReader(reader);
+        return new BufferedReader(new InputStreamReader(inputStream));
     }
 
     public static Set<String> readLines(InputStream inputStream) throws IOException

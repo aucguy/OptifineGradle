@@ -5,10 +5,9 @@ import org.gradle.api.tasks.TaskAction;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.commons.ClassRemapper;
+import org.objectweb.asm.commons.MethodRemapper;
 import org.objectweb.asm.commons.Remapper;
-import org.objectweb.asm.commons.RemappingClassAdapter;
-import org.objectweb.asm.commons.RemappingMethodAdapter;
 
 import com.github.aucguy.optifinegradle.AsmProcessingTask;
 
@@ -23,7 +22,7 @@ public class DeobfuscateJar extends AsmProcessingTask
 		}	
 	}
 	
-	public static class ParameterRemappingClassAdapter extends RemappingClassAdapter
+	public static class ParameterRemappingClassAdapter extends ClassRemapper
 	{
 	    public ParameterRemappingClassAdapter(ClassVisitor cv, Remapper remapper)
 	    {
@@ -31,18 +30,17 @@ public class DeobfuscateJar extends AsmProcessingTask
 		}
 	    
 	    @Override
-		protected MethodVisitor createRemappingMethodAdapter(int access,
-	            String newDesc, MethodVisitor mv)
+		protected MethodVisitor createMethodRemapper(MethodVisitor mv)
 		{
-	        return new ParameterRemappingMethodAdapter(access, newDesc, mv, remapper);
+	        return new ParameterRemappingMethodAdapter(mv, this.remapper);
 	    }
 	}
 	
-	public static class ParameterRemappingMethodAdapter extends RemappingMethodAdapter
+	public static class ParameterRemappingMethodAdapter extends MethodRemapper
 	{
-		protected ParameterRemappingMethodAdapter(int access, String desc, MethodVisitor mv, Remapper remapper)
+		protected ParameterRemappingMethodAdapter(MethodVisitor mv, Remapper remapper)
 		{
-			super(Opcodes.ASM5, access, desc, mv, remapper);
+			super(mv, remapper);
 		}
 		
 		@Override
@@ -84,12 +82,12 @@ public class DeobfuscateJar extends AsmProcessingTask
 	@TaskAction
 	public void doAction() throws Exception
 	{
-		mapping = AsmProcessingTask.loadCsv(getProject().file(methodsCsv), getProject().file(fieldsCsv), getProject().file(paramsCsv));
+		mapping = createRemapper(AsmProcessingTask.loadCsv(getProject().file(methodsCsv), getProject().file(fieldsCsv), getProject().file(paramsCsv)));
 		copyJars(inJar);
 	}
 
 	@Override
-	public byte[] asRead(String name, byte[] data)
+	public byte[] asRead(Object inJar, String name, byte[] data)
 	{
 		if(name.endsWith(".class"))
 		{

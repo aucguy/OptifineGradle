@@ -42,7 +42,6 @@ import com.google.common.collect.ImmutableMap;
 
 import groovy.lang.Closure;
 import net.minecraftforge.gradle.tasks.DeobfuscateJar;
-import net.minecraftforge.gradle.tasks.Download;
 import net.minecraftforge.gradle.tasks.ExtractConfigTask;
 import net.minecraftforge.gradle.tasks.PatchSourcesTask;
 import net.minecraftforge.gradle.tasks.RemapSources;
@@ -129,15 +128,6 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         {
             final Object postDecompJar = chooseDeobfOutput(global, local, "", "decompFixed");
             final Object patchedJar = chooseDeobfOutput(global, local, "", "patched", true);
-            
-            if(isOptifine)
-            {
-                Download dlPatches = makeTask(TASK_DL_PATCHES, Download.class);
-                {
-                    dlPatches.setOutput(delayedFile(PATCH_ZIP));
-                    dlPatches.setUrl(delayedString(PATCH_URL));
-                }
-            }
             
             PatchSourcesTask patch = makeTask(TASK_PATCH, PatchSourcesTask.class);
             if(isOptifine)

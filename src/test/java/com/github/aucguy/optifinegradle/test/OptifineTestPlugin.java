@@ -37,7 +37,6 @@ public class OptifineTestPlugin extends OptifinePatcherPlugin
 			}
 		}
 		
-
         Task deobfuscateJar = makeTask(TASK_DEOBFUSCATE_JAR);
         deobfuscateJar.setGroup(GROUP_OPTIFINE);
         deobfuscateJar.setDescription("Deobfuscates a jar");

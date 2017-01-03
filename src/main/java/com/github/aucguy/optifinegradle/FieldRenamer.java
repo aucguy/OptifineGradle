@@ -7,13 +7,14 @@ import org.objectweb.asm.Opcodes;
 /**
  * removes '__OBFID' fields
  */
-public class FieldRemover extends ClassVisitor
+public class FieldRenamer extends ClassVisitor
 {
-    String name;
-
-    public FieldRemover(ClassVisitor cv)
+	public String className;
+	
+    public FieldRenamer(ClassVisitor cv, String className)
     {
         super(Opcodes.ASM5, cv);
+        this.className = className;
     }
 
     @Override

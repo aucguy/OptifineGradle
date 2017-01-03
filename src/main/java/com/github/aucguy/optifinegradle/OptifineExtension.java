@@ -4,10 +4,21 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 
 public class OptifineExtension
 {
+	private String optifineVersion;
     private String patchURL;
     private String patchArchive;
     private String optifineJar;
-
+    
+    public String getOptifineVersion()
+    {
+    	return optifineVersion == null ? DEFAULT_OPTIFINE_VERSION : optifineVersion;
+    }
+    
+    public void setOptifineVersion(String x)
+    {
+    	optifineVersion = x;
+    }
+    
     public String getPatchURL()
     {
         return patchURL == null ? DEFAULT_PATCH_URL : patchURL;

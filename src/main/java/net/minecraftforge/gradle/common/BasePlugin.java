@@ -48,9 +48,12 @@ import org.gradle.api.artifacts.repositories.FlatDirectoryArtifactRepository;
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
+import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
+import org.gradle.api.tasks.Exec;
 import org.gradle.testfixtures.ProjectBuilder;
 
+import com.github.aucguy.optifinegradle.CacheWrapper;
 import com.github.aucguy.optifinegradle.user.JoinJars;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
@@ -495,17 +498,37 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         String mergeClientJar;
         Task mergeDependency;
         if(isOptifine)
-        {
+        {	
+        	CacheWrapper diff = makeTask(TASK_DIFF_OPTIFINE, CacheWrapper.class);
+        	{
+        		Exec task = makeTask(TASK_DIFF_EXEC, Exec.class);
+        		task.executable("java");
+        		task.args("-cp", delayedString(JAR_OPTIFINE_FRESH), "optifine.Patcher", 
+        			delayedString(JAR_CLIENT_FRESH), delayedString(JAR_OPTIFINE_FRESH), delayedString(JAR_OPTIFINE_DIFFED));
+        		diff.task = task;
+        		diff.input1 = delayedFile(JAR_CLIENT_FRESH);
+        		diff.input2 = delayedFile(JAR_OPTIFINE_FRESH);
+        		diff.output = delayedFile(JAR_OPTIFINE_DIFFED);
+        		diff.dependsOn(dlClient);
+        	}
+        	
+        	Copy extractRenames = makeTask(TASK_EXTRACT_RENAMES, Copy.class);
+        	{
+        		extractRenames.into(delayedFile(PATCH_EXTRACT));
+        		extractRenames.include(PATCH_RENAMES_FILE);
+        	}
+        	
             JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
             {
                 join.client = delayedFile(JAR_CLIENT_FRESH);
-                join.optifine = delayedFile(JAR_OPTIFINE_FRESH);
+                join.optifine = delayedFile(JAR_OPTIFINE_DIFFED);
                 join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
                 join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
+                join.renames = delayedFile(PATCH_RENAMES);
                 join.srg = delayedFile(SRG_NOTCH_TO_MCP);
                 join.exclude("javax/");
                 join.exclude("net/minecraftforge/");
-                join.dependsOn(dlClient);
+                join.dependsOn(dlClient, diff, extractRenames);
             }
             mergeClientJar = JAR_CLIENT_JOINED;
             mergeDependency = join;

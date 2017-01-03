@@ -28,6 +28,7 @@ public class OptifinePlugin
     public void afterEvaluate()
     {
         OptifineExtension ext = (OptifineExtension) plugin.project.getExtensions().getByName(EXTENSION);
+        plugin.replacer.putReplacement(REPLACE_OPTIFINE_VERSION, ext.getOptifineVersion());
         plugin.replacer.putReplacement(REPLACE_PATCH_ARCHIVE, ext.getPatchArchive());
         plugin.replacer.putReplacement(REPLACE_PATCH_URL, ext.getPatchURL());
         plugin.replacer.putReplacement(REPLACE_OPTIFINE_JAR, ext.getOptifineJar());

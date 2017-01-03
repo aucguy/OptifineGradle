@@ -19,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.TaskAction;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -28,6 +29,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import net.md_5.specialsource.JarMapping;
 import net.md_5.specialsource.transformer.MappingTransformer;
 import net.minecraftforge.gradle.common.Constants;
+import net.minecraftforge.gradle.util.caching.Cached;
 import net.minecraftforge.gradle.util.caching.CachedTask;
 
 public abstract class AsmProcessingTask extends CachedTask
@@ -90,12 +92,27 @@ public abstract class AsmProcessingTask extends CachedTask
 	}
 	
 	@OutputFile
+	@Cached
 	@Optional
 	public Object outJar;
 	
+	protected IOManager manager = new IOManager(this);
+	
+	@TaskAction
+	public void doAction() throws Throwable
+	{
+		try
+		{
+			this.middle();
+		}
+		finally
+		{
+			manager.closeAll();
+		}
+	}
+	
 	public void copyJars(Object ... inJars) throws IOException
 	{
-		IOManager manager = new IOManager(this);
 		try
 		{
 			Set<String> copiedEntries = new HashSet<String>();
@@ -119,7 +136,7 @@ public abstract class AsmProcessingTask extends CachedTask
                     byte[] data = IOManager.readAll(stream);
                     stream.close();
                     
-                    data = asRead(name, data);
+                    data = asRead(inJar, name, data);
                     if(output != null)
                     {
                     	output.putNextEntry(new JarEntry(name));
@@ -135,14 +152,18 @@ public abstract class AsmProcessingTask extends CachedTask
 		}
 	}
 	
-	protected abstract byte[] asRead(String name, byte[] data);
+	protected void middle() throws Throwable
+	{
+	}
+	
+	protected abstract byte[] asRead(Object inJar, String name, byte[] data);
 	
 	protected boolean acceptsFile(String name)
 	{
 		return true;
 	}
 	
-	public static Remapper loadMappings(File srg, MappingTransformer inputTransformer, MappingTransformer outputTransformer, boolean reverse) throws IOException
+	public static Map<String, String> loadSrg(File srg, MappingTransformer inputTransformer, MappingTransformer outputTransformer, boolean reverse) throws IOException
 	{
         JarMapping mapping = new JarMapping();
         BufferedReader reader = new BufferedReader(new FileReader(srg));
@@ -150,10 +171,10 @@ public abstract class AsmProcessingTask extends CachedTask
         Map<String, String> renames = new HashMap<String, String>();
         addToRenames(renames, mapping.fields);
         addToRenames(renames, mapping.methods);
-        return new CustomRemapper(renames);
+        return renames;
 	}
 	
-	public static void addToRenames(Map<String, String> renames, Map<String, String> mappings)
+	protected static void addToRenames(Map<String, String> renames, Map<String, String> mappings)
 	{
         for(Entry<String, String> entry : mappings.entrySet())
         {
@@ -161,19 +182,20 @@ public abstract class AsmProcessingTask extends CachedTask
         	int index = key.indexOf("(");
         	index = index == -1 ? key.length() : index;
         	index = key.lastIndexOf("/", index);
+        	index = key.lastIndexOf("/", index - 1);
         	key = key.substring(index + 1, key.length());
-        	key = key.replace(" (", "(");
+        	key = key.replace(" (", "(").replaceFirst("/", ".");
         	renames.put(key, entry.getValue());
         }
 	}
 	
-	public static Remapper loadCsv(File methodsCsv, File fieldsCsv, File paramsCsv) throws IOException
+	public static Map<String, String> loadCsv(File methodsCsv, File fieldsCsv, File paramsCsv) throws IOException
 	{
 		Map<String, String> renames = new HashMap<String, String>();
 		loadCsvFile(renames, methodsCsv);
 		loadCsvFile(renames, fieldsCsv);
 		loadCsvFile(renames, paramsCsv);
-		return new CustomRemapper(renames);
+		return renames;
 	}
 	
 	protected static void loadCsvFile(Map<String, String> renames, File file) throws IOException
@@ -192,5 +214,10 @@ public abstract class AsmProcessingTask extends CachedTask
         ClassVisitor transformer = factory.create(writer);
         reader.accept(transformer, ClassReader.EXPAND_FRAMES);
         return writer.toByteArray();
+	}
+	
+	public static Remapper createRemapper(Map<String, String> renames)
+	{
+		return new CustomRemapper(renames);
 	}
 }

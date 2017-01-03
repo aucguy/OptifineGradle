@@ -76,7 +76,7 @@ public class GetCallersTask extends AsmProcessingTask
 	}
 
 	@Override
-	protected byte[] asRead(String name, byte[] data)
+	protected byte[] asRead(Object inJar, String name, byte[] data)
 	{
 		if(name.endsWith(".class"))
 		{

@@ -124,7 +124,8 @@ public class PatchSourcesTask extends AbstractEditJarTask
                     continue;
                 }
                 File path = patchThingy.toPath().relativize(f.toPath()).toFile();
-                if(Patching.shouldSkip(path.getPath(), ignoredPatches, true)) {
+                if(Patching.shouldSkip(path.getPath(), ignoredPatches, true))
+                {
                     continue;
                 }
                 
@@ -147,7 +148,10 @@ public class PatchSourcesTask extends AbstractEditJarTask
                 @Override
                 public void visitFile(FileVisitDetails details)
                 {
-                    if(Patching.shouldSkip(details.getPath(), ignoredPatches, true)) return;
+                    if(Patching.shouldSkip(details.getPath(), ignoredPatches, true)) {
+                    	System.out.println("skipped patch " + details.getPath());
+                    	return;
+                    }
 
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     details.copyTo(stream);

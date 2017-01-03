@@ -141,5 +141,5 @@ public final class PatcherConstants
     static final String TASK_PROJECT_RANGEMAP    = "extract" + REPLACE_PROJECT_CAP_NAME + "Rangemap";
     public static final String TASK_PROJECT_RETROMAP    = "retromapMc" + REPLACE_PROJECT_CAP_NAME;
     static final String TASK_PROJECT_RETRO_NONMC = "retromapNonMc" + REPLACE_PROJECT_CAP_NAME;
-    static final String TASK_PROJECT_GEN_PATCHES = "gen" + REPLACE_PROJECT_CAP_NAME + "Patches";
+    public static final String TASK_PROJECT_GEN_PATCHES = "gen" + REPLACE_PROJECT_CAP_NAME + "Patches";
 }

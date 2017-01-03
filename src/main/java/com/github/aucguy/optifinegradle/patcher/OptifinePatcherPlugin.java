@@ -1,16 +1,14 @@
 package com.github.aucguy.optifinegradle.patcher;
 
-import com.github.aucguy.optifinegradle.OptifinePlugin;
 import static com.github.aucguy.optifinegradle.OptifineConstants.*;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.JAR_PROJECT_PATCHED;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.JAR_PROJECT_RETROMAPPED;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_RETROMAP;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_PATCH;
+import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_GEN_PATCHES;
 
 import java.io.File;
 
-import org.gradle.api.Task;
+import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.Zip;
+
+import com.github.aucguy.optifinegradle.OptifinePlugin;
 
 import net.minecraftforge.gradle.patcher.PatcherPlugin;
 import net.minecraftforge.gradle.patcher.PatcherProject;
@@ -33,23 +31,18 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         super.applyPlugin();
         delegate.applyPlugin();
         
-        //no prefix
-        TaskGenPatches genPatches = makeTask(TASK_GEN_PATCHES, TaskGenPatches.class);
+        TaskGenPatches optifineGenPatches = makeTask(TASK_GEN_PATCHES, TaskGenPatches.class);
         {
-            //original and changed sources set in afterEval
-            genPatches.setPatchDir(delayedFile(OPTIFINE_PATCH_DIR));
+            optifineGenPatches.setPatchDir(delayedFile(OPTIFINE_PATCH_DIR));
         }
         
         Zip zipPatches = makeTask(TASK_ZIP_PATCHES, Zip.class);
         {
             zipPatches.from(delayedFile(OPTIFINE_PATCH_DIR));
-            zipPatches.dependsOn(genPatches);
+            zipPatches.setGroup(GROUP_OPTIFINE);
+            zipPatches.setDescription("Create the optifine patch archive");
+            zipPatches.dependsOn(optifineGenPatches);
         }
-        
-        Task createPatches = makeTask(TASK_BUILD_PATCHES);
-        createPatches.dependsOn(zipPatches);
-        createPatches.setGroup(GROUP_OPTIFINE);
-        createPatches.setDescription("Create the optifine patch archive");
     }
     
     @Override
@@ -58,27 +51,36 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         super.afterEvaluate();
         delegate.afterEvaluate();
         
-        PatcherProject projectMod = patchersList.get(patchersList.size() - 1);
-        PatcherProject projectOrig = getExtension().getProjects().getByName(projectMod.getPatchAfter());
-
-        //no prefix
-        TaskGenPatches genPatches = (TaskGenPatches) project.getTasks().getByName(TASK_GEN_PATCHES);
-        if (projectOrig.getsModified()) //TODO make common method with PatcherPlugin.afterEvaluate()
+        final PatcherProject projectMod = patchersList.get(patchersList.size() - 1);
+        
+        Copy extractRenames = (Copy) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
         {
-            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETROMAPPED, projectOrig)));
-            genPatches.dependsOn(projectString(TASK_PROJECT_RETROMAP, projectOrig));
+            extractRenames.from(PATCHES_DIR);
         }
-        else
+        
+        TaskGenPatches modGenPatches = (TaskGenPatches) project.getTasks().getByName(projectString(TASK_PROJECT_GEN_PATCHES, projectMod));
+        TaskGenPatches optifineGenPatches = (TaskGenPatches) project.getTasks().getByName(TASK_GEN_PATCHES);
         {
-            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_PATCHED, projectOrig)));
-            genPatches.dependsOn(projectString(TASK_PROJECT_PATCH, projectOrig));
+            for(File file : modGenPatches.getOriginalSource())
+            {
+                optifineGenPatches.addOriginalSource(file);
+            }
+            for(File file : modGenPatches.getChangedSource())
+            {
+                optifineGenPatches.addChangedSource(file);
+            }
+            for(Object dependency : modGenPatches.getDependsOn())
+            {
+                optifineGenPatches.dependsOn(dependency);
+            }
         }
-        genPatches.addChangedSource(delayedFile(projectString(JAR_PROJECT_RETROMAPPED, projectMod)));
-        genPatches.dependsOn(projectString(TASK_PROJECT_RETROMAP, projectMod));
         
         Zip zipPatches = (Zip) project.getTasks().getByName(TASK_ZIP_PATCHES);
-        File out = delayedFile(OPTIFINE_PATCH_ZIP).call();
-        zipPatches.setDestinationDir(out.getParentFile());
-        zipPatches.setArchiveName(out.getName());
+        {
+            File out = delayedFile(OPTIFINE_PATCH_ZIP).call();
+            zipPatches.setDestinationDir(out.getParentFile());
+            zipPatches.setArchiveName(out.getName());
+            zipPatches.from(delayedFile(PATCH_RENAMES_PATCHES));
+        }
     }
 }
