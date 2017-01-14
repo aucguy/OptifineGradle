@@ -40,13 +40,17 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.Configuration.State;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.artifacts.repositories.FlatDirectoryArtifactRepository;
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
 import org.gradle.api.tasks.Copy;
+import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.Exec;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -61,6 +65,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
@@ -89,9 +94,11 @@ import net.minecraftforge.gradle.util.json.fgversion.FGBuildStatus;
 import net.minecraftforge.gradle.util.json.fgversion.FGVersion;
 import net.minecraftforge.gradle.util.json.fgversion.FGVersionWrapper;
 import net.minecraftforge.gradle.util.json.version.Version;
+
 public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Project>
 {
     public boolean isOptifine = false;
+    private static final Logger LOGGER = Logging.getLogger(BasePlugin.class);
 
     public Project       project;
     public BasePlugin<?> otherPlugin;
@@ -122,7 +129,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
         if (project.getBuildDir().getAbsolutePath().contains("!"))
         {
-            project.getLogger().error("Build path has !, This will screw over a lot of java things as ! is used to denote archive paths, REMOVE IT if you want to continue");
+            LOGGER.error("Build path has !, This will screw over a lot of java things as ! is used to denote archive paths, REMOVE IT if you want to continue");
             throw new RuntimeException("Build path contains !");
         }
 
@@ -185,6 +192,9 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         project.getConfigurations().maybeCreate(CONFIG_MC_DEPS);
         project.getConfigurations().maybeCreate(CONFIG_MC_DEPS_CLIENT);
         project.getConfigurations().maybeCreate(CONFIG_NATIVES);
+        project.getConfigurations().maybeCreate(CONFIG_FFI_DEPS);
+
+        addFernFlowerInvokerDeps();
 
         // should be assumed until specified otherwise
         project.getConfigurations().getByName(CONFIG_MC_DEPS).extendsFrom(project.getConfigurations().getByName(CONFIG_MC_DEPS_CLIENT));
@@ -264,19 +274,18 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         if (!displayBanner)
             return;
 
-        Logger logger = this.project.getLogger();
-        logger.lifecycle("#################################################");
-        logger.lifecycle("         ForgeGradle {}        ", this.getVersionString());
-        logger.lifecycle("  https://github.com/MinecraftForge/ForgeGradle  ");
-        logger.lifecycle("#################################################");
-        logger.lifecycle("               Powered by MCP {}               ", this.getExtension().getMcpVersion());
-        logger.lifecycle("             http://modcoderpack.com             ");
-        logger.lifecycle("         by: Searge, ProfMobius, Fesh0r,         ");
-        logger.lifecycle("         R4wk, ZeuX, IngisKahn, bspkrs           ");
-        logger.lifecycle("#################################################");
+        LOGGER.lifecycle("#################################################");
+        LOGGER.lifecycle("         ForgeGradle {}        ", this.getVersionString());
+        LOGGER.lifecycle("  https://github.com/MinecraftForge/ForgeGradle  ");
+        LOGGER.lifecycle("#################################################");
+        LOGGER.lifecycle("               Powered by MCP {}               ", this.getExtension().getMcpVersion());
+        LOGGER.lifecycle("             http://modcoderpack.com             ");
+        LOGGER.lifecycle("         by: Searge, ProfMobius, Fesh0r,         ");
+        LOGGER.lifecycle("         R4wk, ZeuX, IngisKahn, bspkrs           ");
+        LOGGER.lifecycle("#################################################");
 
         for (String str : lines)
-            logger.lifecycle(str);
+            LOGGER.lifecycle(str);
 
         displayBanner = false;
     }
@@ -355,6 +364,42 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
     protected void onVersionCheck(FGVersion version, FGVersionWrapper wrapper)
     {
         // not required.. but you probably wanan implement this
+    }
+
+    private void addFernFlowerInvokerDeps()
+    {
+        DependencyHandler deps = project.getDependencies();
+        // Get dependencies from current FG
+        Project parent = project;
+        Dependency fgDepTemp = null;
+        Configuration buildscriptClasspath = null;
+        while (parent != null && fgDepTemp == null) {
+            buildscriptClasspath = project.getBuildscript().getConfigurations().getByName("classpath");
+            fgDepTemp = Iterables.getFirst(buildscriptClasspath.getDependencies().matching(new Spec<Dependency>() {
+                @Override
+                public boolean isSatisfiedBy(Dependency element)
+                {
+                    return element.getName().equals(GROUP_FG);
+                }
+            }), null);
+            parent = parent.getParent();
+        }
+        final Dependency fgDep = fgDepTemp;
+        if (fgDep == null) {
+            // This shouldn't happen, unless people are doing really wonky stuff
+            LOGGER.warn("Missing FG dep in buildscript classpath. Forking decompilation is likely to break.");
+            return;
+        }
+        // This adds all of the dependencies of FG
+        deps.add(CONFIG_FFI_DEPS, project.files(buildscriptClasspath.getResolvedConfiguration().getFiles(new Spec<Dependency>() {
+            @Override
+            public boolean isSatisfiedBy(Dependency element)
+            {
+                return element.contentEquals(fgDep);
+            }
+        })));
+        // And this adds the groovy dep. FFI shouldn't need Gradle.
+        deps.add(CONFIG_FFI_DEPS, deps.localGroovy());
     }
 
     @SuppressWarnings("serial")
@@ -746,7 +791,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             }
             else
             {
-                project.getLogger().error("Etag download for " + strUrl + " failed with code " + con.getResponseCode());
+                LOGGER.error("Etag download for " + strUrl + " failed with code " + con.getResponseCode());
             }
 
             con.disconnect();
@@ -795,7 +840,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             }
             catch (Exception e)
             {
-                project.getLogger().error("" + file + " could not be parsed");
+                LOGGER.error("" + file + " could not be parsed");
                 Throwables.propagate(e);
             }
         }
@@ -825,7 +870,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             }
         }
         else
-            project.getLogger().debug("RESOLVED: " + CONFIG_MC_DEPS);
+            LOGGER.debug("RESOLVED: " + CONFIG_MC_DEPS);
 
         // the natives
         if (project.getConfigurations().getByName(CONFIG_NATIVES).getState() == State.UNRESOLVED)
@@ -837,7 +882,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             }
         }
         else
-            project.getLogger().debug("RESOLVED: " + CONFIG_NATIVES);
+            LOGGER.debug("RESOLVED: " + CONFIG_NATIVES);
 
         // set asset index
         replacer.putReplacement(REPLACE_ASSET_INDEX, version.assetIndex.id);

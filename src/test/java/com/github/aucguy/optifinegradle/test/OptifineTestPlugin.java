@@ -2,7 +2,7 @@ package com.github.aucguy.optifinegradle.test;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.patcher.PatcherProject;
-import net.minecraftforge.gradle.tasks.ApplyFernFlowerTask;
+import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
 import static com.github.aucguy.optifinegradle.test.OptifineTestConstants.*;
