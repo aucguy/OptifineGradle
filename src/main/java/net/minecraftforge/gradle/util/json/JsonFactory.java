@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Strings;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -46,6 +45,7 @@ import net.minecraftforge.gradle.util.json.version.AssetIndex;
 import net.minecraftforge.gradle.util.json.version.ManifestVersion;
 import net.minecraftforge.gradle.util.json.version.Version;
 
+@SuppressWarnings("serial")
 public class JsonFactory
 {
     public static final Gson GSON;

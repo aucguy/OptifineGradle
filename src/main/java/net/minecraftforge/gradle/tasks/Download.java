@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -39,6 +38,8 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.ParallelizableTask;
 import org.gradle.api.tasks.TaskAction;
+
+import com.google.common.io.Closeables;
 
 @ParallelizableTask
 public class Download extends CachedTask
@@ -74,17 +75,16 @@ public class Download extends CachedTask
 
             inChannel  = Channels.newChannel(connect.getInputStream());
         }
-        FileOutputStream os = new FileOutputStream(outputFile);
-        FileChannel outChannel = os.getChannel();
+        FileOutputStream     outFile = new FileOutputStream(outputFile);
+        FileChannel          outChannel = outFile.getChannel();
 
         // If length is longer than what is available, it copies what is available according to java docs.
         // Therefore, I use Long.MAX_VALUE which is a theoretical maximum.
-        outChannel.write(ByteBuffer.wrap("hello".getBytes()));
         outChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
 
-        outChannel.close();
+        outChannel.close(); //Should close outFile but just in case
+        Closeables.close(outFile, true);
         inChannel.close();
-        os.close();
 
         getLogger().info("Download complete");
     }

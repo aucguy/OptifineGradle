@@ -123,6 +123,7 @@ public class MergeJars extends CachedTask
             for (Entry<String, ZipEntry> entry : cClasses.entrySet())
             {
                 String name = entry.getKey();
+                System.out.println("processing " + name);
                 ZipEntry cEntry = entry.getValue();
                 ZipEntry sEntry = sClasses.get(name);
 

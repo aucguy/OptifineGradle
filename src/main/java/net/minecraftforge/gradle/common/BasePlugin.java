@@ -30,11 +30,9 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import net.minecraftforge.gradle.util.json.version.ManifestVersion;
 import org.gradle.api.Action;
@@ -64,12 +62,10 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.gson.reflect.TypeToken;
 
-import gnu.trove.TIntObjectHashMap;
 import groovy.lang.Closure;
 import net.minecraftforge.gradle.tasks.CrowdinDownload;
 import net.minecraftforge.gradle.tasks.Download;
@@ -366,7 +362,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
     {
         EtagDownloadTask getVersionJson = makeTask(TASK_DL_VERSION_JSON, EtagDownloadTask.class);
         {
-            getVersionJson.setUrl(new Closure<String>(null, null) {
+            getVersionJson.setUrl(new Closure<String>(BasePlugin.class) {
                 @Override
                 public String call()
                 {
@@ -375,7 +371,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             });
             getVersionJson.setFile(delayedFile(JSON_VERSION));
             getVersionJson.setDieWithError(false);
-            getVersionJson.doLast(new Closure<Boolean>(project) // normalizes to linux endings
+            getVersionJson.doLast(new Closure<Boolean>(BasePlugin.class) // normalizes to linux endings
             {
                 @Override
                 public Boolean call()
@@ -428,7 +424,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
         EtagDownloadTask getAssetsIndex = makeTask(TASK_DL_ASSET_INDEX, EtagDownloadTask.class);
         {
-            getAssetsIndex.setUrl(new Closure<String>(null, null) {
+            getAssetsIndex.setUrl(new Closure<String>(BasePlugin.class) {
                 @Override
                 public String call()
                 {
@@ -450,7 +446,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         Download dlClient = makeTask(TASK_DL_CLIENT, Download.class);
         {
             dlClient.setOutput(delayedFile(JAR_CLIENT_FRESH));
-            dlClient.setUrl(new Closure<String>(null, null) {
+            dlClient.setUrl(new Closure<String>(BasePlugin.class) {
                 @Override
                 public String call()
                 {
@@ -464,7 +460,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         Download dlServer = makeTask(TASK_DL_SERVER, Download.class);
         {
             dlServer.setOutput(delayedFile(JAR_SERVER_FRESH));
-            dlServer.setUrl(new Closure<String>(null, null) {
+            dlServer.setUrl(new Closure<String>(BasePlugin.class) {
                 @Override
                 public String call()
                 {
@@ -568,6 +564,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         {
             genSrgs.setInSrg(delayedFile(MCP_DATA_SRG));
             genSrgs.setInExc(delayedFile(MCP_DATA_EXC));
+            genSrgs.setInStatics(delayedFile(MCP_DATA_STATICS));
             genSrgs.setMethodsCsv(delayedFile(CSV_METHOD));
             genSrgs.setFieldsCsv(delayedFile(CSV_FIELD));
             genSrgs.setNotchToSrg(delayedFile(Constants.SRG_NOTCH_TO_SRG));
@@ -721,12 +718,11 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
             con.connect();
 
-            String out = null;
             if (con.getResponseCode() == 304)
             {
                 // the existing file is good
                 Files.touch(cache); // touch it to update last-modified time, to wait another minute
-                out = Files.toString(cache, Charsets.UTF_8);
+                return Files.toString(cache, Charsets.UTF_8);
             }
             else if (con.getResponseCode() == 200)
             {
@@ -746,7 +742,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                     Files.write(etag, etagFile, Charsets.UTF_8);
                 }
 
-                out = new String(data);
+                return new String(data);
             }
             else
             {
@@ -754,8 +750,6 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             }
 
             con.disconnect();
-
-            return out;
         }
         catch (Exception e)
         {
@@ -869,7 +863,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                     new CacheLoader<String, DelayedString>() {
                         public DelayedString load(String key)
                         {
-                            return new DelayedString(replacerCache.getUnchecked(key));
+                            return new DelayedString(CacheLoader.class, replacerCache.getUnchecked(key));
                         }
                     });
     private LoadingCache<String, DelayedFile> fileCache = CacheBuilder.newBuilder()
@@ -878,7 +872,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                     new CacheLoader<String, DelayedFile>() {
                         public DelayedFile load(String key)
                         {
-                            return new DelayedFile(project, replacerCache.getUnchecked(key));
+                            return new DelayedFile(CacheLoader.class, project, replacerCache.getUnchecked(key));
                         }
                     });
 
@@ -905,7 +899,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
     public DelayedFileTree delayedTree(String path)
     {
-        return new DelayedFileTree(project, replacerCache.getUnchecked(path));
+        return new DelayedFileTree(BasePlugin.class, project, replacerCache.getUnchecked(path));
     }
 
     protected File cacheFile(String path)

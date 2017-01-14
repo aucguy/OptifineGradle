@@ -62,7 +62,7 @@ dependencies {
     compile gradleApi()
 
     // moved to the beginning to be the overrider
-    compile 'org.ow2.asm:asm-debug-all:5.0.3'
+    compile 'org.ow2.asm:asm-debug-all:5.1'
     compile 'com.google.guava:guava:18.0'
 
     compile 'net.sf.opencsv:opencsv:2.3' // reading CSVs.. also used by SpecialSource
@@ -91,6 +91,12 @@ dependencies {
     //Stuff used in the GradleStart classes
     compileOnly 'com.mojang:authlib:1.5.16'
     compileOnly "net.minecraft:launchwrapper:1.11"
+
+    testCompile 'junit:junit:4.12'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14'
 }
 
 sourceSets {

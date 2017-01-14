@@ -43,7 +43,7 @@ public class OptifineConstants
     public static final String PATCH_URL              = "{patchUrl}";
     
     // defaults
-    public static final String DEFAULT_OPTIFINE_VERSION = "1.9.4_HD_U_B5";
+    public static final String DEFAULT_OPTIFINE_VERSION = "1.11.2_HD_U_B5";
     public static final String DEFAULT_PATCH_URL      = "https://aucguy.github.io/downloads/optifinegradle/patches/{patchArchive}";
     public static final String DEFAULT_PATCH_ARCHIVE  = "patches-{optifineVersion}.zip";
     public static final String DEFAULT_OPTIFINE_JAR   = "{mainDir}/OptiFine_{optifineVersion}.jar";
