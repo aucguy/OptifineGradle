@@ -25,6 +25,7 @@ import static net.minecraftforge.gradle.user.UserConstants.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,7 @@ import org.gradle.api.artifacts.result.ComponentArtifactsResult;
 import org.gradle.api.artifacts.result.DependencyResult;
 import org.gradle.api.artifacts.result.ResolvedArtifactResult;
 import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.file.FileTreeElement;
 import org.gradle.api.internal.plugins.DslObject;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
@@ -76,6 +78,8 @@ import org.gradle.jvm.JvmLibrary;
 import org.gradle.language.base.artifact.SourcesArtifact;
 import org.gradle.plugins.ide.eclipse.model.EclipseModel;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet;
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -260,7 +264,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             exec.classpath(jarTask.getArchivePath());
             exec.dependsOn(jarTask);
             exec.jvmArgs(getServerJvmArgs(getExtension()));
-            exec.jvmArgs(getServerRunArgs(getExtension()));
+            exec.args(getServerRunArgs(getExtension()));
         }
 
         // complain about version number
@@ -505,7 +509,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
     /**
      * Creates the api SourceSet and configures the classpaths of all the SourceSets to have MC and the MC deps in them.
-     * Also sets the target JDK to java 6
+     * Also sets the target JDK to java 8
      */
     protected void configureCompilation()
     {
@@ -552,8 +556,8 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
         project.getDependencies().add(JavaPlugin.COMPILE_CONFIGURATION_NAME, project.fileTree("libs"));
 
         // set the compile target
-        javaConv.setSourceCompatibility("1.6");
-        javaConv.setTargetCompatibility("1.6");
+        javaConv.setSourceCompatibility("1.8");
+        javaConv.setTargetCompatibility("1.8");
     }
 
     /**
@@ -620,6 +624,37 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                     GroovyCompile compile = (GroovyCompile) project.getTasks().getByName(set.getCompileTaskName("groovy"));
                     compile.dependsOn(task);
                     compile.setSource(dir);
+                }
+
+                // kotlin
+                if (project.getPlugins().hasPlugin("kotlin"))
+                {
+                    KotlinSourceSet langSet = (KotlinSourceSet) new DslObject(set).getConvention().getPlugins().get("kotlin");
+                    File dir = new File(dirRoot, "kotlin");
+
+                    task = makeTask(taskPrefix+"Kotlin", TaskSourceCopy.class);
+                    task.setSource(langSet.getKotlin());
+                    task.setOutput(dir);
+
+                    // must get replacements from extension afterEValuate()
+
+                    KotlinCompile compile = (KotlinCompile) project.getTasks().getByName(set.getCompileTaskName("kotlin"));
+                    compile.dependsOn(task);
+                    compile.setSource(dir);
+                    Path dirPath = dir.toPath();
+
+                    // Apparently the Kotlin plugin doesn't respect setSource in any way, so this is required
+                    compile.include(new Closure<Boolean>(UserBasePlugin.class)
+                    {
+                        @Override
+                        public Boolean call(Object o)
+                        {
+                            if (o instanceof FileTreeElement) {
+                                return ((FileTreeElement) o).getFile().toPath().startsWith(dirPath);
+                            }
+                            return super.call();
+                        }
+                    });
                 }
             }
         };
@@ -859,7 +894,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             }
         });
 
-        // get scala sources too
+        // get scala & kotlin sources too
         project.afterEvaluate(new Action<Project>()
         {
             @Override public void execute(Project project)
@@ -868,6 +903,11 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                 {
                     ScalaSourceSet langSet = (ScalaSourceSet) new DslObject(main).getConvention().getPlugins().get("scala");
                     sourceJar.from(langSet.getAllScala());
+                }
+                if (project.getPlugins().hasPlugin("kotlin"))
+                {
+                    KotlinSourceSet langSet = (KotlinSourceSet) new DslObject(main).getConvention().getPlugins().get("kotlin");
+                    sourceJar.from(langSet.getKotlin());
                 }
             }
         });
@@ -1300,7 +1340,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             addXml(child, "option", ImmutableMap.of("name", "ENABLE_SWING_INSPECTOR", "value", "false"));
             addXml(child, "option", ImmutableMap.of("name", "ENV_VARIABLES"));
             addXml(child, "option", ImmutableMap.of("name", "PASS_PARENT_ENVS", "value", "true"));
-            addXml(child, "module", ImmutableMap.of("name", ((IdeaModel) project.getExtensions().getByName("idea")).getModule().getName()));
+            addXml(child, "module", ImmutableMap.of("name", ((IdeaModel) project.getExtensions().getByName("idea")).getModule().getName() + '_' + getExtension().getRunSourceSet().getName()));
             addXml(child, "RunnerSettings", ImmutableMap.of("RunnerId", "Run"));
             addXml(child, "ConfigurationWrapper", ImmutableMap.of("RunnerId", "Run"));
         }

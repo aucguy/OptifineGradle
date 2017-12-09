@@ -163,7 +163,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             {
                 createProjects.putProject("Clean", null, null, null, null);
             }
-            createProjects.setJavaLevel("1.6");
+            createProjects.setJavaLevel("1.8");
         }
 
         Task setupProjects = makeTask(TASK_SETUP_PROJECTS);
@@ -700,7 +700,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
                     // add repo for url if its not the MC repo, not maven central, and not already added
                     String url = lib.getUrl();
-                    if (!url.contains("libraries.minecraft.net") && !url.contains("maven.apache.org") && !repos.contains(url))
+                    if (!url.contains("libraries.minecraft.net") && !url.contains("minecraft-libraries.s3.amazonaws.com") && !url.contains("maven.apache.org") && !repos.contains(url))
                     {
                         createProjects.addRepo("jsonRepo" + repos.size(), url);
 

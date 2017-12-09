@@ -128,6 +128,12 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 throw new RuntimeException("ForgeGradle 2.0 requires Gradle 2.3 or above.");
         }
 
+        // check for java version
+        {
+            if ("9".equals(System.getProperty("java.specification.version")) && !"true".equals(System.getProperty("forgegradle.overrideJava9Check")))
+                throw new RuntimeException("ForgeGradle does not currently support Java 9");
+        }
+
         if (project.getBuildDir().getAbsolutePath().contains("!"))
         {
             LOGGER.error("Build path has !, This will screw over a lot of java things as ! is used to denote archive paths, REMOVE IT if you want to continue");
@@ -783,10 +789,12 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 }
                 else if (con.getResponseCode() == 200)
                 {
-                    InputStream stream = con.getInputStream();
-                    byte[] data = ByteStreams.toByteArray(stream);
+                    byte[] data;
+                    try (InputStream stream = con.getInputStream())
+                    {
+                        data = ByteStreams.toByteArray(stream);
+                    }
                     Files.write(data, cache);
-                    stream.close();
 
                     // write etag
                     etag = con.getHeaderField("ETag");
@@ -891,7 +899,12 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             for (net.minecraftforge.gradle.util.json.version.Library lib : version.getLibraries())
             {
                 if (lib.natives != null)
-                    handler.add(CONFIG_NATIVES, lib.getArtifactName());
+                {
+                    if (lib.getArtifactName().contains("java-objc-bridge") && lib.getArtifactName().contains("natives-osx")) //Normal repo bundles this in the mian jar so we need to just use the main jar
+                        handler.add(CONFIG_NATIVES, lib.getArtifactNameSkipNatives());
+                    else
+                        handler.add(CONFIG_NATIVES, lib.getArtifactName());
+                }
             }
         }
         else

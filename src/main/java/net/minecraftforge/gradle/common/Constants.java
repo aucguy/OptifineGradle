@@ -118,7 +118,8 @@ public class Constants
     public static final String URL_MC_MANIFEST     = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
     public static final String URL_FF              = "http://files.minecraftforge.net/fernflower-fix-1.0.zip";
     public static final String URL_ASSETS          = "http://resources.download.minecraft.net";
-    public static final String URL_LIBRARY         = "https://libraries.minecraft.net/";
+    public static final String URL_LIBRARY         = "https://libraries.minecraft.net/"; // Mojang's Cloudflare front end
+    //public static final String URL_LIBRARY         = "https://minecraft-libraries.s3.amazonaws.com/"; // Mojang's AWS server, as Cloudflare is having issues, TODO: Switch back to above when their servers are fixed.
     public static final String URL_FORGE_MAVEN     = "http://files.minecraftforge.net/maven";
     public static final List<String> URLS_MCP_JSON = Arrays.asList(
             URL_FORGE_MAVEN + "/de/oceanlabs/mcp/versions.json",
@@ -318,17 +319,14 @@ public class Constants
         // make dirs just in case
         out.getParentFile().mkdirs();
 
-        FileInputStream fis = new FileInputStream(in);
-        FileOutputStream fout = new FileOutputStream(out);
-
-        FileChannel source = fis.getChannel();
-        FileChannel dest = fout.getChannel();
-
-        long size = source.size();
-        source.transferTo(0, size, dest);
-
-        fis.close();
-        fout.close();
+        try (FileInputStream fis = new FileInputStream(in);
+             FileOutputStream fout = new FileOutputStream(out);
+             FileChannel source = fis.getChannel();
+             FileChannel dest = fout.getChannel())
+        {
+            long size = source.size();
+            source.transferTo(0, size, dest);
+        }
     }
 
     /**
@@ -344,16 +342,13 @@ public class Constants
         // make dirs just in case
         out.getParentFile().mkdirs();
 
-        FileInputStream fis = new FileInputStream(in);
-        FileOutputStream fout = new FileOutputStream(out);
-
-        FileChannel source = fis.getChannel();
-        FileChannel dest = fout.getChannel();
-
-        source.transferTo(0, size, dest);
-
-        fis.close();
-        fout.close();
+        try (FileInputStream fis = new FileInputStream(in);
+             FileOutputStream fout = new FileOutputStream(out);
+             FileChannel source = fis.getChannel();
+             FileChannel dest = fout.getChannel())
+        {
+            source.transferTo(0, size, dest);
+        }
     }
 
     public static String hash(File file)
@@ -399,12 +394,10 @@ public class Constants
 
     public static String hashZip(File file, String function)
     {
-        try
+        try (ZipInputStream zin = new ZipInputStream(new FileInputStream(file)))
         {
             MessageDigest hasher = MessageDigest.getInstance(function);
-
-            ZipInputStream zin = new ZipInputStream(new FileInputStream(file));
-            ZipEntry entry = null;
+            ZipEntry entry;
             while ((entry = zin.getNextEntry()) != null)
             {
                 hasher.update(entry.getName().getBytes());
