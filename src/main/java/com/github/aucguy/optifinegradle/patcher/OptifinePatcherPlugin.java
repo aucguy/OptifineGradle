@@ -5,9 +5,9 @@ import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_GE
 
 import java.io.File;
 
-import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.Zip;
 
+import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 
 import net.minecraftforge.gradle.patcher.PatcherPlugin;
@@ -53,9 +53,9 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         
         final PatcherProject projectMod = patchersList.get(patchersList.size() - 1);
         
-        Copy extractRenames = (Copy) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
+        ExtractRenames extractRenames = (ExtractRenames) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
         {
-            extractRenames.from(PATCHES_DIR);
+            extractRenames.inZip = delayedFile(PATCH_RENAMES);
         }
         
         TaskGenPatches modGenPatches = (TaskGenPatches) project.getTasks().getByName(projectString(TASK_PROJECT_GEN_PATCHES, projectMod));
@@ -80,7 +80,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             File out = delayedFile(OPTIFINE_PATCH_ZIP).call();
             zipPatches.setDestinationDir(out.getParentFile());
             zipPatches.setArchiveName(out.getName());
-            zipPatches.from(delayedFile(PATCH_RENAMES_PATCHES));
+            zipPatches.from(delayedFile(PATCH_RENAMES));
         }
     }
 }

@@ -32,12 +32,14 @@ public class OptifineConstants
             + "/minecraft-" + REPLACE_MC_VERSION + "-deobfuscatedClasses.txt";
     
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
+    
     public static final String PATCH_ZIP              = OPTIFINE_CACHE + "{patchArchive}";
-    public static final String PATCH_EXTRACT          = OPTIFINE_CACHE + "patch-extract/";
-    public static final String PATCH_RENAMES_FILE     = "optifine-renames.properties";
+    public static final String RENAMES_BASE           = "optifine-renames.properties";
+    public static final String RENAMES_FILE           = OPTIFINE_CACHE + RENAMES_BASE;
+    
     public static final String PATCHES_DIR            = "patches/";
-    public static final String PATCH_RENAMES_PATCHES  = PATCHES_DIR + PATCH_RENAMES_FILE;
-    public static final String PATCH_RENAMES          = PATCH_EXTRACT + PATCH_RENAMES_FILE;
+    public static final String PATCH_RENAMES          = PATCHES_DIR + RENAMES_BASE;
+    public static final String USER_RENAMES           = PATCH_ZIP + "/" + RENAMES_BASE;
     
     public static final String PATCH_ARCHIVE          = "{patchArchive}";
     public static final String PATCH_URL              = "{patchUrl}";

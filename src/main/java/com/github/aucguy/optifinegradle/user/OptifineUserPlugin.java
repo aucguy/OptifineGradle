@@ -1,19 +1,15 @@
 package com.github.aucguy.optifinegradle.user;
 
+import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_URL;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DL_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.USER_RENAMES;
 
-import java.io.File;
-
-import org.gradle.api.file.FileTree;
-import org.gradle.api.tasks.Copy;
-
-import static com.github.aucguy.optifinegradle.OptifineConstants.*;
-
+import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 
-import groovy.lang.Closure;
 import net.minecraftforge.gradle.tasks.Download;
 import net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin;
 
@@ -38,17 +34,12 @@ public class OptifineUserPlugin extends ForgePlugin
         {
         	dlPatches.setOutput(delayedFile(PATCH_ZIP));
         	dlPatches.setUrl(delayedString(PATCH_URL));
+        	dlPatches.dependsOn(net.minecraftforge.gradle.common.Constants.TASK_DL_ASSET_INDEX);
         }
         
-    	Copy extractRenames = (Copy) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
+    	ExtractRenames extractRenames = (ExtractRenames) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
     	{
-    		extractRenames.from(new Closure<FileTree>(null)
-    		{
-    			public FileTree call()
-    			{
-    				return project.zipTree(delayedString(PATCH_ZIP).call());
-    			}
-    		});
+    	    extractRenames.inZip = delayedFile(USER_RENAMES);
     		extractRenames.dependsOn(dlPatches);
     	}
         

@@ -50,13 +50,13 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
-import org.gradle.api.tasks.Copy;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.Exec;
 import org.gradle.testfixtures.ProjectBuilder;
 
 import com.github.aucguy.optifinegradle.CacheWrapper;
+import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.user.JoinJars;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
@@ -439,7 +439,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                         Files.write(buf.toString().getBytes(Charsets.UTF_8), json);
 
                         // grab the AssetIndex if it isnt already there
-                        if (!replacer.hasReplacement(REPLACE_ASSET_INDEX))
+                        if (replacer.get(REPLACE_ASSET_INDEX) == null || replacer.get(REPLACE_ASSET_INDEX) == "tmp")
                         {
                             parseAndStoreVersion(json, json.getParentFile());
                         }
@@ -459,7 +459,9 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 }
             });
         }
-
+        
+        replacer.putReplacement(REPLACE_ASSET_INDEX, "tmp");
+        
         ExtractConfigTask extractNatives = makeTask(TASK_EXTRACT_NATIVES, ExtractConfigTask.class);
         {
             extractNatives.setDestinationDir(delayedFile(DIR_NATIVES));
@@ -548,6 +550,8 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         		task.executable("java");
         		task.args("-cp", delayedString(JAR_OPTIFINE_FRESH), "optifine.Patcher", 
         			delayedString(JAR_CLIENT_FRESH), delayedString(JAR_OPTIFINE_FRESH), delayedString(JAR_OPTIFINE_DIFFED));
+        		task.setStandardOutput(System.out);
+        		task.setErrorOutput(System.err);
         		diff.task = task;
         		diff.input1 = delayedFile(JAR_CLIENT_FRESH);
         		diff.input2 = delayedFile(JAR_OPTIFINE_FRESH);
@@ -555,10 +559,9 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         		diff.dependsOn(dlClient);
         	}
         	
-        	Copy extractRenames = makeTask(TASK_EXTRACT_RENAMES, Copy.class);
+        	ExtractRenames extractRenames = makeTask(TASK_EXTRACT_RENAMES, ExtractRenames.class);
         	{
-        		extractRenames.into(delayedFile(PATCH_EXTRACT));
-        		extractRenames.include(PATCH_RENAMES_FILE);
+        		extractRenames.extractTo = delayedFile(RENAMES_FILE);
         	}
         	
             JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
@@ -567,7 +570,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 join.optifine = delayedFile(JAR_OPTIFINE_DIFFED);
                 join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
                 join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
-                join.renames = delayedFile(PATCH_RENAMES);
+                join.renames = delayedFile(RENAMES_FILE);
                 join.srg = delayedFile(SRG_NOTCH_TO_MCP);
                 join.exclude("javax/");
                 join.exclude("net/minecraftforge/");
