@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/item/crafting/CraftingManager.java
++++ ../src-work/minecraft/net/minecraft/item/crafting/CraftingManager.java
+@@ -93,7 +93,7 @@
+                     path = filesystem.getPath("/assets/minecraft/recipes", new String[0]);
+                 }
+ 
+-                for (Path path1 : Files.walk(path, new FileVisitOption[0]))
++                for (Path path1 : Files.walk(path, new FileVisitOption[0]).collect(java.util.stream.Collectors.toList()))
+                 {
+                     if ("json".equals(FilenameUtils.getExtension(path1.toString())))
+                     {

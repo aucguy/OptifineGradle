@@ -1,32 +1,31 @@
 --- ../src-base/minecraft/net/minecraft/client/renderer/texture/TextureMap.java
 +++ ../src-work/minecraft/net/minecraft/client/renderer/texture/TextureMap.java
-@@ -32,9 +32,9 @@
-     private static final Logger field_147635_d = LogManager.getLogger();
-     public static final ResourceLocation field_174945_f = new ResourceLocation("missingno");
-     public static final ResourceLocation field_110575_b = new ResourceLocation("textures/atlas/blocks.png");
--    private final List field_94258_i;
-+    private final List<TextureAtlasSprite> field_94258_i;
-     private final Map field_110574_e;
--    private final Map field_94252_e;
-+    private final Map<Object, TextureAtlasSprite> field_94252_e;
-     private final String field_94254_c;
-     private final IIconCreator field_174946_m;
-     private int field_147636_j;
-@@ -123,7 +123,7 @@
-         this.func_110571_b(p_174943_1_);
+@@ -83,7 +83,7 @@
+         this(p_i46100_1_, p_i46100_2_, false);
      }
  
--    public void func_110571_b(IResourceManager param1)
-+    public void func_110571_b(IResourceManager p_110571_1_)
+-    public TextureMap(String p_i1_1_, ITextureMapPopulator p_i1_2_, boolean p_i1_3_)
++    public TextureMap(String p_i46100_1_, ITextureMapPopulator p_i46100_2_, boolean skipFirst)
      {
+         this.iconGrid = null;
+         this.iconGridSize = -1;
+@@ -98,8 +98,8 @@
+         this.field_110574_e = Maps.<String, TextureAtlasSprite>newHashMap();
+         this.field_94252_e = Maps.<String, TextureAtlasSprite>newHashMap();
+         this.field_94249_f = new TextureAtlasSprite("missingno");
+-        this.field_94254_c = p_i1_1_;
+-        this.field_174946_m = p_i1_2_;
++        this.field_94254_c = p_i46100_1_;
++        this.field_174946_m = p_i46100_2_;
      }
  
-@@ -310,7 +310,7 @@
-         return j;
+     private void func_110569_e()
+@@ -743,7 +743,7 @@
+         return l3;
      }
  
 -    private int detectMinimumSpriteSize(Map p_detectMinimumSpriteSize_1_, IResourceManager p_detectMinimumSpriteSize_2_, int p_detectMinimumSpriteSize_3_)
 +    private int detectMinimumSpriteSize(Map<Object, Object> p_detectMinimumSpriteSize_1_, IResourceManager p_detectMinimumSpriteSize_2_, int p_detectMinimumSpriteSize_3_)
      {
-         Map map = new HashMap();
+         Map map1 = new HashMap();
  

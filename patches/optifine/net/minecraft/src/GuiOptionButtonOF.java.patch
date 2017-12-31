@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/src/GuiOptionButtonOF.java
++++ ../src-work/minecraft/net/minecraft/src/GuiOptionButtonOF.java
+@@ -16,7 +16,7 @@
+         this.option = p_i7_4_;
+     }
+ 
+-    public GameSettings.Options getOption()
++    public GameSettings.Options func_146136_c()
+     {
+         return this.option;
+     }

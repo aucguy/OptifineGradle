@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/entity/passive/AbstractHorse.java
++++ ../src-work/minecraft/net/minecraft/entity/passive/AbstractHorse.java
+@@ -112,7 +112,7 @@
+     {
+         super.func_70088_a();
+         this.field_70180_af.func_187214_a(field_184787_bE, Byte.valueOf((byte)0));
+-        this.field_70180_af.func_187214_a(field_184790_bH, Optional.<T>absent());
++        this.field_70180_af.func_187214_a(field_184790_bH, Optional.absent());
+     }
+ 
+     protected boolean func_110233_w(int p_110233_1_)
+@@ -147,7 +147,7 @@
+ 
+     public void func_184779_b(@Nullable UUID p_184779_1_)
+     {
+-        this.field_70180_af.func_187227_b(field_184790_bH, Optional.<T>fromNullable(p_184779_1_));
++        this.field_70180_af.func_187227_b(field_184790_bH, Optional.fromNullable(p_184779_1_));
+     }
+ 
+     public float func_110254_bY()

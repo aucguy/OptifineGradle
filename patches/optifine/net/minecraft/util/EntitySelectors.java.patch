@@ -1,0 +1,10 @@
+--- ../src-base/minecraft/net/minecraft/util/EntitySelectors.java
++++ ../src-work/minecraft/net/minecraft/util/EntitySelectors.java
+@@ -95,7 +95,6 @@
+                 }
+             }
+         });
+-        return (Predicate<T>)ret;
+     }
+ 
+     public static Predicate<Entity> func_191324_b(final Entity p_191324_0_)

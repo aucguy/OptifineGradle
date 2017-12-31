@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/advancements/AdvancementManager.java
++++ ../src-work/minecraft/net/minecraft/advancements/AdvancementManager.java
+@@ -26,6 +26,8 @@
+ import java.nio.file.Paths;
+ import java.util.Collections;
+ import java.util.Map;
++import java.util.stream.Collectors;
++
+ import javax.annotation.Nullable;
+ import net.minecraft.item.crafting.CraftingManager;
+ import net.minecraft.util.EnumTypeAdapterFactory;
+@@ -162,7 +164,7 @@
+                     path = filesystem.getPath("/assets/minecraft/advancements", new String[0]);
+                 }
+ 
+-                for (Path path1 : Files.walk(path, new FileVisitOption[0]))
++                for (Path path1 : Files.walk(path, new FileVisitOption[0]).collect(Collectors.toList()))
+                 {
+                     if ("json".equals(FilenameUtils.getExtension(path1.toString())))
+                     {

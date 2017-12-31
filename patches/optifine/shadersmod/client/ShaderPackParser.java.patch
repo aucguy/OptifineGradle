@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/shadersmod/client/ShaderPackParser.java
 +++ ../src-work/minecraft/shadersmod/client/ShaderPackParser.java
-@@ -237,7 +237,7 @@
+@@ -251,7 +251,7 @@
          String s = "profile.";
          List<ShaderProfile> list = new ArrayList();
  
@@ -9,3 +9,14 @@
          {
              if (s1.startsWith(s))
              {
+@@ -691,8 +691,9 @@
+         Map<String, IExpression> map = new HashMap();
+         List<CustomUniform> list = new ArrayList();
+ 
+-        for (String s4 : props.keySet())
++        for (Object i : props.keySet())
+         {
++            String s4 = (String) i;
+             String[] astring = Config.tokenize(s4, ".");
+ 
+             if (astring.length == 3)

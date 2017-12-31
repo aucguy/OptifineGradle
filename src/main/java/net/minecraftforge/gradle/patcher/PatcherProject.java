@@ -54,6 +54,7 @@ public class PatcherProject implements Serializable
     private File resourcesDir;
     private File testSourcesDir;
     private File testResourcesDir;
+    private File rejectFolder;
 
     private String mainClassClient = "GradleStart";
     private String mainClassServer = "GradleStartServer";
@@ -357,6 +358,16 @@ public class PatcherProject implements Serializable
         return getFile(testResourcesDir, DEFAULT_TEST_RES_DIR);
     }
 
+    public File getRejectFolder()
+    {
+        return rejectFolder;
+    }
+
+    public void setRejectFolder(Object rejectFolder)
+    {
+       this.rejectFolder = rejectFolder == null ? null : project.file(rejectFolder);
+    }
+
     /**
      * The directory where the non-patch resources for this project are.
      * By default this is rootDir/src/test/resources
@@ -375,6 +386,11 @@ public class PatcherProject implements Serializable
     public void testResourcesDir(Object testResourcesDir)
     {
         setTestResourcesDir(testResourcesDir);
+    }
+
+    public void rejectFolder(Object rejectFolder)
+    {
+        setRejectFolder(rejectFolder);
     }
 
     public String getMainClassClient()
@@ -714,7 +730,7 @@ public class PatcherProject implements Serializable
             }
         };
     }
-    
+
     @SuppressWarnings("serial")
     protected Closure<File> getDelayedOptifinePatchDir()
     {
@@ -722,6 +738,17 @@ public class PatcherProject implements Serializable
             public File call()
             {
                 return getOptifinePatchDir();
+            }
+        };
+    }
+
+    @SuppressWarnings("serial")
+    protected Closure<File> getDelayedRejectFolder()
+    {
+        return new Closure<File>(project, this) {
+            public File call()
+            {
+                return getRejectFolder();
             }
         };
     }

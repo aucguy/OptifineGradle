@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/world/storage/loot/conditions/LootConditionManager.java
++++ ../src-work/minecraft/net/minecraft/world/storage/loot/conditions/LootConditionManager.java
+@@ -25,7 +25,7 @@
+     public static <T extends LootCondition> void func_186639_a(LootCondition.Serializer <? extends T > p_186639_0_)
+     {
+         ResourceLocation resourcelocation = p_186639_0_.func_186602_a();
+-        Class<T> oclass = p_186639_0_.func_186604_b();
++        Class<T> oclass = (Class<T>) p_186639_0_.func_186604_b();
+ 
+         if (field_186642_a.containsKey(resourcelocation))
+         {

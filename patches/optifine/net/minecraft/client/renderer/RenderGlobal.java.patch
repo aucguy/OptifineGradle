@@ -1,43 +1,42 @@
 --- ../src-base/minecraft/net/minecraft/client/renderer/RenderGlobal.java
 +++ ../src-work/minecraft/net/minecraft/client/renderer/RenderGlobal.java
-@@ -123,8 +123,8 @@
-     private final RenderManager field_175010_j;
-     private WorldClient field_72769_h;
-     private Set field_175009_l = Sets.newLinkedHashSet();
--    private List field_72755_R = Lists.newArrayListWithCapacity(69696);
--    private final Set field_181024_n = Sets.newHashSet();
-+    private List<ContainerLocalRenderInformation> field_72755_R = Lists.newArrayListWithCapacity(69696);
-+    private final Set<TileEntity> field_181024_n = Sets.newHashSet();
-     private ViewFrustum field_175008_n;
-     private int field_72772_v = -1;
-     private int field_72771_w = -1;
-@@ -134,7 +134,7 @@
-     private VertexBuffer field_175012_t;
-     private VertexBuffer field_175011_u;
-     private int field_72773_u;
--    public final Map field_72738_E = Maps.newHashMap();
-+    public final Map<Object, DestroyBlockProgress> field_72738_E = Maps.newHashMap();
-     private final Map field_147593_P = Maps.newHashMap();
-     private final TextureAtlasSprite[] field_94141_F = new TextureAtlasSprite[10];
-     private Framebuffer field_175015_z;
-@@ -173,7 +173,7 @@
+@@ -184,8 +184,8 @@
      public Set chunksToUpdateForced = new LinkedHashSet();
+     private Set<RenderChunk> chunksToUpdatePrev = new ObjectLinkedOpenHashSet();
      private Deque visibilityDeque = new ArrayDeque();
-     private List renderInfosEntities = new ArrayList(1024);
+-    private List renderInfosEntities = new ArrayList(1024);
 -    private List renderInfosTileEntities = new ArrayList(1024);
++    private List<ContainerLocalRenderInformation> renderInfosEntities = new ArrayList(1024);
 +    private List<ContainerLocalRenderInformation> renderInfosTileEntities = new ArrayList(1024);
      private List renderInfosNormal = new ArrayList(1024);
      private List renderInfosEntitiesNormal = new ArrayList(1024);
      private List renderInfosTileEntitiesNormal = new ArrayList(1024);
-@@ -3139,9 +3139,9 @@
-             this.field_178032_d = p_i46248_4_;
-         }
+@@ -213,9 +213,9 @@
+         this.field_72777_q = p_i1249_1_;
+         this.field_175010_j = p_i1249_1_.func_175598_ae();
+         this.field_72770_i = p_i1249_1_.func_110434_K();
+-        this.field_72770_i.func_110577_a(field_175006_g);
+-        GlStateManager.func_187421_b(3553, 10242, 10497);
+-        GlStateManager.func_187421_b(3553, 10243, 10497);
++        //this.renderEngine.bindTexture(FORCEFIELD_TEXTURES);
++        //GlStateManager.glTexParameteri(3553, 10242, 10497);
++        //GlStateManager.glTexParameteri(3553, 10243, 10497);
+         GlStateManager.func_179144_i(0);
+         this.func_174971_n();
+         this.field_175005_X = OpenGlHelper.func_176075_f();
+@@ -3448,11 +3448,11 @@
+             int field_178035_c;
+             boolean cacheable = false;
  
--        ContainerLocalRenderInformation(RenderChunk p_i41_2_, EnumFacing p_i41_3_, int p_i41_4_, Object p_i41_5_)
-+        ContainerLocalRenderInformation(RenderChunk p_i46249_2_, EnumFacing p_i46249_3_, int p_i46249_4_, Object p_i46249_5_)
-         {
--            this(p_i41_2_, p_i41_3_, p_i41_4_);
-+            this(p_i46249_2_, p_i46249_3_, p_i46249_4_);
-         }
-     }
- }
+-            public ContainerLocalRenderInformation(RenderChunk p_i96_1_, EnumFacing p_i96_2_, int p_i96_3_)
++            public ContainerLocalRenderInformation(RenderChunk p_i46248_2_, EnumFacing p_i46248_3_, int p_i46248_4_)
+             {
+-                this.field_178036_a = p_i96_1_;
+-                this.field_178034_b = p_i96_2_;
+-                this.field_178035_c = p_i96_3_;
++                this.field_178036_a = p_i46248_2_;
++                this.field_178034_b = p_i46248_3_;
++                this.field_178035_c = p_i46248_4_;
+             }
+ 
+             public void func_189561_a(byte p_189561_1_, EnumFacing p_189561_2_)

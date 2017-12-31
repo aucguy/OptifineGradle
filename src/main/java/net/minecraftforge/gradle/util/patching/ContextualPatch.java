@@ -1245,8 +1245,18 @@ public final class ContextualPatch
         }
     }
 
+    private static final Pattern REMOVE_PATTERN = Pattern.compile("(\\s?<[\\w\\s<>,\\?.]*>\\s?)|(\\([\\w.]+\\)(?=\\s?[\\w\"\\(]))|((, )?new \\w+\\[0\\])");
+    private static final Pattern SINGLETON_ARRAY_PATTERN = Pattern.compile("new \\w+\\[\\] \\{(?<content>[^{}]+)\\}");
+
     private boolean similar(String target, String hunk, char lineType)
     {
+        //ignore generic, casting, empty arrays
+        target = REMOVE_PATTERN.matcher(target).replaceAll("");
+        hunk = REMOVE_PATTERN.matcher(hunk).replaceAll("");
+        //ignore singleton arrays
+        target = SINGLETON_ARRAY_PATTERN.matcher(target).replaceAll("${content}");
+        hunk = SINGLETON_ARRAY_PATTERN.matcher(hunk).replaceAll("${content}");
+
         if (c14nAccess)
         {
             if (c14nWhitespace)

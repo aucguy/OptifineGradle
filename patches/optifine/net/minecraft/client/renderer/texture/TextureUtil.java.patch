@@ -1,0 +1,15 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/texture/TextureUtil.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/texture/TextureUtil.java
+@@ -285,9 +285,9 @@
+             if (bufferedimage != null)
+             {
+                 int j = bufferedimage.getWidth();
+-                int i = bufferedimage.getHeight();
+-                int[] aint1 = new int[j * i];
+-                bufferedimage.getRGB(0, 0, j, i, aint1, 0, j);
++                int i2 = bufferedimage.getHeight();
++                int[] aint1 = new int[j * i2];
++                bufferedimage.getRGB(0, 0, j, i2, aint1, 0, j);
+                 int[] aint = aint1;
+                 return aint;
+             }

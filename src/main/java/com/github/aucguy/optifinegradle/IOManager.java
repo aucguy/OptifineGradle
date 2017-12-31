@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -38,7 +40,7 @@ public class IOManager
         ZipFile f;
         try
         {
-            f = new ZipFile(this.getFile(file, false));
+            f = new ZipFile(this.getFile(file));
         } catch (IOException e)
         {
             throw new IOException("Couldn't open input zip: " + e.getMessage());
@@ -52,7 +54,7 @@ public class IOManager
         ZipOutputStream f;
         try
         {
-            f = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(this.getFile(file))));
+            f = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(this.getFile(file, true))));
         } catch (IOException e)
         {
             throw new IOException("Couldn't open output zip: " + e.getMessage());
@@ -124,7 +126,7 @@ public class IOManager
         BufferedOutputStream f;
         try
         {
-            f = new BufferedOutputStream(new FileOutputStream(this.getFile(file)));
+            f = new BufferedOutputStream(new FileOutputStream(this.getFile(file, true)));
         } catch (IOException e)
         {
             throw new IOException("Couldn't open input file: " + e.getMessage());
@@ -175,10 +177,10 @@ public class IOManager
         return new BufferedReader(new InputStreamReader(inputStream));
     }
 
-    public static Set<String> readLines(InputStream inputStream) throws IOException
+    public static List<String> readLines(InputStream inputStream) throws IOException
     {
         BufferedReader reader = toBufferedReader(inputStream);
-        Set<String> ret = new HashSet<String>();
+        List<String> ret = new LinkedList<String>();
 
         String line;
         if (reader.ready())
@@ -190,6 +192,11 @@ public class IOManager
             }
         }
         return ret;
+    }
+
+    public static Set<String> readLinesAsSet(InputStream inputStream) throws IOException
+    {
+        return new HashSet<String>(readLines(inputStream));
     }
 
     public static byte[] readAll(InputStream inputStream) throws IOException

@@ -1,0 +1,44 @@
+--- ../src-base/minecraft/net/minecraft/block/Block.java
++++ ../src-work/minecraft/net/minecraft/block/Block.java
+@@ -556,8 +556,7 @@
+     @Deprecated
+     public float func_180647_a(IBlockState p_180647_1_, EntityPlayer p_180647_2_, World p_180647_3_, BlockPos p_180647_4_)
+     {
+-        float f = p_180647_1_.func_185887_b(p_180647_3_, p_180647_4_);
+-        return f < 0.0F ? 0.0F : (!p_180647_2_.func_184823_b(p_180647_1_) ? p_180647_2_.func_184813_a(p_180647_1_) / f / 100.0F : p_180647_2_.func_184813_a(p_180647_1_) / f / 30.0F);
++        return net.minecraftforge.common.ForgeHooks.blockStrength(p_180647_1_, p_180647_2_, p_180647_3_, p_180647_4_);
+     }
+ 
+     public final void func_176226_b(World p_176226_1_, BlockPos p_176226_2_, IBlockState p_176226_3_, int p_176226_4_)
+@@ -2523,31 +2522,6 @@
+                 block15.field_149783_u = flag;
+             }
+         }
+-
+-        Set<Block> set = Sets.newHashSet(new Block[] {(Block)field_149771_c.func_82594_a(new ResourceLocation("tripwire"))});
+-
+-        for (Block block16 : field_149771_c)
+-        {
+-            if (set.contains(block16))
+-            {
+-                for (int i = 0; i < 15; ++i)
+-                {
+-                    int j = field_149771_c.func_148757_b(block16) << 4 | i;
+-                    field_176229_d.func_148746_a(block16.func_176203_a(i), j);
+-                }
+-            }
+-            else
+-            {
+-                UnmodifiableIterator lvt_18_2_ = block16.func_176194_O().func_177619_a().iterator();
+-
+-                while (lvt_18_2_.hasNext())
+-                {
+-                    IBlockState iblockstate = (IBlockState)lvt_18_2_.next();
+-                    int k = field_149771_c.func_148757_b(block16) << 4 | block16.func_176201_c(iblockstate);
+-                    field_176229_d.func_148746_a(iblockstate, k);
+-                }
+-            }
+-        }
+     }
+ 
+     private static void func_176215_a(int p_176215_0_, ResourceLocation p_176215_1_, Block p_176215_2_)

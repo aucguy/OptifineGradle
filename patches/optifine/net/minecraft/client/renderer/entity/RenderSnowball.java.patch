@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/client/renderer/entity/RenderSnowball.java
 +++ ../src-work/minecraft/net/minecraft/client/renderer/entity/RenderSnowball.java
-@@ -22,8 +22,8 @@
+@@ -23,8 +23,8 @@
          this.field_177084_a = p_i46137_2_;
          this.field_177083_e = p_i46137_3_;
      }
@@ -11,12 +11,25 @@
      {
          GlStateManager.func_179094_E();
          GlStateManager.func_179109_b((float)p_76986_2_, (float)p_76986_4_, (float)p_76986_6_);
-@@ -32,7 +32,7 @@
-         GlStateManager.func_179114_b(-this.field_76990_c.field_78735_i, 0.0F, 1.0F, 0.0F);
-         GlStateManager.func_179114_b(this.field_76990_c.field_78732_j, 1.0F, 0.0F, 0.0F);
-         this.func_110776_a(TextureMap.field_110575_b);
+@@ -37,10 +37,10 @@
+         if (this.field_188301_f)
+         {
+             GlStateManager.func_179142_g();
+-            GlStateManager.func_187431_e(this.func_188298_c(p_76986_1_));
++            GlStateManager.func_187431_e(this.func_188298_c((T) p_76986_1_));
+         }
+ 
 -        this.field_177083_e.func_181564_a(this.func_177082_d(p_76986_1_), ItemCameraTransforms.TransformType.GROUND);
 +        this.field_177083_e.func_181564_a(this.func_177082_d((T) p_76986_1_), ItemCameraTransforms.TransformType.GROUND);
+ 
+         if (this.field_188301_f)
+         {
+@@ -50,7 +50,7 @@
+ 
          GlStateManager.func_179101_C();
          GlStateManager.func_179121_F();
-         super.func_76986_a(p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+-        super.func_76986_a(p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
++        super.func_76986_a((T) p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+     }
+ 
+     public ItemStack func_177082_d(T p_177082_1_)

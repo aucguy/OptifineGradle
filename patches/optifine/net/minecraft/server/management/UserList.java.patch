@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/server/management/UserList.java
++++ ../src-work/minecraft/net/minecraft/server/management/UserList.java
+@@ -205,7 +205,7 @@
+                 {
+                     if (userlistentry.func_152640_f() != null)
+                     {
+-                        this.field_152696_d.put(this.func_152681_a(userlistentry.func_152640_f()), userlistentry);
++                        this.field_152696_d.put(this.func_152681_a(userlistentry.func_152640_f()), (V) userlistentry);
+                     }
+                 }
+             }

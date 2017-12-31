@@ -1,6 +1,12 @@
 package com.github.aucguy.optifinegradle.patcher;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.*;
+import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_ZIP;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_GEN_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_ZIP_PATCHES;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_GEN_PATCHES;
 
 import java.io.File;
@@ -10,9 +16,11 @@ import org.gradle.api.tasks.bundling.Zip;
 import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 
+import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.patcher.PatcherPlugin;
 import net.minecraftforge.gradle.patcher.PatcherProject;
 import net.minecraftforge.gradle.patcher.TaskGenPatches;
+import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 
 public class OptifinePatcherPlugin extends PatcherPlugin
 {
@@ -43,6 +51,15 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             zipPatches.setDescription("Create the optifine patch archive");
             zipPatches.dependsOn(optifineGenPatches);
         }
+
+        ApplyFernFlowerTask testFernFlower = makeTask("testFernFlower", ApplyFernFlowerTask.class);
+        {
+            testFernFlower.setInJar(delayedFile("{BUILD_DIR}/localCache/test-in.zip"));
+            testFernFlower.setOutJar(delayedFile("{BUILD_DIR}/localCache/test-out.zip"));
+            testFernFlower.setDoesCache(false);
+            testFernFlower.setClasspath(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS));
+            testFernFlower.setForkedClasspath(project.getConfigurations().getByName(Constants.CONFIG_FFI_DEPS));
+        }
     }
     
     @Override
@@ -69,6 +86,8 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             {
                 optifineGenPatches.addChangedSource(file);
             }
+            optifineGenPatches.setOriginalPrefix(modGenPatches.getOriginalPrefix());
+            optifineGenPatches.setChangedPrefix(modGenPatches.getChangedPrefix());
             for(Object dependency : modGenPatches.getDependsOn())
             {
                 optifineGenPatches.dependsOn(dependency);

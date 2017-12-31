@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/src/CustomColors.java
 +++ ../src-work/minecraft/net/minecraft/src/CustomColors.java
-@@ -371,7 +371,7 @@
+@@ -454,7 +454,7 @@
          String s = "palette.block.";
          Map map = new HashMap();
  
@@ -9,7 +9,7 @@
          {
              String s2 = p_readCustomColormaps_0_.getProperty(s1);
  
-@@ -1339,7 +1339,7 @@
+@@ -1351,7 +1351,7 @@
      private static int[] readSpawnEggColors(Properties p_readSpawnEggColors_0_, String p_readSpawnEggColors_1_, String p_readSpawnEggColors_2_, String p_readSpawnEggColors_3_)
      {
          List<Integer> list = new ArrayList();
@@ -18,7 +18,7 @@
          int i = 0;
  
          for (String s : set)
-@@ -1434,7 +1434,7 @@
+@@ -1485,7 +1485,7 @@
          float[][] afloat1 = new float[aenumdyecolor.length][];
          int k = 0;
  
@@ -27,7 +27,7 @@
          {
              String s1 = p_readDyeColors_0_.getProperty(s);
  
-@@ -1507,7 +1507,7 @@
+@@ -1558,7 +1558,7 @@
          Arrays.fill((int[])aint, (int) - 1);
          int i = 0;
  
@@ -36,7 +36,7 @@
          {
              String s1 = p_readTextColors_0_.getProperty(s);
  
-@@ -1563,7 +1563,7 @@
+@@ -1614,7 +1614,7 @@
          Arrays.fill((int[])aint, (int) - 1);
          int i = 0;
  
@@ -45,7 +45,7 @@
          {
              String s1 = p_readMapColors_0_.getProperty(s);
  
-@@ -1602,7 +1602,7 @@
+@@ -1653,7 +1653,7 @@
          Arrays.fill((int[])aint, (int) - 1);
          int i = 0;
  

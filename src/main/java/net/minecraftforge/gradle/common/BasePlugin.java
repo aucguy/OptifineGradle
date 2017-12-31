@@ -57,6 +57,7 @@ import org.gradle.testfixtures.ProjectBuilder;
 
 import com.github.aucguy.optifinegradle.CacheWrapper;
 import com.github.aucguy.optifinegradle.ExtractRenames;
+import com.github.aucguy.optifinegradle.PreProcess;
 import com.github.aucguy.optifinegradle.user.JoinJars;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
@@ -549,7 +550,12 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         String mergeClientJar;
         Task mergeDependency;
         if(isOptifine)
-        {	
+        {
+            ExtractRenames extractRenames = makeTask(TASK_EXTRACT_RENAMES, ExtractRenames.class);
+            {
+                extractRenames.extractTo = delayedFile(RENAMES_FILE);
+            }
+
         	CacheWrapper diff = makeTask(TASK_DIFF_OPTIFINE, CacheWrapper.class);
         	{
         		Exec task = makeTask(TASK_DIFF_EXEC, Exec.class);
@@ -563,11 +569,6 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         		diff.input2 = delayedFile(JAR_OPTIFINE_FRESH);
         		diff.output = delayedFile(JAR_OPTIFINE_DIFFED);
         		diff.dependsOn(dlClient);
-        	}
-        	
-        	ExtractRenames extractRenames = makeTask(TASK_EXTRACT_RENAMES, ExtractRenames.class);
-        	{
-        		extractRenames.extractTo = delayedFile(RENAMES_FILE);
         	}
         	
             JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
@@ -595,11 +596,28 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         {
             merge.setClient(delayedFile(mergeClientJar));
             merge.setServer(delayedFile(JAR_SERVER_PURE));
-            merge.setOutJar(delayedFile(JAR_MERGED));
+            if(isOptifine)
+            {
+                merge.setOutJar(delayedFile(JAR_MERGED.replace("\\.jar", "-pre.jar")));
+            }
+            else
+            {
+                merge.setOutJar(delayedFile(JAR_MERGED, true));
+            }
             merge.dependsOn(mergeDependency, splitServer);
 
             merge.setGroup(null);
             merge.setDescription(null);
+        }
+
+        if(isOptifine)
+        {
+            PreProcess preprocess = makeTask("preprocess", PreProcess.class);
+            {
+                preprocess.inJar = delayedFile(JAR_MERGED.replace("\\.jar", "-pre.jar"));
+                preprocess.outJar = delayedFile(JAR_MERGED, true);
+                preprocess.dependsOn(merge);
+            }
         }
 
         ExtractConfigTask extractMcpData = makeTask(TASK_EXTRACT_MCP, ExtractConfigTask.class);

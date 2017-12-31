@@ -1,0 +1,24 @@
+--- ../src-base/minecraft/net/minecraft/item/Item.java
++++ ../src-work/minecraft/net/minecraft/item/Item.java
+@@ -1740,5 +1740,21 @@
+         {
+             return this == WOOD ? Item.func_150898_a(Blocks.field_150344_f) : (this == STONE ? Item.func_150898_a(Blocks.field_150347_e) : (this == GOLD ? Items.field_151043_k : (this == IRON ? Items.field_151042_j : (this == DIAMOND ? Items.field_151045_i : null))));
+         }
++        
++        public ToolMaterial setRepairItem(ItemStack stack)
++        {
++            if (!this.repairMaterial.func_190926_b()) throw new RuntimeException("Repair material has already been set");
++            if (this == WOOD || this == STONE || this == GOLD || this == IRON || this == DIAMOND) throw new RuntimeException("Can not change vanilla tool repair materials");
++            this.repairMaterial = stack;
++            return this;
++        }
++
++        public ItemStack getRepairItemStack()
++        {
++            if (!repairMaterial.func_190926_b()) return repairMaterial;
++            Item ret = this.func_150995_f();
++            if (ret != null) repairMaterial = new ItemStack(ret, 1, net.minecraftforge.oredict.OreDictionary.WILDCARD_VALUE);
++            return repairMaterial;
++        }
+     }
+ }

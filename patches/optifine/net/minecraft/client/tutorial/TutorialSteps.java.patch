@@ -1,0 +1,21 @@
+--- ../src-base/minecraft/net/minecraft/client/tutorial/TutorialSteps.java
++++ ../src-work/minecraft/net/minecraft/client/tutorial/TutorialSteps.java
+@@ -7,12 +7,12 @@
+ @SideOnly(Side.CLIENT)
+ public enum TutorialSteps
+ {
+-    MOVEMENT("movement", MovementStep::<init>),
+-    FIND_TREE("find_tree", FindTreeStep::<init>),
+-    PUNCH_TREE("punch_tree", PunchTreeStep::<init>),
+-    OPEN_INVENTORY("open_inventory", OpenInventoryStep::<init>),
+-    CRAFT_PLANKS("craft_planks", CraftPlanksStep::<init>),
+-    NONE("none", CompletedTutorialStep::<init>);
++    MOVEMENT("movement", MovementStep::new),
++    FIND_TREE("find_tree", FindTreeStep::new),
++    PUNCH_TREE("punch_tree", PunchTreeStep::new),
++    OPEN_INVENTORY("open_inventory", OpenInventoryStep::new),
++    CRAFT_PLANKS("craft_planks", CraftPlanksStep::new),
++    NONE("none", CompletedTutorialStep::new);
+ 
+     private final String field_193316_g;
+     private final Function < Tutorial, ? extends ITutorialStep > field_193317_h;

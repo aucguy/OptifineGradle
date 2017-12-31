@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
@@ -42,9 +44,11 @@ import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.ParallelizableTask;
 
 import com.cloudbees.diff.PatchException;
+import com.github.aucguy.optifinegradle.IOManager;
 import com.github.aucguy.optifinegradle.user.Patching;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -95,9 +99,19 @@ public class PatchSourcesTask extends AbstractEditJarTask
     @Optional
     private Object deobfuscatedClasses;
 
+    @OutputFile
+    @Optional
+    private Object rejectZip;
+
     @Override
     public void doStuffBefore() throws IOException
     {
+        File rejectZip = getRejectZip();
+        if(rejectZip != null && rejectZip.exists())
+        {
+            rejectZip.delete();
+        }
+
         getLogger().info("Reading patches");
 
         // create context provider
@@ -129,7 +143,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
                     continue;
                 }
                 
-                loadedPatches.add(new PatchedFile(f, context, fuzz));
+                loadedPatches.add(new PatchedFile(f, context, fuzz, ignoredPatches == null));
             }
         }
         else if (patchThingy.getName().endsWith(".jar") || patchThingy.getName().endsWith(".zip"))
@@ -156,7 +170,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     details.copyTo(stream);
                     String file = new String(stream.toByteArray(), Constants.CHARSET);
-                    loadedPatches.add(new PatchedFile(file, context, fuzz));
+                    loadedPatches.add(new PatchedFile(file, context, fuzz, ignoredPatches == null));
                 }
 
             });
@@ -240,6 +254,16 @@ public class PatchSourcesTask extends AbstractEditJarTask
     {
         boolean fuzzed = false;
         Throwable failure = null;
+        IOManager manager = new IOManager(this);
+        ZipOutputStream rejectOut;
+        if(getRejectZip() == null)
+        {
+            rejectOut = null;
+        }
+        else
+        {
+            rejectOut = manager.openZipForWriting(getRejectZip());
+        }
 
         for (PatchedFile patch : loadedPatches)
         {
@@ -262,7 +286,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
                             failed++;
                             getLogger().error("  " + hunk.getHunkID() + ": " + (hunk.getFailure() != null ? hunk.getFailure().getMessage() : "") + " @ " + hunk.getIndex());
 
-                            if (makeRejects)
+                            if (makeRejects && !patch.isOptifine)
                             {
                                 rejectBuilder.append(String.format("++++ REJECTED PATCH %d\n", hunk.getHunkID()));
                                 rejectBuilder.append(Joiner.on('\n').join(hunk.hunk.lines));
@@ -277,7 +301,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
                     getLogger().log(LogLevel.ERROR, "  {}/{} failed", failed, report.getHunks().size());
 
-                    if (makeRejects)
+                    if (makeRejects && !patch.isOptifine)
                     {
                         File reject = patch.makeRejectFile();
                         if (reject.exists())
@@ -285,6 +309,8 @@ public class PatchSourcesTask extends AbstractEditJarTask
                             reject.delete();
                         }
                         Files.append(rejectBuilder.toString(),reject, Charsets.UTF_8);
+                        rejectOut.putNextEntry(new ZipEntry(patch.fileToPatch.getName() + ".rej"));
+                        rejectOut.write(rejectBuilder.toString().getBytes());
                         getLogger().log(LogLevel.ERROR, "  Rejects written to {}", reject.getAbsolutePath());
                     }
 
@@ -330,6 +356,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
         {
             getLogger().lifecycle("Patches Fuzzed!");
         }
+        manager.closeAll();
     }
 
     // START GETTERS/SETTERS HERE
@@ -485,17 +512,20 @@ public class PatchSourcesTask extends AbstractEditJarTask
     {
         public final File            fileToPatch;
         public final ContextualPatch patch;
+        public final boolean         isOptifine;
 
-        public PatchedFile(File file, ContextProvider provider, int maxFuzz) throws IOException
+        public PatchedFile(File file, ContextProvider provider, int maxFuzz, boolean isOptifine) throws IOException
         {
             this.fileToPatch = file;
             this.patch = ContextualPatch.create(Files.toString(file, Charset.defaultCharset()), provider).setAccessC14N(true).setMaxFuzz(maxFuzz);
+            this.isOptifine = isOptifine;
         }
 
-        public PatchedFile(String file, ContextProvider provider, int maxFuzz)
+        public PatchedFile(String file, ContextProvider provider, int maxFuzz, boolean isOptifine)
         {
             this.fileToPatch = null;
             this.patch = ContextualPatch.create(file, provider).setAccessC14N(true).setMaxFuzz(maxFuzz);
+            this.isOptifine = isOptifine;
         }
 
         public File makeRejectFile()
@@ -540,5 +570,28 @@ public class PatchSourcesTask extends AbstractEditJarTask
     public void setOptifinePatches(Object optifinePatches)
     {
         this.optifinePatches = optifinePatches;
+    }
+
+    public File getRejectZip()
+    {
+        Object folder;
+        if (rejectZip == null)
+        {
+            folder = null;
+        }
+        else if (rejectZip instanceof Closure)
+        {
+            folder = ((Closure<?>) rejectZip).call();
+        }
+        else
+        {
+            folder = rejectZip;
+        }
+        return folder != null ? getProject().file(folder) : null;
+    }
+
+    public void setRejectZip(Object rejectZip)
+    {
+        this.rejectZip = rejectZip;
     }
 }

@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/entity/ai/EntityAINearestAttackableTarget.java
++++ ../src-work/minecraft/net/minecraft/entity/ai/EntityAINearestAttackableTarget.java
+@@ -71,7 +71,7 @@
+             else
+             {
+                 Collections.sort(list, this.field_75306_g);
+-                this.field_75309_a = (EntityLivingBase)list.get(0);
++                this.field_75309_a = (T)list.get(0);
+                 return true;
+             }
+         }
+@@ -99,7 +99,7 @@
+ 
+                     return Double.valueOf(1.0D);
+                 }
+-            }, this.field_82643_g);
++            }, (Predicate<EntityPlayer>) this.field_82643_g);
+             return this.field_75309_a != null;
+         }
+     }

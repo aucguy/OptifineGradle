@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/src/GuiScreenOF.java
++++ ../src-work/minecraft/net/minecraft/src/GuiScreenOF.java
+@@ -15,13 +15,13 @@
+     {
+     }
+ 
+-    protected void func_73864_a(int p_73864_1_, int p_73864_2_, int p_73864_3_) throws IOException
++    protected void func_73864_a(int mouseX, int mouseY, int mouseButton) throws IOException
+     {
+-        super.func_73864_a(p_73864_1_, p_73864_2_, p_73864_3_);
++        super.func_73864_a(mouseX, mouseY, mouseButton);
+ 
+-        if (p_73864_3_ == 1)
++        if (mouseButton == 1)
+         {
+-            GuiButton guibutton = getSelectedButton(p_73864_1_, p_73864_2_, this.field_146292_n);
++            GuiButton guibutton = getSelectedButton(mouseX, mouseY, this.field_146292_n);
+ 
+             if (guibutton != null && guibutton.field_146124_l)
+             {

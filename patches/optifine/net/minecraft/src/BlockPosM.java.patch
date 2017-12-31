@@ -9,8 +9,8 @@
      {
          if (this.level <= 0)
          {
--            return super.func_177967_a(p_177972_1_, 1);
-+            return super.func_177967_a(facing, 1);
+-            return super.func_177967_a(p_177972_1_, 1).func_185334_h();
++            return super.func_177967_a(facing, 1).func_185334_h();
          }
          else
          {
@@ -40,8 +40,8 @@
 -    public BlockPos func_177967_a(EnumFacing p_177967_1_, int p_177967_2_)
 +    public BlockPos func_177967_a(EnumFacing facing, int n)
      {
--        return p_177967_2_ == 1 ? this.func_177972_a(p_177967_1_) : super.func_177967_a(p_177967_1_, p_177967_2_);
-+        return n == 1 ? this.func_177972_a(facing) : super.func_177967_a(facing, n);
+-        return p_177967_2_ == 1 ? this.func_177972_a(p_177967_1_) : super.func_177967_a(p_177967_1_, p_177967_2_).func_185334_h();
++        return n == 1 ? this.func_177972_a(facing) : super.func_177967_a(facing, n).func_185334_h();
      }
  
      private void update()

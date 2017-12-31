@@ -66,7 +66,7 @@ public class Patching
         Set<String> IPS = null;
         if (deobfClasses != null)
         {
-            IPS = IOManager.readLines(manager.openFileForReading(deobfClasses));
+            IPS = IOManager.readLinesAsSet(manager.openFileForReading(deobfClasses));
         }
         return IPS;
     }
@@ -76,6 +76,7 @@ public class Patching
         if (ignoredPatches == null)
             return false;
         name = name.endsWith(".java.patch") ? name.substring(0, name.length() - 11) : name;
+        name = name.endsWith(".java") ? name.substring(0, name.length() - 5) : name;
         name = replace ? name.replace('/', '.').replace('\\', '.') : name;
         return ignoredPatches.contains(name);
     }

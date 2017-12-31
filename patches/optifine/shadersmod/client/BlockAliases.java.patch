@@ -1,0 +1,13 @@
+--- ../src-base/minecraft/shadersmod/client/BlockAliases.java
++++ ../src-work/minecraft/shadersmod/client/BlockAliases.java
+@@ -132,8 +132,9 @@
+                 Config.dbg("[Shaders] Parsing block mappings: " + path);
+                 ConnectedParser connectedparser = new ConnectedParser("Shaders");
+ 
+-                for (String s : properties.keySet())
++                for (Object k : properties.keySet())
+                 {
++                    String s = (String) k;
+                     String s1 = properties.getProperty(s);
+                     String s2 = "block.";
+ 

@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/entity/monster/AbstractSkeleton.java
++++ ../src-work/minecraft/net/minecraft/entity/monster/AbstractSkeleton.java
+@@ -47,7 +47,7 @@
+ {
+     private static final DataParameter<Boolean> field_184728_b = EntityDataManager.<Boolean>func_187226_a(AbstractSkeleton.class, DataSerializers.field_187198_h);
+     private final EntityAIAttackRangedBow<AbstractSkeleton> field_85037_d = new EntityAIAttackRangedBow(this, 1.0D, 20, 15.0F);
+-    private final EntityAIAttackMelee field_85038_e = new EntityAIAttackMelee(this, 1.2D, p_i47250_5_)
++    private final EntityAIAttackMelee field_85038_e = new EntityAIAttackMelee(this, 1.2D, false)
+     {
+         public void func_75251_c()
+         {

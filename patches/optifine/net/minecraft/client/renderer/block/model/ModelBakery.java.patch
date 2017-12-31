@@ -1,0 +1,89 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/block/model/ModelBakery.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/block/model/ModelBakery.java
+@@ -338,8 +338,8 @@
+             {
+                 if (s.startsWith("builtin/"))
+                 {
+-                    String s2 = s.substring("builtin/".length());
+-                    String s1 = (String)field_177600_d.get(s2);
++                    String s3 = s.substring("builtin/".length());
++                    String s1 = (String)field_177600_d.get(s3);
+ 
+                     if (s1 == null)
+                     {
+@@ -553,7 +553,7 @@
+ 
+             IBakedModel ibakedmodel2 = multipartbakedmodel$builder.func_188647_a();
+ 
+-            for (ModelResourceLocation modelresourcelocation1 : (Collection)entry.getValue())
++            for (ModelResourceLocation modelresourcelocation1 : (Collection<ModelResourceLocation>)entry.getValue())
+             {
+                 if (!modelblockdefinition.func_188000_b(modelresourcelocation1.func_177518_c()))
+                 {
+@@ -720,40 +720,40 @@
+     @Nullable
+     public IBakedModel func_177578_a(ModelBlock p_177578_1_, ModelRotation p_177578_2_, boolean p_177578_3_)
+     {
+-        return this.bakeModel(p_177578_1_, p_177578_2_, p_177578_3_);
++        return this.func_177578_a(p_177578_1_, p_177578_2_, p_177578_3_);
+     }
+ 
+-    protected IBakedModel bakeModel(ModelBlock p_bakeModel_1_, ITransformation p_bakeModel_2_, boolean p_bakeModel_3_)
++    protected IBakedModel bakeModel(ModelBlock p_177578_1_, ITransformation p_177578_2_, boolean p_177578_3_)
+     {
+-        TextureAtlasSprite textureatlassprite = (TextureAtlasSprite)this.field_177599_g.get(new ResourceLocation(p_bakeModel_1_.func_178308_c("particle")));
+-        SimpleBakedModel.Builder simplebakedmodel$builder = (new SimpleBakedModel.Builder(p_bakeModel_1_, p_bakeModel_1_.func_187967_g())).func_177646_a(textureatlassprite);
++        TextureAtlasSprite textureatlassprite = (TextureAtlasSprite)this.field_177599_g.get(new ResourceLocation(p_177578_1_.func_178308_c("particle")));
++        SimpleBakedModel.Builder simplebakedmodel$builder = (new SimpleBakedModel.Builder(p_177578_1_, p_177578_1_.func_187967_g())).func_177646_a(textureatlassprite);
+ 
+-        if (p_bakeModel_1_.func_178298_a().isEmpty())
++        if (p_177578_1_.func_178298_a().isEmpty())
+         {
+             return null;
+         }
+         else
+         {
+-            for (BlockPart blockpart : p_bakeModel_1_.func_178298_a())
++            for (BlockPart blockpart : p_177578_1_.func_178298_a())
+             {
+                 for (EnumFacing enumfacing : blockpart.field_178240_c.keySet())
+                 {
+                     BlockPartFace blockpartface = (BlockPartFace)blockpart.field_178240_c.get(enumfacing);
+-                    TextureAtlasSprite textureatlassprite1 = (TextureAtlasSprite)this.field_177599_g.get(new ResourceLocation(p_bakeModel_1_.func_178308_c(blockpartface.field_178242_d)));
++                    TextureAtlasSprite textureatlassprite1 = (TextureAtlasSprite)this.field_177599_g.get(new ResourceLocation(p_177578_1_.func_178308_c(blockpartface.field_178242_d)));
+                     boolean flag = true;
+ 
+                     if (Reflector.ForgeHooksClient.exists())
+                     {
+-                        flag = TRSRTransformation.isInteger(p_bakeModel_2_.getMatrix());
++                        flag = TRSRTransformation.isInteger(p_177578_2_.getMatrix());
+                     }
+ 
+                     if (blockpartface.field_178244_b != null && flag)
+                     {
+-                        simplebakedmodel$builder.func_177650_a(p_bakeModel_2_.rotate(blockpartface.field_178244_b), this.makeBakedQuad(blockpart, blockpartface, textureatlassprite1, enumfacing, p_bakeModel_2_, p_bakeModel_3_));
++                        simplebakedmodel$builder.func_177650_a(p_177578_2_.rotate(blockpartface.field_178244_b), this.makeBakedQuad(blockpart, blockpartface, textureatlassprite1, enumfacing, p_177578_2_, p_177578_3_));
+                     }
+                     else
+                     {
+-                        simplebakedmodel$builder.func_177648_a(this.makeBakedQuad(blockpart, blockpartface, textureatlassprite1, enumfacing, p_bakeModel_2_, p_bakeModel_3_));
++                        simplebakedmodel$builder.func_177648_a(this.makeBakedQuad(blockpart, blockpartface, textureatlassprite1, enumfacing, p_177578_2_, p_177578_3_));
+                     }
+                 }
+             }
+@@ -764,12 +764,12 @@
+ 
+     private BakedQuad func_177589_a(BlockPart p_177589_1_, BlockPartFace p_177589_2_, TextureAtlasSprite p_177589_3_, EnumFacing p_177589_4_, ModelRotation p_177589_5_, boolean p_177589_6_)
+     {
+-        return Reflector.ForgeHooksClient.exists() ? this.makeBakedQuad(p_177589_1_, p_177589_2_, p_177589_3_, p_177589_4_, p_177589_5_, p_177589_6_) : this.field_177607_l.func_178414_a(p_177589_1_.field_178241_a, p_177589_1_.field_178239_b, p_177589_2_, p_177589_3_, p_177589_4_, p_177589_5_, p_177589_1_.field_178237_d, p_177589_6_, p_177589_1_.field_178238_e);
++        return Reflector.ForgeHooksClient.exists() ? this.func_177589_a(p_177589_1_, p_177589_2_, p_177589_3_, p_177589_4_, p_177589_5_, p_177589_6_) : this.field_177607_l.func_178414_a(p_177589_1_.field_178241_a, p_177589_1_.field_178239_b, p_177589_2_, p_177589_3_, p_177589_4_, p_177589_5_, p_177589_1_.field_178237_d, p_177589_6_, p_177589_1_.field_178238_e);
+     }
+ 
+-    protected BakedQuad makeBakedQuad(BlockPart p_makeBakedQuad_1_, BlockPartFace p_makeBakedQuad_2_, TextureAtlasSprite p_makeBakedQuad_3_, EnumFacing p_makeBakedQuad_4_, ITransformation p_makeBakedQuad_5_, boolean p_makeBakedQuad_6_)
++    protected BakedQuad makeBakedQuad(BlockPart p_177589_1_, BlockPartFace p_177589_2_, TextureAtlasSprite p_177589_3_, EnumFacing p_177589_4_, ITransformation p_177589_5_, boolean p_177589_6_)
+     {
+-        return this.field_177607_l.makeBakedQuad(p_makeBakedQuad_1_.field_178241_a, p_makeBakedQuad_1_.field_178239_b, p_makeBakedQuad_2_, p_makeBakedQuad_3_, p_makeBakedQuad_4_, p_makeBakedQuad_5_, p_makeBakedQuad_1_.field_178237_d, p_makeBakedQuad_6_, p_makeBakedQuad_1_.field_178238_e);
++        return this.field_177607_l.makeBakedQuad(p_177589_1_.field_178241_a, p_177589_1_.field_178239_b, p_177589_2_, p_177589_3_, p_177589_4_, p_177589_5_, p_177589_1_.field_178237_d, p_177589_6_, p_177589_1_.field_178238_e);
+     }
+ 
+     private void func_177597_h()

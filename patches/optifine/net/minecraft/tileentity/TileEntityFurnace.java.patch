@@ -1,0 +1,26 @@
+--- ../src-base/minecraft/net/minecraft/tileentity/TileEntityFurnace.java
++++ ../src-work/minecraft/net/minecraft/tileentity/TileEntityFurnace.java
+@@ -260,7 +260,22 @@
+             else
+             {
+                 ItemStack itemstack1 = (ItemStack)this.field_145957_n.get(2);
+-                return itemstack1.func_190926_b() ? true : (!itemstack1.func_77969_a(itemstack) ? false : (itemstack1.func_190916_E() < this.func_70297_j_() && itemstack1.func_190916_E() < itemstack1.func_77976_d() ? true : itemstack1.func_190916_E() < itemstack.func_77976_d()));
++                if (itemstack1.func_190926_b())
++                {
++                    return true; 
++                }
++                else if (!itemstack1.func_77969_a(itemstack))
++                {
++                    return false;                 
++                }
++                else if (itemstack1.func_190916_E() + itemstack.func_190916_E() <= this.func_70297_j_() && itemstack1.func_190916_E() + itemstack.func_190916_E() <= itemstack1.func_77976_d())  // Forge fix: make furnace respect stack sizes in furnace recipes
++                {
++                    return true;
++                }
++                else
++                {
++                    return itemstack1.func_190916_E() + itemstack.func_190916_E() <= itemstack.func_77976_d(); // Forge fix: make furnace respect stack sizes in furnace recipes
++                }
+             }
+         }
+     }

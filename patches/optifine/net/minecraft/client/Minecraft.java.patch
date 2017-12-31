@@ -1,0 +1,114 @@
+--- ../src-base/minecraft/net/minecraft/client/Minecraft.java
++++ ../src-work/minecraft/net/minecraft/client/Minecraft.java
+@@ -54,6 +54,7 @@
+ import net.minecraft.client.gui.GuiIngame;
+ import net.minecraft.client.gui.GuiIngameMenu;
+ import net.minecraft.client.gui.GuiMainMenu;
++import net.minecraft.client.gui.GuiMemoryErrorScreen;
+ import net.minecraft.client.gui.GuiMultiplayer;
+ import net.minecraft.client.gui.GuiNewChat;
+ import net.minecraft.client.gui.GuiScreen;
+@@ -171,6 +172,7 @@
+ import net.minecraft.util.EnumHand;
+ import net.minecraft.util.FrameTimer;
+ import net.minecraft.util.IThreadListener;
++import net.minecraft.util.MinecraftError;
+ import net.minecraft.util.MouseHelper;
+ import net.minecraft.util.MovementInputFromOptions;
+ import net.minecraft.util.NonNullList;
+@@ -365,7 +367,77 @@
+         this.field_193034_aS = new GuiToast(this);
+         this.field_193035_aW = new Tutorial(this);
+     }
++    
++    public void func_99999_d()
++    {
++        this.field_71425_J = true;
+ 
++        try
++        {
++            this.func_71384_a();
++        }
++        catch (Throwable throwable)
++        {
++            CrashReport crashreport = CrashReport.func_85055_a(throwable, "Initializing game");
++            crashreport.func_85058_a("Initialization");
++            this.func_71377_b(this.func_71396_d(crashreport));
++            return;
++        }
++
++        while (true)
++        {
++            try
++            {
++                while (this.field_71425_J)
++                {
++                    if (!this.field_71434_R || this.field_71433_S == null)
++                    {
++                        try
++                        {
++                            this.func_71411_J();
++                        }
++                        catch (OutOfMemoryError var10)
++                        {
++                            this.func_71398_f();
++                            this.func_147108_a(new GuiMemoryErrorScreen());
++                            System.gc();
++                        }
++                    }
++                    else
++                    {
++                        this.func_71377_b(this.field_71433_S);
++                    }
++                }
++            }
++            catch (MinecraftError var12)
++            {
++                break;
++            }
++            catch (ReportedException reportedexception)
++            {
++                this.func_71396_d(reportedexception.func_71575_a());
++                this.func_71398_f();
++                field_147123_G.fatal("Reported exception thrown!", (Throwable)reportedexception);
++                this.func_71377_b(reportedexception.func_71575_a());
++                break;
++            }
++            catch (Throwable throwable1)
++            {
++                CrashReport crashreport1 = this.func_71396_d(new CrashReport("Unexpected error", throwable1));
++                this.func_71398_f();
++                field_147123_G.fatal("Unreported exception thrown!", throwable1);
++                this.func_71377_b(crashreport1);
++                break;
++            }
++            finally
++            {
++                this.func_71405_e();
++            }
++
++            return;
++        }
++    }
++
+     private void func_71384_a() throws LWJGLException, IOException
+     {
+         this.field_71474_y = new GameSettings(this, this.field_71412_D);
+@@ -498,7 +570,7 @@
+ 
+     public void func_193986_ar()
+     {
+-        SearchTree<ItemStack> searchtree = new SearchTree((p_193988_0_) ->
++        SearchTree<ItemStack> searchtree = new SearchTree<ItemStack>((p_193988_0_) ->
+         {
+             return (List)p_193988_0_.func_82840_a((EntityPlayer)null, ITooltipFlag.TooltipFlags.NORMAL).stream().map(TextFormatting::func_110646_a).map(String::trim).filter((p_193984_0_) -> {
+                 return !p_193984_0_.isEmpty();
+@@ -515,7 +587,7 @@
+         }
+ 
+         nonnulllist.forEach(searchtree::func_194043_a);
+-        SearchTree<RecipeList> searchtree1 = new SearchTree((p_193990_0_) ->
++        SearchTree<RecipeList> searchtree1 = new SearchTree<RecipeList>((p_193990_0_) ->
+         {
+             return (List)p_193990_0_.func_192711_b().stream().flatMap((p_193993_0_) -> {
+                 return p_193993_0_.func_77571_b().func_82840_a((EntityPlayer)null, ITooltipFlag.TooltipFlags.NORMAL).stream();

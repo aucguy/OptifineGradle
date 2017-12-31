@@ -1,0 +1,27 @@
+--- ../src-base/minecraft/net/minecraft/client/util/SuffixArray.java
++++ ../src-work/minecraft/net/minecraft/client/util/SuffixArray.java
+@@ -72,15 +72,15 @@
+ 
+             if (p_194054_3_ != p_194054_4_)
+             {
+-                int i2 = lvt_3_1_[p_194054_3_];
+-                lvt_3_1_[p_194054_3_] = lvt_3_1_[p_194054_4_];
+-                lvt_3_1_[p_194054_4_] = i2;
+-                i2 = lvt_4_1_[p_194054_3_];
+-                lvt_4_1_[p_194054_3_] = lvt_4_1_[p_194054_4_];
+-                lvt_4_1_[p_194054_4_] = i2;
+-                i2 = lvt_5_1_[p_194054_3_];
+-                lvt_5_1_[p_194054_3_] = lvt_5_1_[p_194054_4_];
+-                lvt_5_1_[p_194054_4_] = i2;
++                int i2 = aint1[p_194054_3_];
++                aint1[p_194054_3_] = aint1[p_194054_4_];
++                aint1[p_194054_4_] = i2;
++                i2 = aint2[p_194054_3_];
++                aint2[p_194054_3_] = aint2[p_194054_4_];
++                aint2[p_194054_4_] = i2;
++                i2 = aint3[p_194054_3_];
++                aint3[p_194054_3_] = aint3[p_194054_4_];
++                aint3[p_194054_4_] = i2;
+             }
+         };
+ 

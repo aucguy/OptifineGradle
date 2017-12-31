@@ -1,22 +1,25 @@
 --- ../src-base/minecraft/net/minecraft/client/renderer/texture/TextureManager.java
 +++ ../src-work/minecraft/net/minecraft/client/renderer/texture/TextureManager.java
-@@ -27,7 +27,7 @@
- {
-     private static final Logger field_147646_a = LogManager.getLogger();
-     private final Map field_110585_a = Maps.newHashMap();
--    private final List field_110583_b = Lists.newArrayList();
-+    private final List<ITickable> field_110583_b = Lists.newArrayList();
-     private final Map field_110584_c = Maps.newHashMap();
-     private IResourceManager field_110582_d;
- 
-@@ -180,8 +180,9 @@
-             }
-         }
- 
--        for (Entry entry : this.field_110585_a.entrySet())
-+        for (Object i : this.field_110585_a.entrySet())
-         {
-+        	Entry entry = (Entry) i;
-             this.func_110579_a((ResourceLocation)entry.getKey(), (ITextureObject)entry.getValue());
+@@ -87,7 +87,7 @@
          }
      }
+ 
+-    public boolean func_110579_a(ResourceLocation p_110579_1_, final ITextureObject p_110579_2_)
++    public boolean func_110579_a(ResourceLocation p_110579_1_, ITextureObject p_110579_2_)
+     {
+         boolean flag = true;
+ 
+@@ -111,11 +111,12 @@
+             CrashReport crashreport = CrashReport.func_85055_a(throwable, "Registering texture");
+             CrashReportCategory crashreportcategory = crashreport.func_85058_a("Resource location being registered");
+             crashreportcategory.func_71507_a("Resource location", p_110579_1_);
++            final ITextureObject textureObj2 = p_110579_2_;
+             crashreportcategory.func_189529_a("Texture object class", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+-                    return p_110579_2_.getClass().getName();
++                    return textureObj2.getClass().getName();
+                 }
+             });
+             throw new ReportedException(crashreport);

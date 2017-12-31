@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/src/TextureUtils.java
 +++ ../src-work/minecraft/net/minecraft/src/TextureUtils.java
-@@ -278,9 +278,9 @@
+@@ -277,9 +277,9 @@
              IReloadableResourceManager ireloadableresourcemanager = (IReloadableResourceManager)iresourcemanager;
              IResourceManagerReloadListener iresourcemanagerreloadlistener = new IResourceManagerReloadListener()
              {
@@ -12,7 +12,7 @@
                  }
              };
              ireloadableresourcemanager.func_110542_a(iresourcemanagerreloadlistener);
-@@ -292,7 +292,7 @@
+@@ -291,14 +291,14 @@
              {
                  TextureAnimations.updateCustomAnimations();
              }
@@ -21,12 +21,11 @@
              {
              }
              public int func_110552_b()
-@@ -515,7 +515,7 @@
-         }
-     }
- 
--    private static void dbgQuads(String p_dbgQuads_0_, List p_dbgQuads_1_, String p_dbgQuads_2_)
-+    private static void dbgQuads(String p_dbgQuads_0_, List<BakedQuad> p_dbgQuads_1_, String p_dbgQuads_2_)
-     {
-         for (BakedQuad bakedquad : p_dbgQuads_1_)
-         {
+             {
+                 return 0;
+             }
+-            public void func_174936_b(boolean p_174936_1_, boolean p_174936_2_)
++            public void func_174936_b(boolean blurIn, boolean mipmapIn)
+             {
+             }
+             public void func_174935_a()

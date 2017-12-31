@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/src/SmartLeaves.java
++++ ../src-work/minecraft/net/minecraft/src/SmartLeaves.java
+@@ -129,7 +129,7 @@
+ 
+                     if (ibakedmodel != null && ibakedmodel != modelmanager.func_174951_a())
+                     {
+-                        List list = ibakedmodel.func_188616_a((IBlockState)null, (EnumFacing)null, 0L);
++                        List<BakedQuad> list = ibakedmodel.func_188616_a((IBlockState)null, (EnumFacing)null, 0L);
+ 
+                         if (list.size() == 0)
+                         {

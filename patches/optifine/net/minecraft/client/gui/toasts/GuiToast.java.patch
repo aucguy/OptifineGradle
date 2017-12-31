@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/gui/toasts/GuiToast.java
++++ ../src-work/minecraft/net/minecraft/client/gui/toasts/GuiToast.java
+@@ -55,7 +55,7 @@
+         {
+             if (toastinstance != null && p_192990_1_.isAssignableFrom(toastinstance.func_193685_a().getClass()) && toastinstance.func_193685_a().func_193652_b().equals(p_192990_2_))
+             {
+-                return toastinstance.func_193685_a();
++                return (T) toastinstance.func_193685_a();
+             }
+         }
+ 

@@ -264,7 +264,7 @@ public class PostDecompileTask extends AbstractEditJarTask
         if (fuzzed)
             getLogger().lifecycle("Patches Fuzzed!");
         if (error != null) {
-            Throwables.propagate(error);
+            //Throwables.propagate(error);
         }
     }
 

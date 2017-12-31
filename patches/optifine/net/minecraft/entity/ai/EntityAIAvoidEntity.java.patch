@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/entity/ai/EntityAIAvoidEntity.java
++++ ../src-work/minecraft/net/minecraft/entity/ai/EntityAIAvoidEntity.java
+@@ -58,7 +58,7 @@
+         }
+         else
+         {
+-            this.field_75376_d = (Entity)list.get(0);
++            this.field_75376_d = (T)list.get(0);
+             Vec3d vec3d = RandomPositionGenerator.func_75461_b(this.field_75380_a, 16, 7, new Vec3d(this.field_75376_d.field_70165_t, this.field_75376_d.field_70163_u, this.field_75376_d.field_70161_v));
+ 
+             if (vec3d == null)

@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/entity/Entity.java
++++ ../src-work/minecraft/net/minecraft/entity/Entity.java
+@@ -3197,7 +3197,7 @@
+         {
+             if (p_184175_1_.isAssignableFrom(entity.getClass()))
+             {
+-                p_184175_2_.add(entity);
++                p_184175_2_.add((T) entity);
+             }
+ 
+             entity.func_184175_a(p_184175_1_, p_184175_2_);

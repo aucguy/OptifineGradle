@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/server/integrated/IntegratedServer.java
 +++ ../src-work/minecraft/net/minecraft/server/integrated/IntegratedServer.java
-@@ -112,7 +112,7 @@
+@@ -110,7 +110,7 @@
          else
          {
              this.field_71305_c = new WorldServer[3];

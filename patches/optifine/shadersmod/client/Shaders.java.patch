@@ -1,14 +1,32 @@
 --- ../src-base/minecraft/shadersmod/client/Shaders.java
 +++ ../src-work/minecraft/shadersmod/client/Shaders.java
-@@ -58,6 +58,7 @@
- import net.minecraftforge.fml.relauncher.Side;
+@@ -68,6 +68,7 @@
  import net.minecraftforge.fml.relauncher.SideOnly;
+ import org.apache.commons.io.IOUtils;
  import org.lwjgl.BufferUtils;
 +import org.lwjgl.opengl.ARBFragmentShader;
  import org.lwjgl.opengl.ARBShaderObjects;
  import org.lwjgl.opengl.ARBVertexShader;
  import org.lwjgl.opengl.ContextCapabilities;
-@@ -3090,7 +3091,7 @@
+@@ -877,7 +878,7 @@
+         Set set = props.keySet();
+         List<CustomTexture> list = new ArrayList();
+ 
+-        for (String s1 : set)
++        for (String s1 : (Set<String>) set)
+         {
+             if (s1.startsWith(s))
+             {
+@@ -1601,7 +1602,7 @@
+     public static void startup(Minecraft mc)
+     {
+         checkShadersModInstalled();
+-        mc = mc;
++        Shaders.mc = mc;
+         mc = Minecraft.func_71410_x();
+         capabilities = GLContext.getCapabilities();
+         glVersionString = GL11.glGetString(GL11.GL_VERSION);
+@@ -3685,7 +3686,7 @@
      {
          if (currentWorld != world)
          {
@@ -17,7 +35,16 @@
              currentWorld = world;
  
              if (world != null && world != null)
-@@ -4232,7 +4233,7 @@
+@@ -4764,7 +4765,7 @@
+     public static void setFog(GlStateManager.FogMode fogMode)
+     {
+         GlStateManager.func_187430_a(fogMode);
+-        fogMode = fogMode.field_187351_d;
++        //fogMode = fogMode.capabilityId;
+ 
+         if (fogEnabled)
+         {
+@@ -4939,7 +4940,7 @@
                          Lang.loadLocaleData(inputstream, properties);
                          inputstream.close();
  

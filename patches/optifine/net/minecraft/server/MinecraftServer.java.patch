@@ -1,0 +1,49 @@
+--- ../src-base/minecraft/net/minecraft/server/MinecraftServer.java
++++ ../src-work/minecraft/net/minecraft/server/MinecraftServer.java
+@@ -737,7 +737,7 @@
+                 WorldServer worldserver = net.minecraftforge.common.DimensionManager.getWorld(id);
+                 this.field_71304_b.func_194340_a(() ->
+                 {
+-                    return lvt_4_1_.func_72912_H().func_76065_j();
++                    return worldserver.func_72912_H().func_76065_j();
+                 });
+ 
+                 if (this.field_71315_w % 20 == 0)
+@@ -825,7 +825,13 @@
+ 
+     public WorldServer func_71218_a(int p_71218_1_)
+     {
+-        return p_71218_1_ == -1 ? this.field_71305_c[1] : (p_71218_1_ == 1 ? this.field_71305_c[2] : this.field_71305_c[0]);
++        WorldServer ret = net.minecraftforge.common.DimensionManager.getWorld(p_71218_1_);
++        if (ret == null)
++        {
++            net.minecraftforge.common.DimensionManager.initDimension(p_71218_1_);
++            ret = net.minecraftforge.common.DimensionManager.getWorld(p_71218_1_);
++        }
++        return ret;
+     }
+ 
+     public String func_71249_w()
+@@ -1412,6 +1418,22 @@
+     {
+         return this.field_71305_c[0].func_193037_A();
+     }
++    
++    public void func_193031_aM()
++    {
++        if (this.func_152345_ab())
++        {
++            this.func_184103_al().func_72389_g();
++            this.field_71305_c[0].func_184146_ak().func_186522_a();
++            this.func_191949_aK().func_192779_a();
++            this.func_193030_aL().func_193059_f();
++            this.func_184103_al().func_193244_w();
++        }
++        else
++        {
++            this.func_152344_a(this::func_193031_aM);
++        }
++    }
+ 
+     @SideOnly(Side.SERVER)
+     public String func_71211_k()

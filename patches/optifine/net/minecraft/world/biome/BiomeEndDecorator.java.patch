@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/world/biome/BiomeEndDecorator.java
++++ ../src-work/minecraft/net/minecraft/world/biome/BiomeEndDecorator.java
+@@ -50,7 +50,7 @@
+ 
+             public WorldGenSpikes.EndSpike[] load(Long p_load_1_) throws Exception
+             {
+-                List<Integer> list = Lists.newArrayList(ContiguousSet.create(Range.<C>closedOpen(Integer.valueOf(0), Integer.valueOf(10)), DiscreteDomain.integers()));
++                List<Integer> list = Lists.newArrayList(ContiguousSet.create(Range.closedOpen(Integer.valueOf(0), Integer.valueOf(10)), DiscreteDomain.integers()));
+                 Collections.shuffle(list, new Random(p_load_1_.longValue()));
+                 WorldGenSpikes.EndSpike[] aworldgenspikes$endspike = new WorldGenSpikes.EndSpike[10];
+ 

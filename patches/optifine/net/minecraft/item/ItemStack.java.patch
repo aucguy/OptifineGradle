@@ -1,0 +1,29 @@
+--- ../src-base/minecraft/net/minecraft/item/ItemStack.java
++++ ../src-work/minecraft/net/minecraft/item/ItemStack.java
+@@ -140,7 +140,7 @@
+ 
+     public boolean func_190926_b()
+     {
+-        return this == field_190927_a ? true : (this.field_151002_e != null && this.field_151002_e != Item.func_150898_a(Blocks.field_150350_a) ? (this.field_77994_a <= 0 ? true : this.field_77991_e < -32768 || this.field_77991_e > 65535) : true);
++        return this == field_190927_a ? true : (this.getItemRaw() != null && this.getItemRaw() != Item.func_150898_a(Blocks.field_150350_a) ? (this.field_77994_a <= 0 ? true : this.field_77991_e < -32768 || this.field_77991_e > 65535) : true);
+     }
+ 
+     public static void func_189868_a(DataFixer p_189868_0_)
+@@ -237,7 +237,7 @@
+ 
+     public boolean func_77984_f()
+     {
+-        return this.field_190928_g ? false : (this.field_151002_e.func_77612_l() <= 0 ? false : !this.func_77942_o() || !this.func_77978_p().func_74767_n("Unbreakable"));
++        return this.field_190928_g ? false : (this.field_151002_e.getMaxDamage(this) <= 0 ? false : !this.func_77942_o() || !this.func_77978_p().func_74767_n("Unbreakable"));
+     }
+ 
+     public boolean func_77981_g()
+@@ -377,7 +377,7 @@
+ 
+     public static boolean func_77970_a(ItemStack p_77970_0_, ItemStack p_77970_1_)
+     {
+-        return p_77970_0_.func_190926_b() && p_77970_1_.func_190926_b() ? true : (!p_77970_0_.func_190926_b() && !p_77970_1_.func_190926_b() ? (p_77970_0_.field_77990_d == null && p_77970_1_.field_77990_d != null ? false : p_77970_0_.field_77990_d == null || p_77970_0_.field_77990_d.equals(p_77970_1_.field_77990_d)) : false);
++        return p_77970_0_.func_190926_b() && p_77970_1_.func_190926_b() ? true : (!p_77970_0_.func_190926_b() && !p_77970_1_.func_190926_b() ? (p_77970_0_.field_77990_d == null && p_77970_1_.field_77990_d != null ? false : (p_77970_0_.field_77990_d == null || p_77970_0_.field_77990_d.equals(p_77970_1_.field_77990_d)) && p_77970_0_.areCapsCompatible(p_77970_1_)) : false);
+     }
+ 
+     public static boolean func_77989_b(ItemStack p_77989_0_, ItemStack p_77989_1_)

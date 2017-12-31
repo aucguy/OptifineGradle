@@ -1,0 +1,70 @@
+--- ../src-base/minecraft/net/minecraft/entity/monster/EntityShulker.java
++++ ../src-work/minecraft/net/minecraft/entity/monster/EntityShulker.java
+@@ -133,7 +133,7 @@
+     {
+         super.func_70088_a();
+         this.field_70180_af.func_187214_a(field_184700_a, EnumFacing.DOWN);
+-        this.field_70180_af.func_187214_a(field_184701_b, Optional.<T>absent());
++        this.field_70180_af.func_187214_a(field_184701_b, Optional.absent());
+         this.field_70180_af.func_187214_a(field_184702_c, Byte.valueOf((byte)0));
+         this.field_70180_af.func_187214_a(field_190770_bw, Byte.valueOf((byte)field_190771_bx.func_176765_a()));
+     }
+@@ -166,11 +166,11 @@
+             int i = p_70037_1_.func_74762_e("APX");
+             int j = p_70037_1_.func_74762_e("APY");
+             int k = p_70037_1_.func_74762_e("APZ");
+-            this.field_70180_af.func_187227_b(field_184701_b, Optional.<T>of(new BlockPos(i, j, k)));
++            this.field_70180_af.func_187227_b(field_184701_b, Optional.of(new BlockPos(i, j, k)));
+         }
+         else
+         {
+-            this.field_70180_af.func_187227_b(field_184701_b, Optional.<T>absent());
++            this.field_70180_af.func_187227_b(field_184701_b, Optional.absent());
+         }
+     }
+ 
+@@ -198,7 +198,7 @@
+         if (blockpos == null && !this.field_70170_p.field_72995_K)
+         {
+             blockpos = new BlockPos(this);
+-            this.field_70180_af.func_187227_b(field_184701_b, Optional.<T>of(blockpos));
++            this.field_70180_af.func_187227_b(field_184701_b, Optional.of(blockpos));
+         }
+ 
+         if (this.func_184218_aH())
+@@ -223,7 +223,7 @@
+                     if (this.field_70170_p.func_175623_d(blockpos.func_177972_a(enumfacing)))
+                     {
+                         blockpos = blockpos.func_177972_a(enumfacing);
+-                        this.field_70180_af.func_187227_b(field_184701_b, Optional.<T>of(blockpos));
++                        this.field_70180_af.func_187227_b(field_184701_b, Optional.of(blockpos));
+                     }
+                     else
+                     {
+@@ -237,7 +237,7 @@
+                     if (this.field_70170_p.func_175623_d(blockpos.func_177972_a(enumfacing3)))
+                     {
+                         blockpos = blockpos.func_177972_a(enumfacing3);
+-                        this.field_70180_af.func_187227_b(field_184701_b, Optional.<T>of(blockpos));
++                        this.field_70180_af.func_187227_b(field_184701_b, Optional.of(blockpos));
+                     }
+                     else
+                     {
+@@ -434,7 +434,7 @@
+                     if (flag)
+                     {
+                         this.func_184185_a(SoundEvents.field_187791_eX, 1.0F, 1.0F);
+-                        this.field_70180_af.func_187227_b(field_184701_b, Optional.<T>of(blockpos1));
++                        this.field_70180_af.func_187227_b(field_184701_b, Optional.of(blockpos1));
+                         this.field_70180_af.func_187227_b(field_184702_c, Byte.valueOf((byte)0));
+                         this.func_70624_b((EntityLivingBase)null);
+                         return true;
+@@ -550,7 +550,7 @@
+ 
+     public void func_184694_g(@Nullable BlockPos p_184694_1_)
+     {
+-        this.field_70180_af.func_187227_b(field_184701_b, Optional.<T>fromNullable(p_184694_1_));
++        this.field_70180_af.func_187227_b(field_184701_b, Optional.fromNullable(p_184694_1_));
+     }
+ 
+     public int func_184684_db()

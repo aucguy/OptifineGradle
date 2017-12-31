@@ -1,0 +1,24 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/block/model/BakedQuad.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/block/model/BakedQuad.java
+@@ -27,14 +27,14 @@
+     private boolean quadEmissiveChecked;
+     private BakedQuad quadEmissive;
+ 
+-    public BakedQuad(int[] p_i109_1_, int p_i109_2_, EnumFacing p_i109_3_, TextureAtlasSprite p_i109_4_, boolean p_i109_5_, VertexFormat p_i109_6_)
++    public BakedQuad(int[] p_i46574_1_, int p_i46574_2_, EnumFacing p_i46574_3_, TextureAtlasSprite p_i46574_4_, boolean applyDiffuseLighting, VertexFormat format)
+     {
+-        this.field_178215_a = p_i109_1_;
+-        this.field_178213_b = p_i109_2_;
+-        this.field_178214_c = p_i109_3_;
+-        this.field_187509_d = p_i109_4_;
+-        this.applyDiffuseLighting = p_i109_5_;
+-        this.format = p_i109_6_;
++        this.field_178215_a = p_i46574_1_;
++        this.field_178213_b = p_i46574_2_;
++        this.field_178214_c = p_i46574_3_;
++        this.field_187509_d = p_i46574_4_;
++        this.applyDiffuseLighting = applyDiffuseLighting;
++        this.format = format;
+         this.fixVertexData();
+     }
+ 

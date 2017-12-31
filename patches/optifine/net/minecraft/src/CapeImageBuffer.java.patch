@@ -1,0 +1,14 @@
+--- ../src-base/minecraft/net/minecraft/src/CapeImageBuffer.java
++++ ../src-work/minecraft/net/minecraft/src/CapeImageBuffer.java
+@@ -19,9 +19,9 @@
+         this.resourceLocation = p_i57_2_;
+     }
+ 
+-    public BufferedImage func_78432_a(BufferedImage p_78432_1_)
++    public BufferedImage func_78432_a(BufferedImage image)
+     {
+-        return CapeUtils.parseCape(p_78432_1_);
++        return CapeUtils.parseCape(image);
+     }
+ 
+     public void func_152634_a()

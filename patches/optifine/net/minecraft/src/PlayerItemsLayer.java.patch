@@ -1,11 +1,11 @@
 --- ../src-base/minecraft/net/minecraft/src/PlayerItemsLayer.java
 +++ ../src-work/minecraft/net/minecraft/src/PlayerItemsLayer.java
 @@ -21,9 +21,9 @@
-         this.renderPlayer = p_i53_1_;
+         this.renderPlayer = p_i94_1_;
      }
  
 -    public void func_177141_a(EntityLivingBase p_177141_1_, float p_177141_2_, float p_177141_3_, float p_177141_4_, float p_177141_5_, float p_177141_6_, float p_177141_7_, float p_177141_8_)
-+    public void func_177141_a(EntityLivingBase entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale)
++    public void func_177141_a(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
      {
 -        this.renderEquippedItems(p_177141_1_, p_177141_8_, p_177141_4_);
 +        this.renderEquippedItems(entitylivingbaseIn, scale, partialTicks);

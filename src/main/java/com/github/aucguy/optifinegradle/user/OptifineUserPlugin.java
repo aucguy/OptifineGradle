@@ -6,11 +6,18 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DL_PATCHES
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.USER_RENAMES;
+import static net.minecraftforge.gradle.user.UserConstants.*;
+
+import java.io.File;
+
+import org.gradle.api.tasks.Delete;
 
 import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 
+import groovy.lang.Closure;
 import net.minecraftforge.gradle.tasks.Download;
+import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 import net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin;
 
 public class OptifineUserPlugin extends ForgePlugin
@@ -36,16 +43,35 @@ public class OptifineUserPlugin extends ForgePlugin
         	dlPatches.setUrl(delayedString(PATCH_URL));
         	dlPatches.dependsOn(net.minecraftforge.gradle.common.Constants.TASK_DL_ASSET_INDEX);
         }
-        
+
     	ExtractRenames extractRenames = (ExtractRenames) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
     	{
     	    extractRenames.inZip = delayedFile(USER_RENAMES);
     		extractRenames.dependsOn(dlPatches);
     	}
-        
+
         JoinJars join = (JoinJars) project.getTasks().getByName(TASK_JOIN_JARS);
         {
         	join.dependsOn(extractRenames);
+        }
+
+        Delete deleteRenames = makeTask("deleteRenames", Delete.class);
+        {
+            deleteRenames.delete(delayedString("{mainDir}/localVariables"));
+        }
+
+        FindRenamesTask findRenames = makeTask("findRenames", FindRenamesTask.class);
+        {
+            findRenames.inJar = new Closure<File>(OptifineUserPlugin.class, this)
+            {
+                public File call()
+                {
+                    File file = ((ApplyFernFlowerTask) project.getTasks().getByName(TASK_DECOMPILE)).getOutJar();
+                    return new File(file.getParentFile(), file.getName().replaceAll("-optifine", ""));
+                }
+            };
+            findRenames.outFolder = delayedString("{mainDir}/localVariables");
+            findRenames.dependsOn(deleteRenames);
         }
     }
     

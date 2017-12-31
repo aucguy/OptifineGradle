@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/src/RandomMobs.java
 +++ ../src-work/minecraft/net/minecraft/src/RandomMobs.java
-@@ -96,15 +96,15 @@
+@@ -107,15 +107,15 @@
  
                  if (renderGlobal != null)
                  {

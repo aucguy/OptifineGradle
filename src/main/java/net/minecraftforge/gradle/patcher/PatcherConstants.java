@@ -50,7 +50,7 @@ public final class PatcherConstants
     static final String DEOBF_DATA               = Constants.DIR_MCP_DATA + "/deobfuscation_data-" + Constants.REPLACE_MC_VERSION + ".lzma";
 
     // cached stuff
-    static final String DIR_LOCAL_CACHE          = Constants.REPLACE_BUILD_DIR + "/localCache";
+    public static final String DIR_LOCAL_CACHE          = Constants.REPLACE_BUILD_DIR + "/localCache";
     public static final String JAR_DEOBF                = DIR_LOCAL_CACHE + "/deobfuscated.jar";
     static final String JAR_DECOMP               = DIR_LOCAL_CACHE + "/decompiled.zip";
     static final String JAR_DECOMP_POST          = DIR_LOCAL_CACHE + "/decompiled-processed.zip";

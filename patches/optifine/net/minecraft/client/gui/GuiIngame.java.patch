@@ -1,11 +1,11 @@
 --- ../src-base/minecraft/net/minecraft/client/gui/GuiIngame.java
 +++ ../src-work/minecraft/net/minecraft/client/gui/GuiIngame.java
-@@ -542,7 +542,7 @@
-                 return this.apply((Score)p_apply_1_);
-             }
-         }));
--        ArrayList arraylist1;
-+        ArrayList<Score> arraylist1;
+@@ -1338,7 +1338,7 @@
  
-         if (arraylist.size() > 15)
+     public void func_191742_a(ChatType p_191742_1_, ITextComponent p_191742_2_)
+     {
+-        for (IChatListener ichatlistener : (List)this.field_191743_I.get(p_191742_1_))
++        for (IChatListener ichatlistener : (List<IChatListener>)this.field_191743_I.get(p_191742_1_))
          {
+             ichatlistener.func_192576_a(p_191742_1_, p_191742_2_);
+         }

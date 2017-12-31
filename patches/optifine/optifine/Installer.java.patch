@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/optifine/Installer.java
++++ ../src-work/minecraft/optifine/Installer.java
+@@ -274,7 +274,7 @@
+ 
+         try
+         {
+-            Enumeration<ZipEntry> enumeration = zipfile.entries();
++            Enumeration<ZipEntry> enumeration = (Enumeration<ZipEntry>) zipfile.entries();
+ 
+             while (enumeration.hasMoreElements())
+             {

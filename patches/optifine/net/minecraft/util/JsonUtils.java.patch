@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/util/JsonUtils.java
++++ ../src-work/minecraft/net/minecraft/util/JsonUtils.java
+@@ -358,7 +358,7 @@
+         {
+             JsonReader jsonreader = new JsonReader(p_193838_1_);
+             jsonreader.setLenient(p_193838_3_);
+-            return p_193838_0_.getAdapter(TypeToken.get(p_193838_2_)).read(jsonreader);
++            return (T) p_193838_0_.getAdapter(TypeToken.get(p_193838_2_)).read(jsonreader);
+         }
+         catch (IOException ioexception)
+         {

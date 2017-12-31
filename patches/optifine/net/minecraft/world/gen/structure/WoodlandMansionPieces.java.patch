@@ -1,0 +1,29 @@
+--- ../src-base/minecraft/net/minecraft/world/gen/structure/WoodlandMansionPieces.java
++++ ../src-work/minecraft/net/minecraft/world/gen/structure/WoodlandMansionPieces.java
+@@ -43,7 +43,7 @@
+         {
+             private FirstFloor()
+             {
+-                super(null);
++                super();
+             }
+ 
+             public String func_191104_a(Random p_191104_1_)
+@@ -1214,7 +1214,7 @@
+         {
+             private SecondFloor()
+             {
+-                super(null);
++                super();
+             }
+ 
+             public String func_191104_a(Random p_191104_1_)
+@@ -1310,7 +1310,7 @@
+         {
+             private ThirdFloor()
+             {
+-                super(null);
++                super();
+             }
+         }
+ }

@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/gui/recipebook/GuiButtonRecipeTab.java
++++ ../src-work/minecraft/net/minecraft/client/gui/recipebook/GuiButtonRecipeTab.java
+@@ -33,7 +33,7 @@
+         RecipeBook recipebook = p_193918_1_.field_71439_g.func_192035_E();
+         label38:
+ 
+-        for (RecipeList recipelist : (List)RecipeBookClient.field_194086_e.get(this.field_193921_u))
++        for (RecipeList recipelist : (List<RecipeList>)RecipeBookClient.field_194086_e.get(this.field_193921_u))
+         {
+             Iterator iterator = recipelist.func_194208_a(recipebook.func_192815_c()).iterator();
+ 

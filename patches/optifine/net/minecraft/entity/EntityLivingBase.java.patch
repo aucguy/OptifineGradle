@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/entity/EntityLivingBase.java
++++ ../src-work/minecraft/net/minecraft/entity/EntityLivingBase.java
+@@ -1273,7 +1273,7 @@
+             BlockPos blockpos = new BlockPos(i, j, k);
+             IBlockState iblockstate = this.field_70170_p.func_180495_p(blockpos);
+             Block block = iblockstate.func_177230_c();
+-            return block != Blocks.field_150468_ap && block != Blocks.field_150395_bd ? block instanceof BlockTrapDoor && this.func_184604_a(blockpos, iblockstate) : true;
++            return net.minecraftforge.common.ForgeHooks.isLivingOnLadder(iblockstate, field_70170_p, new BlockPos(i, j, k), this);
+         }
+     }
+ 

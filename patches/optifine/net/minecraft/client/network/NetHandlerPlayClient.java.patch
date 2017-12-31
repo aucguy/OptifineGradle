@@ -1,0 +1,21 @@
+--- ../src-base/minecraft/net/minecraft/client/network/NetHandlerPlayClient.java
++++ ../src-work/minecraft/net/minecraft/client/network/NetHandlerPlayClient.java
+@@ -1476,15 +1476,15 @@
+             case ADD:
+                 p_191980_1_.func_192595_a().forEach((p_194025_2_) ->
+                 {
+-                    lvt_2_1_.func_194073_a(p_194025_2_);
+-                    lvt_2_1_.func_193825_e(p_194025_2_);
++                    recipebook.func_194073_a(p_194025_2_);
++                    recipebook.func_193825_e(p_194025_2_);
+                     RecipeToast.func_193665_a(this.field_147299_f.func_193033_an(), p_194025_2_);
+                 });
+         }
+ 
+         RecipeBookClient.field_194087_f.forEach((p_194023_1_) ->
+         {
+-            p_194023_1_.func_194214_a(lvt_2_1_);
++            p_194023_1_.func_194214_a(recipebook);
+         });
+ 
+         if (this.field_147299_f.field_71462_r instanceof IRecipeShownListener)

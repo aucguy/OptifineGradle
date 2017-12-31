@@ -1,0 +1,28 @@
+--- ../src-base/minecraft/net/minecraft/world/storage/loot/properties/EntityPropertyManager.java
++++ ../src-work/minecraft/net/minecraft/world/storage/loot/properties/EntityPropertyManager.java
+@@ -3,6 +3,7 @@
+ import com.google.common.collect.Maps;
+ import java.util.Map;
+ import net.minecraft.util.ResourceLocation;
++import net.minecraft.world.storage.loot.properties.EntityProperty.Serializer;
+ 
+ public class EntityPropertyManager
+ {
+@@ -12,7 +13,7 @@
+     public static <T extends EntityProperty> void func_186644_a(EntityProperty.Serializer <? extends T > p_186644_0_)
+     {
+         ResourceLocation resourcelocation = p_186644_0_.func_186649_a();
+-        Class<T> oclass = p_186644_0_.func_186651_b();
++        Class<T> oclass = (Class<T>) p_186644_0_.func_186651_b();
+ 
+         if (field_186647_a.containsKey(resourcelocation))
+         {
+@@ -53,7 +54,7 @@
+         }
+         else
+         {
+-            return serializer;
++            return (Serializer<T>) serializer;
+         }
+     }
+ 

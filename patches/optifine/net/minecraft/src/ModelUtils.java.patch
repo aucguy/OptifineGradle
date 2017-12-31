@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/src/ModelUtils.java
++++ ../src-work/minecraft/net/minecraft/src/ModelUtils.java
+@@ -34,7 +34,7 @@
+         }
+     }
+ 
+-    private static void dbgQuads(String p_dbgQuads_0_, List p_dbgQuads_1_, String p_dbgQuads_2_)
++    private static void dbgQuads(String p_dbgQuads_0_, List<BakedQuad> p_dbgQuads_1_, String p_dbgQuads_2_)
+     {
+         for (BakedQuad bakedquad : p_dbgQuads_1_)
+         {
+@@ -84,7 +84,7 @@
+         return simplebakedmodel;
+     }
+ 
+-    public static List duplicateQuadList(List p_duplicateQuadList_0_)
++    public static List duplicateQuadList(List<BakedQuad> p_duplicateQuadList_0_)
+     {
+         List list = new ArrayList();
+ 

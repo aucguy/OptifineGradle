@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/gui/GuiPageButtonList.java
++++ ../src-work/minecraft/net/minecraft/client/gui/GuiPageButtonList.java
+@@ -363,7 +363,7 @@
+             public EditBoxEntry(int p_i45534_1_, String p_i45534_2_, boolean p_i45534_3_, Predicate<String> p_i45534_4_)
+             {
+                 super(p_i45534_1_, p_i45534_2_, p_i45534_3_);
+-                this.field_178951_a = (Predicate)MoreObjects.firstNonNull(p_i45534_4_, Predicates.<T>alwaysTrue());
++                this.field_178951_a = (Predicate)MoreObjects.firstNonNull(p_i45534_4_, Predicates.alwaysTrue());
+             }
+ 
+             public Predicate<String> func_178950_a()

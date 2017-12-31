@@ -1,0 +1,38 @@
+--- ../src-base/minecraft/net/minecraft/client/multiplayer/WorldClient.java
++++ ../src-work/minecraft/net/minecraft/client/multiplayer/WorldClient.java
+@@ -313,7 +313,6 @@
+         return entity;
+     }
+ 
+-    *
+     @Deprecated
+     public boolean func_180503_b(BlockPos p_180503_1_, IBlockState p_180503_2_)
+     {
+@@ -579,22 +578,22 @@
+         return (ChunkProviderClient)super.func_72863_F();
+     }
+ 
+-    public int func_175626_b(BlockPos p_175626_1_, int p_175626_2_)
++    public int func_175626_b(BlockPos pos, int lightValue)
+     {
+-        int i = super.func_175626_b(p_175626_1_, p_175626_2_);
++        int i = super.func_175626_b(pos, lightValue);
+ 
+         if (Config.isDynamicLights())
+         {
+-            i = DynamicLights.getCombinedLight(p_175626_1_, i);
++            i = DynamicLights.getCombinedLight(pos, i);
+         }
+ 
+         return i;
+     }
+ 
+-    public boolean func_180501_a(BlockPos p_180501_1_, IBlockState p_180501_2_, int p_180501_3_)
++    public boolean func_180501_a(BlockPos pos, IBlockState newState, int flags)
+     {
+         this.playerUpdate = this.isPlayerActing();
+-        boolean flag = super.func_180501_a(p_180501_1_, p_180501_2_, p_180501_3_);
++        boolean flag = super.func_180501_a(pos, newState, flags);
+         this.playerUpdate = false;
+         return flag;
+     }

@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/src/ChunkUtils.java
 +++ ../src-work/minecraft/net/minecraft/src/ChunkUtils.java
-@@ -48,7 +48,7 @@
+@@ -26,7 +26,7 @@
      {
          try
          {

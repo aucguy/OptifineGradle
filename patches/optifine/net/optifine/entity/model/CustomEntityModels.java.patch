@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/optifine/entity/model/CustomEntityModels.java
++++ ../src-work/minecraft/net/optifine/entity/model/CustomEntityModels.java
+@@ -108,7 +108,7 @@
+ 
+     private static Map<Class, TileEntitySpecialRenderer> getTileEntityRenderMap()
+     {
+-        Map<Class, TileEntitySpecialRenderer> map = TileEntityRendererDispatcher.field_147556_a.field_147559_m;
++        Map<Class, TileEntitySpecialRenderer> map = (Map) TileEntityRendererDispatcher.field_147556_a.field_147559_m;
+ 
+         if (originalTileEntityRenderMap == null)
+         {

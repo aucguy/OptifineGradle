@@ -1,15 +1,15 @@
 --- ../src-base/minecraft/net/minecraft/src/ConnectedParser.java
 +++ ../src-work/minecraft/net/minecraft/src/ConnectedParser.java
-@@ -75,7 +75,7 @@
-                     return NO_MATCH_BLOCKS;
-                 }
+@@ -81,7 +81,7 @@
  
--                list.addAll(Arrays.<E>asList(amatchblock));
-+                list.addAll(Arrays.asList(amatchblock));
+                 if (amatchblock != null)
+                 {
+-                    list.addAll(Arrays.<E>asList(amatchblock));
++                    list.addAll(Arrays.asList(amatchblock));
+                 }
              }
  
-             MatchBlock[] amatchblock1 = (MatchBlock[])((MatchBlock[])list.toArray(new MatchBlock[list.size()]));
-@@ -383,7 +383,7 @@
+@@ -416,7 +416,7 @@
          return comparable;
      }
  

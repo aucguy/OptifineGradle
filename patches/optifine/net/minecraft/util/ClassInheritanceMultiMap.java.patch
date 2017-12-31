@@ -1,0 +1,29 @@
+--- ../src-base/minecraft/net/minecraft/util/ClassInheritanceMultiMap.java
++++ ../src-work/minecraft/net/minecraft/util/ClassInheritanceMultiMap.java
+@@ -87,7 +87,7 @@
+ 
+         if (list == null)
+         {
+-            this.field_180218_a.put(p_181743_2_, Lists.newArrayList(new Object[] {p_181743_1_}));
++            this.field_180218_a.put(p_181743_2_, (List<T>) Lists.newArrayList(new Object[] {p_181743_1_}));
+         }
+         else
+         {
+@@ -97,7 +97,7 @@
+ 
+     public boolean remove(Object p_remove_1_)
+     {
+-        T t = p_remove_1_;
++        T t = (T) p_remove_1_;
+         boolean flag = false;
+ 
+         for (Class<?> oclass : this.field_180216_b)
+@@ -144,7 +144,7 @@
+ 
+     public Iterator<T> iterator()
+     {
+-        return this.field_181745_e.isEmpty() ? Collections.emptyIterator() : IteratorCache.getReadOnly(this.field_181745_e);
++        return this.field_181745_e.isEmpty() ? Collections.emptyIterator() : (Iterator<T>) IteratorCache.getReadOnly(this.field_181745_e);
+     }
+ 
+     public int size()

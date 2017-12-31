@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/settings/KeyBinding.java
++++ ../src-work/minecraft/net/minecraft/client/settings/KeyBinding.java
+@@ -299,7 +299,7 @@
+             return p_193626_0_;
+         }: () ->
+         {
+-            return GameSettings.func_74298_c(lvt_1_1_.func_151463_i());
++            return keybinding.getDisplayName();
+         };
+     }
+ 

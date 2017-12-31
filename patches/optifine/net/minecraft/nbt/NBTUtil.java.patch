@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/nbt/NBTUtil.java
++++ ../src-work/minecraft/net/minecraft/nbt/NBTUtil.java
+@@ -269,7 +269,7 @@
+ 
+         if (optional.isPresent())
+         {
+-            return p_193590_0_.func_177226_a(p_193590_1_, (Comparable)optional.get());
++            return p_193590_0_.func_177226_a(p_193590_1_, optional.get());
+         }
+         else
+         {

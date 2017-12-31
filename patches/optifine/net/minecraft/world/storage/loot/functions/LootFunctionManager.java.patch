@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/world/storage/loot/functions/LootFunctionManager.java
++++ ../src-work/minecraft/net/minecraft/world/storage/loot/functions/LootFunctionManager.java
+@@ -23,7 +23,7 @@
+     public static <T extends LootFunction> void func_186582_a(LootFunction.Serializer <? extends T > p_186582_0_)
+     {
+         ResourceLocation resourcelocation = p_186582_0_.func_186529_a();
+-        Class<T> oclass = p_186582_0_.func_186531_b();
++        Class<T> oclass = (Class<T>) p_186582_0_.func_186531_b();
+ 
+         if (field_186584_a.containsKey(resourcelocation))
+         {

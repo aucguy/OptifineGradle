@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/util/WeightedRandom.java
++++ ../src-work/minecraft/net/minecraft/util/WeightedRandom.java
+@@ -38,7 +38,7 @@
+ 
+         for (int j = p_180166_0_.size(); i < j; ++i)
+         {
+-            T t = (WeightedRandom.Item)p_180166_0_.get(i);
++            T t = (T)p_180166_0_.get(i);
+             p_180166_1_ -= t.field_76292_a;
+ 
+             if (p_180166_1_ < 0)

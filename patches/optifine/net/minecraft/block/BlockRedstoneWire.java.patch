@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/block/BlockRedstoneWire.java
++++ ../src-work/minecraft/net/minecraft/block/BlockRedstoneWire.java
+@@ -409,7 +409,7 @@
+         IBlockState iblockstate = p_176339_1_.func_180495_p(blockpos);
+         boolean flag = iblockstate.func_185915_l();
+         boolean flag1 = p_176339_1_.func_180495_p(p_176339_2_.func_177984_a()).func_185915_l();
+-        return !flag1 && flag && func_176340_e(p_176339_1_, blockpos.func_177984_a()) ? true : (func_176343_a(iblockstate, p_176339_3_) ? true : (iblockstate.func_177230_c() == Blocks.field_150416_aS && iblockstate.func_177229_b(BlockRedstoneDiode.field_185512_D) == p_176339_3_ ? true : !flag && func_176340_e(p_176339_1_, blockpos.func_177977_b())));
++        return !flag1 && flag && func_176340_e(p_176339_1_, blockpos.func_177984_a()) ? true : (canConnectTo(iblockstate, p_176339_3_, p_176339_1_, p_176339_2_) ? true : (iblockstate.func_177230_c() == Blocks.field_150416_aS && iblockstate.func_177229_b(BlockRedstoneDiode.field_185512_D) == p_176339_3_ ? true : !flag && func_176340_e(p_176339_1_, blockpos.func_177977_b())));
+     }
+ 
+     protected static boolean func_176340_e(IBlockAccess p_176340_0_, BlockPos p_176340_1_)
+@@ -432,7 +432,7 @@
+         }
+         else
+         {
+-            return Blocks.field_190976_dk == p_176343_0_.func_177230_c() ? p_176343_1_ == p_176343_0_.func_177229_b(BlockObserver.field_176387_N) : p_176343_0_.func_185897_m() && p_176343_1_ != null;
++            return Blocks.field_190976_dk == p_176343_0_.func_177230_c() ? p_176343_1_ == p_176343_0_.func_177229_b(BlockObserver.field_176387_N) : p_176343_0_.func_177230_c().canConnectRedstone(p_176343_0_, world, pos, p_176343_1_);
+         }
+     }
+ 

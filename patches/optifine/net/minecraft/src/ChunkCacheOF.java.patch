@@ -1,0 +1,103 @@
+--- ../src-base/minecraft/net/minecraft/src/ChunkCacheOF.java
++++ ../src-work/minecraft/net/minecraft/src/ChunkCacheOF.java
+@@ -74,9 +74,9 @@
+         }
+     }
+ 
+-    public int func_175626_b(BlockPos p_175626_1_, int p_175626_2_)
++    public int func_175626_b(BlockPos pos, int lightValue)
+     {
+-        int i = this.getPositionIndex(p_175626_1_);
++        int i = this.getPositionIndex(pos);
+ 
+         if (i >= 0 && i < this.arraySize && this.combinedLights != null)
+         {
+@@ -84,7 +84,7 @@
+ 
+             if (j == -1)
+             {
+-                j = this.getCombinedLightRaw(p_175626_1_, p_175626_2_);
++                j = this.getCombinedLightRaw(pos, lightValue);
+                 this.combinedLights[i] = j;
+             }
+ 
+@@ -92,7 +92,7 @@
+         }
+         else
+         {
+-            return this.getCombinedLightRaw(p_175626_1_, p_175626_2_);
++            return this.getCombinedLightRaw(pos, lightValue);
+         }
+     }
+ 
+@@ -108,9 +108,9 @@
+         return i;
+     }
+ 
+-    public IBlockState func_180495_p(BlockPos p_180495_1_)
++    public IBlockState func_180495_p(BlockPos pos)
+     {
+-        int i = this.getPositionIndex(p_180495_1_);
++        int i = this.getPositionIndex(pos);
+ 
+         if (i >= 0 && i < this.arraySize && this.blockStates != null)
+         {
+@@ -118,7 +118,7 @@
+ 
+             if (iblockstate == null)
+             {
+-                iblockstate = this.chunkCache.func_180495_p(p_180495_1_);
++                iblockstate = this.chunkCache.func_180495_p(pos);
+                 this.blockStates[i] = iblockstate;
+             }
+ 
+@@ -126,7 +126,7 @@
+         }
+         else
+         {
+-            return this.chunkCache.func_180495_p(p_180495_1_);
++            return this.chunkCache.func_180495_p(pos);
+         }
+     }
+ 
+@@ -160,19 +160,19 @@
+         return this.chunkCache.func_72806_N();
+     }
+ 
+-    public Biome func_180494_b(BlockPos p_180494_1_)
++    public Biome func_180494_b(BlockPos pos)
+     {
+-        return this.chunkCache.func_180494_b(p_180494_1_);
++        return this.chunkCache.func_180494_b(pos);
+     }
+ 
+-    public int func_175627_a(BlockPos p_175627_1_, EnumFacing p_175627_2_)
++    public int func_175627_a(BlockPos pos, EnumFacing direction)
+     {
+-        return this.chunkCache.func_175627_a(p_175627_1_, p_175627_2_);
++        return this.chunkCache.func_175627_a(pos, direction);
+     }
+ 
+-    public TileEntity func_175625_s(BlockPos p_175625_1_)
++    public TileEntity func_175625_s(BlockPos pos)
+     {
+-        return this.chunkCache.func_190300_a(p_175625_1_, Chunk.EnumCreateEntityType.CHECK);
++        return this.chunkCache.func_190300_a(pos, Chunk.EnumCreateEntityType.CHECK);
+     }
+ 
+     public TileEntity getTileEntity(BlockPos p_getTileEntity_1_, Chunk.EnumCreateEntityType p_getTileEntity_2_)
+@@ -185,11 +185,12 @@
+         return this.chunkCache.func_175624_G();
+     }
+ 
+-    public boolean func_175623_d(BlockPos p_175623_1_)
++    public boolean func_175623_d(BlockPos pos)
+     {
+-        return this.chunkCache.func_175623_d(p_175623_1_);
++        return this.chunkCache.func_175623_d(pos);
+     }
+ 
++    @Override
+     public boolean isSideSolid(BlockPos p_isSideSolid_1_, EnumFacing p_isSideSolid_2_, boolean p_isSideSolid_3_)
+     {
+         return Reflector.callBoolean(this.chunkCache, Reflector.ForgeChunkCache_isSideSolid, new Object[] {p_isSideSolid_1_, p_isSideSolid_2_, Boolean.valueOf(p_isSideSolid_3_)});

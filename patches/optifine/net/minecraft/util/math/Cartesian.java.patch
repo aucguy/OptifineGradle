@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/util/math/Cartesian.java
++++ ../src-work/minecraft/net/minecraft/util/math/Cartesian.java
+@@ -54,7 +54,7 @@
+ 
+             public List<T> apply(@Nullable Object[] p_apply_1_)
+             {
+-                return Arrays.<T>asList((Object[])p_apply_1_);
++                return (List<T>) Arrays.asList((Object[])p_apply_1_);
+             }
+         }
+ 

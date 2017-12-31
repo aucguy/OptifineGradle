@@ -1,0 +1,32 @@
+--- ../src-base/minecraft/net/minecraft/entity/EntityAreaEffectCloud.java
++++ ../src-work/minecraft/net/minecraft/entity/EntityAreaEffectCloud.java
+@@ -307,16 +307,16 @@
+                     }
+                 }
+ 
+-                iterator = Lists.<Entry<Entity, Integer>>newArrayList();
++                iterator = (Iterator<Entry<Entity, Integer>>) Lists.newArrayList();
+ 
+                 for (PotionEffect potioneffect1 : this.field_184502_e.func_185170_a())
+                 {
+-                    iterator.add(new PotionEffect(potioneffect1.func_188419_a(), potioneffect1.func_76459_b() / 4, potioneffect1.func_76458_c(), potioneffect1.func_82720_e(), potioneffect1.func_188418_e()));
++                    ((List<PotionEffect>) iterator).add(new PotionEffect(potioneffect1.func_188419_a(), potioneffect1.func_76459_b() / 4, potioneffect1.func_76458_c(), potioneffect1.func_82720_e(), potioneffect1.func_188418_e()));
+                 }
+ 
+-                iterator.addAll(this.field_184503_f);
++                ((List<PotionEffect>) iterator).addAll(this.field_184503_f);
+ 
+-                if (iterator.isEmpty())
++                if (((EntityDataManager) iterator).func_187228_d())
+                 {
+                     this.field_184504_g.clear();
+                 }
+@@ -338,7 +338,7 @@
+                                 {
+                                     this.field_184504_g.put(entitylivingbase, Integer.valueOf(this.field_70173_aa + this.field_184507_at));
+ 
+-                                    for (PotionEffect potioneffect : iterator)
++                                    for (PotionEffect potioneffect : (Iterable<PotionEffect>) iterator)
+                                     {
+                                         if (potioneffect.func_188419_a().func_76403_b())
+                                         {

@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/entity/monster/EntityPolarBear.java
++++ ../src-work/minecraft/net/minecraft/entity/monster/EntityPolarBear.java
+@@ -204,7 +204,7 @@
+     {
+         public AIAttackPlayer()
+         {
+-            super(EntityPolarBear.this, EntityPlayer.class, 20, true, true, (Predicate <? super T >)null);
++            super(EntityPolarBear.this, EntityPlayer.class, 20, true, true, null);
+         }
+ 
+         public boolean func_75250_a()
