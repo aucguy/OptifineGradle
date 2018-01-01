@@ -86,8 +86,6 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             {
                 optifineGenPatches.addChangedSource(file);
             }
-            optifineGenPatches.setOriginalPrefix(modGenPatches.getOriginalPrefix());
-            optifineGenPatches.setChangedPrefix(modGenPatches.getChangedPrefix());
             for(Object dependency : modGenPatches.getDependsOn())
             {
                 optifineGenPatches.dependsOn(dependency);
