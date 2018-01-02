@@ -18,7 +18,6 @@ public class OptifinePlugin
     public void init()
     {
         plugin.isOptifine = true;
-        Output.init();
     }
 
     public void applyPlugin()

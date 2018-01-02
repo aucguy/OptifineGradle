@@ -598,7 +598,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             merge.setServer(delayedFile(JAR_SERVER_PURE));
             if(isOptifine)
             {
-                merge.setOutJar(delayedFile(JAR_MERGED.replace("\\.jar", "-pre.jar")));
+                merge.setOutJar(delayedFile(JAR_PREPROCESS));
             }
             else
             {
@@ -612,9 +612,9 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
         if(isOptifine)
         {
-            PreProcess preprocess = makeTask("preprocess", PreProcess.class);
+            PreProcess preprocess = makeTask(TASK_PREPROCESS, PreProcess.class);
             {
-                preprocess.inJar = delayedFile(JAR_MERGED.replace("\\.jar", "-pre.jar"));
+                preprocess.inJar = delayedFile(JAR_PREPROCESS);
                 preprocess.outJar = delayedFile(JAR_MERGED, true);
                 preprocess.dependsOn(merge);
             }

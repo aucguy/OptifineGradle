@@ -21,6 +21,12 @@ package net.minecraftforge.gradle.patcher;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OBFUSCATED_CLASSES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DELETE_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_EXTRACT_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
 import groovy.lang.Closure;
@@ -47,7 +53,6 @@ import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.Zip;
 
-import com.github.aucguy.optifinegradle.ApplyRenamesTask;
 import com.github.aucguy.optifinegradle.RemapRejects;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
@@ -128,7 +133,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             deobfJar.setDoesCache(false);
             deobfJar.setFailOnAtError(!isOptifine);
             // access transformers are added afterEvaluate
-            deobfJar.dependsOn("preprocess", TASK_GENERATE_SRGS);
+            deobfJar.dependsOn(TASK_PREPROCESS, TASK_GENERATE_SRGS);
         }
 
         ApplyFernFlowerTask decompileJar = makeTask(TASK_DECOMP, ApplyFernFlowerTask.class);
@@ -140,27 +145,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             decompileJar.setForkedClasspath(project.getConfigurations().getByName(Constants.CONFIG_FFI_DEPS));
             decompileJar.dependsOn(deobfJar);
         }
-
-        /*Task postDecompileDependency;
-        Object postDecompileInJar;
-        if(isOptifine)
-        {
-            ApplyRenamesTask renames = makeTask("applyRenames", ApplyRenamesTask.class);
-            {
-                renames.setInJar(delayedFile(JAR_DECOMP));
-                renames.renamesDir = "patches/optifine/localVariables";
-                renames.ignoredSources = delayedFile(DEOBFUSCATED_CLASSES);
-                renames.setOutJar(delayedFile(PatcherConstants.DIR_LOCAL_CACHE + "/renamed.zip"));
-                renames.dependsOn(decompileJar);
-            }
-            postDecompileDependency = renames;
-            postDecompileInJar = delayedFile(PatcherConstants.DIR_LOCAL_CACHE + "/renamed.zip");
-        }
-        else
-        {
-            postDecompileDependency = decompileJar;
-            postDecompileInJar = delayedFile(JAR_DECOMP);
-        }*/
 
         PostDecompileTask postDecompileJar = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
@@ -466,23 +450,23 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             patch.setOutJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
             patch.setPatches(patcher.getDelayedPatchDir());
             patch.setOptifinePatches(patcher.getDelayedOptifinePatchDir());
-            patch.setRejectZip(delayedFile(projectString(DIR_PROJECT_CACHE + "/rejects.zip", patcher)));
+            patch.setRejectZip(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
             patch.setDoesCache(false);
             patch.setMaxFuzz(2);
             patch.setFailOnError(false);
             patch.setMakeRejects(true);
         }
 
-        Delete deleteRejects = makeTask(projectString("delete{CAPNAME}Rejects", patcher), Delete.class);
+        Delete deleteRejects = makeTask(projectString(TASK_PROJECT_DELETE_REJECTS, patcher), Delete.class);
         {
-            deleteRejects.delete(projectString(DIR_PROJECT_CACHE + "/rejects-remapped.zip", patcher));
+            deleteRejects.delete(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher));
             //deletes and depending on depending on settings
         }
 
-        RemapRejects remapRejects = makeTask(projectString("remap{CAPNAME}Rejects", patcher), RemapRejects.class);
+        RemapRejects remapRejects = makeTask(projectString(TASK_PROJECT_REMAP_REJECTS, patcher), RemapRejects.class);
         {
-            remapRejects.setInJar(delayedFile(projectString(DIR_PROJECT_CACHE + "/rejects.zip", patcher)));
-            remapRejects.setOutJar(delayedFile(projectString(DIR_PROJECT_CACHE + "/rejects-remapped.zip", patcher)));
+            remapRejects.setInJar(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
+            remapRejects.setOutJar(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
             remapRejects.setMethodsCsv(delayedFile(Constants.CSV_METHOD));
             remapRejects.setFieldsCsv(delayedFile(Constants.CSV_FIELD));
             remapRejects.setParamsCsv(delayedFile(Constants.CSV_PARAM));
@@ -491,10 +475,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             remapRejects.dependsOn(patch);
         }
 
-        ExtractTask extractRejects = makeTask(projectString("extract{CAPNAME}Rejects", patcher), ExtractTask.class);
+        ExtractTask extractRejects = makeTask(projectString(TASK_PROJECT_EXTRACT_REJECTS, patcher), ExtractTask.class);
         {
             // set into() thing in afterEval
-            extractRejects.from(delayedFile(projectString(DIR_PROJECT_CACHE + "/rejects-remapped.zip", patcher)));
+            extractRejects.from(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
             extractRejects.include("*.java.patch.rej");
             extractRejects.setDoesCache(false);
             extractRejects.setClean(true);
