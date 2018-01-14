@@ -153,10 +153,11 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
             replacer.putReplacement(REPLACE_PROJECT_CACHE_DIR, projectCacheDir.getAbsolutePath());
 
+            //commented out temporary
             FileLogListenner listener = new FileLogListenner(new File(projectCacheDir, "gradle.log"));
-            project.getLogging().addStandardOutputListener(listener);
+            /*project.getLogging().addStandardOutputListener(listener);
             project.getLogging().addStandardErrorListener(listener);
-            project.getGradle().addBuildListener(listener);
+            project.getGradle().addBuildListener(listener);*/
         }
 
         // extension objects
