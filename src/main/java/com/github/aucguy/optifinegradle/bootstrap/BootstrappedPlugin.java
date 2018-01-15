@@ -52,7 +52,8 @@ public class BootstrappedPlugin implements Plugin<Project>
             urls[i++] = file.toURI().toURL();
         }
 
-        ClassLoader classloader = new BootstrapClassLoader(this.getClass().getClassLoader(), new URLClassLoader(urls));
+        ClassLoader classloader = new BootstrapClassLoader(this.getClass().getClassLoader(), new URLClassLoader(urls),
+                new String[] {"net.minecraftforge.gradle", "com.github.aucguy.optifinegradle"});
 
         Class<?> clazz = classloader.loadClass(mainPlugin);
         ((Plugin<Project>) clazz.newInstance()).apply(project);

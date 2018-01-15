@@ -12,12 +12,14 @@ public class BootstrapClassLoader extends ClassLoader
 {
     protected ClassLoader providedDelegate;
     protected ClassLoader forgeDelegate;
-    Manifest manifest;
+    protected String[] overriddenPackages;
+    protected Manifest manifest;
 
-    BootstrapClassLoader(ClassLoader providedDelegate, ClassLoader forgeDelegate) throws IOException
+    BootstrapClassLoader(ClassLoader providedDelegate, ClassLoader forgeDelegate, String[] overriddenPackages) throws IOException
     {
         this.providedDelegate = providedDelegate;
         this.forgeDelegate = forgeDelegate;
+        this.overriddenPackages = overriddenPackages;
         manifest = new Manifest();
         manifest.read(forgeDelegate.getResourceAsStream("META-INF/MANIFEST.MF"));
     }
@@ -62,7 +64,7 @@ public class BootstrapClassLoader extends ClassLoader
         {
             return clazz;
         }
-        if(name.startsWith("net.minecraftforge.") || name.startsWith("com.github.aucguy.optifinegradle."))
+        if(isPackageOverridden(name))
         {
             InputStream input = getResourceAsStream(name.replace('.', '/') + ".class");
             if(input != null)
@@ -150,6 +152,31 @@ public class BootstrapClassLoader extends ClassLoader
             }
         }
         definePackage(name, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor, sealBase);
+    }
+
+    protected boolean isPackageOverridden(String name)
+    {
+        while(name.indexOf('.') != -1)
+        {
+            if(arrayContains(overriddenPackages, name))
+            {
+                return true;
+            }
+            name = name.substring(0, name.lastIndexOf('.'));
+        }
+        return arrayContains(overriddenPackages, name);
+    }
+
+    public static <T> boolean arrayContains(T[] array, T item)
+    {
+        for(T i : array)
+        {
+            if(i.equals(item))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     //from https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java
