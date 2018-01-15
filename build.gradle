@@ -56,8 +56,10 @@ dependencies {
     compile 'org.ow2.asm:asm-debug-all:6.0_BETA'
     compileOnly 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     testCompile 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-	compileOnly 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
-	testCompile 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
+    //compile 'net.minecraftforge:fernflower:2.0-SNAPSHOT' // Fernflower Forge edition
+	//compileOnly 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
+	//testCompile 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
+	compile 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
 
 	//here until unmodified classes are deleted
 	compileOnly 'com.mojang:authlib:1.5.16'
