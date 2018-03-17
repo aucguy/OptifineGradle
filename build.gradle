@@ -17,7 +17,7 @@ apply plugin: "com.gradle.plugin-publish"
 
 group = 'com.github.aucguy.optifinegradle'
 version = '0.0.0'
-archivesBaseName = 'OptifineGradle'
+archivesBaseName = 'ForgeGradle'
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
@@ -49,25 +49,16 @@ repositories {
     }
 }
 
+configurations {
+    deployerJars
+    shade
+    compileOnly.extendsFrom shade
+}
+
 dependencies {
     compile gradleApi()
 
     // moved to the beginning to be the overrider
-    compile 'org.ow2.asm:asm-debug-all:6.0_BETA'
-    compileOnly 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    testCompile 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    //compile 'net.minecraftforge:fernflower:2.0-SNAPSHOT' // Fernflower Forge edition
-	//compileOnly 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
-	//testCompile 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
-	compile 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
-
-	//here until unmodified classes are deleted
-	compileOnly 'com.mojang:authlib:1.5.16'
-    compileOnly "net.minecraft:launchwrapper:1.11"
-
-    compileOnly "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.3-2"
-    testCompile 'junit:junit:4.12'
-
     compile 'com.google.guava:guava:18.0'
 
     compile 'net.sf.opencsv:opencsv:2.3' // reading CSVs.. also used by SpecialSource
@@ -79,14 +70,43 @@ dependencies {
     compile 'com.nothome:javaxdelta:2.0.1' // GDIFF implementation for BinPatches
     compile 'com.google.code.gson:gson:2.2.4' // Used instead of Argo for buuilding changelog.
     compile 'com.github.tony19:named-regexp:0.2.3' // 1.7 Named regexp features
+    compile 'net.minecraftforge:forgeflower:1.0.342-SNAPSHOT' // Fernflower Forge edition
+
+    shade 'net.md-5:SpecialSource:1.8.2' // deobf and reobf
 
     // because curse
     compile 'org.apache.httpcomponents:httpclient:4.3.3'
     compile 'org.apache.httpcomponents:httpmime:4.3.3'
+
+    // mcp stuff
+    shade 'de.oceanlabs.mcp:RetroGuard:3.6.6'
+    shade('de.oceanlabs.mcp:mcinjector:3.4-SNAPSHOT'){
+     exclude group: 'org.ow2.asm', module: 'asm-debug-all'
+    }
+    shade('net.minecraftforge.srg2source:Srg2Source:4.0-SNAPSHOT'){
+        exclude group: 'org.ow2.asm',         module: 'asm-debug-all'
+        exclude group: 'org.eclipse.equinox', module: 'org.eclipse.equinox.common'
+    }
+
+    //Stuff used in the GradleStart classes
+    compileOnly 'com.mojang:authlib:1.5.16'
+    compileOnly('net.minecraft:launchwrapper:1.11'){
+     exclude group: 'org.ow2.asm', module: 'asm-debug-all'
+    }
+
+    compileOnly "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.3-2"
+    testCompile 'junit:junit:4.12'
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.14'
+}
+
+sourceSets {
+    main.compileClasspath += configurations.shade;
+    main.runtimeClasspath += configurations.shade;
+    test.compileClasspath += configurations.shade;
+    test.runtimeClasspath += configurations.shade;
 }
 
 compileJava {
@@ -106,6 +126,24 @@ processResources {
 }
 
 jar {
+
+    configurations.shade.each { dep ->
+        /* I can use this again to find where dupes come from, so.. gunna just keep it here.
+        logger.lifecycle(dep.toString())
+        project.zipTree(dep).visit { 
+            element -> 
+                def path = element.relativePath.toString()
+                if (path.contains('org/eclipse/core') && path.endsWith('.class'))
+                    println "  $element.relativePath"
+            
+        }
+        */
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**', '.api_description', '.options', 'about.html', 'module-info.class', 'plugin.properties', 'plugin.xml', 'about_files/**'
+            duplicatesStrategy 'warn'
+        }
+    }
+
     manifest {
         attributes 'version':project.version
         attributes 'javaCompliance': project.targetCompatibility
@@ -139,19 +177,32 @@ test {
 }
 
 pluginBundle {
-    website = 'http://www.gradle.org/' //TODO https?
-    vcsUrl = 'https://github.com/MinecraftForge/ForgeGradle' //TODO
-    description = 'Gradle plugin for optifine decompilation'
-    tags = ['forge', 'minecraft', 'minecraftforge', 'sponge', 'mcp', 'optifine']
+    website = 'http://www.gradle.org/'
+    vcsUrl = 'https://github.com/MinecraftForge/ForgeGradle'
+    description = 'Gradle plugin for all Minecraft mod development needs'
+    tags = ['forge', 'minecraft', 'minecraftforge', 'sponge', 'mcp']
 
     plugins {
         patcher {
-            id = 'com.github.aucguy.optifinegradle.Patcher'
+            id = 'com.github.aucguy.optifinegradle.optifinePatcher'
             displayName = 'Minicraft Patcher Plugin'
         }
+        tweakerClient {
+            id = 'net.minecraftforge.gradle.tweaker-client'
+            displayName = 'Mincraft Client Tweaker Plugin'
+        }
+        tweakerServer {
+            id = 'net.minecraftforge.gradle.tweaker-server'
+            displayName = 'Mincraft Server Tweaker Plugin'
+        }
         forge {
-            id = 'com.github.aucguy.optifinegradleUser'
+            id = 'com.github.aucguy.optifinegradle.optifineUser'
             displayName = 'MincraftForge Mod Development Plugin'
+        }
+
+        launch4j {
+            id = 'net.minecraftforge.gradle.launch4j'
+            displayName = 'Specialized Launch4J Gradle Plugin'
         }
     }
 }

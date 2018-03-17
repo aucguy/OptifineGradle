@@ -1,6 +1,6 @@
 /*
  * A Gradle plugin for the creation of Minecraft mods and MinecraftForge plugins.
- * Copyright (C) 2013 Minecraft Forge
+ * Copyright (C) 2013-2018 Minecraft Forge
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -49,18 +49,25 @@ public class ReobfTaskFactory implements NamedDomainObjectFactory<IReobfuscator>
     @Override
     public IReobfuscator create(final String jarName)
     {
-        String name = "reobf" + Character.toUpperCase(jarName.charAt(0)) + jarName.substring(1);
-        final TaskSingleReobf task = plugin.maybeMakeTask(name, TaskSingleReobf.class);
+        String name = Character.toUpperCase(jarName.charAt(0)) + jarName.substring(1);
+        final TaskSingleReobf task = plugin.maybeMakeTask("reobf" + name, TaskSingleReobf.class);
 
         task.dependsOn(Constants.TASK_GENERATE_SRGS, jarName);
         task.mustRunAfter("test");
 
-        task.setJar(new Closure<File>(ReobfTaskFactory.class) {
+        Closure<File> outputJar = new Closure<File>(ReobfTaskFactory.class) {
             public File call()
             {
                 return ((Jar) plugin.project.getTasks().getByName(jarName)).getArchivePath();
             }
-        });
+        };
+
+        task.setJar(outputJar);
+
+        final TaskExtractAnnotations annos = plugin.maybeMakeTask("extractAnnotations" + name, TaskExtractAnnotations.class);
+        annos.setJar(outputJar);
+        task.finalizedBy(annos);
+
 
         plugin.project.getTasks().getByName("assemble").dependsOn(task);
 

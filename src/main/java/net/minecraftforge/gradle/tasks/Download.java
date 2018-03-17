@@ -1,6 +1,6 @@
 /*
  * A Gradle plugin for the creation of Minecraft mods and MinecraftForge plugins.
- * Copyright (C) 2013 Minecraft Forge
+ * Copyright (C) 2013-2018 Minecraft Forge
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,12 +36,10 @@ import net.minecraftforge.gradle.util.caching.CachedTask;
 
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.ParallelizableTask;
 import org.gradle.api.tasks.TaskAction;
 
 import com.google.common.io.Closeables;
 
-@ParallelizableTask
 public class Download extends CachedTask
 {
     @Input

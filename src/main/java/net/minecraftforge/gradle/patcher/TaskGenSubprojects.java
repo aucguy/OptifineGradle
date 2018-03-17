@@ -1,6 +1,6 @@
 /*
  * A Gradle plugin for the creation of Minecraft mods and MinecraftForge plugins.
- * Copyright (C) 2013 Minecraft Forge
+ * Copyright (C) 2013-2018 Minecraft Forge
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -167,7 +167,7 @@ class TaskGenSubprojects extends DefaultTask
 
         // @formatter:off
 
-        // why use relatvie paths? so the eclipse hack below can work correctly.
+        // why use relative paths? so the eclipse hack below can work correctly.
         // add extra sourceDirs
         append(builder, "sourceSets {", NEWLINE);
         append(builder, INDENT, "main.java.srcDir 'src/main/start'", NEWLINE); // add start dir to gradle sources

@@ -1,6 +1,6 @@
 /*
  * A Gradle plugin for the creation of Minecraft mods and MinecraftForge plugins.
- * Copyright (C) 2013 Minecraft Forge
+ * Copyright (C) 2013-2018 Minecraft Forge
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,6 @@ import net.minecraftforge.gradle.util.caching.CachedTask;
 
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.ParallelizableTask;
 import org.gradle.api.tasks.TaskAction;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -48,7 +47,6 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
-@ParallelizableTask
 public class TaskSingleDeobfBin extends CachedTask
 {
     @InputFile

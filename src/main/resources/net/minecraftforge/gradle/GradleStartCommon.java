@@ -1,6 +1,6 @@
 /*
  * A Gradle plugin for the creation of Minecraft mods and MinecraftForge plugins.
- * Copyright (C) 2013 Minecraft Forge
+ * Copyright (C) 2013-2018 Minecraft Forge
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -167,7 +167,7 @@ public abstract class GradleStartCommon
             {
                 String value = (String) options.valueOf(key);
                 argMap.put(key, value);
-                if (!"password".equalsIgnoreCase(key))
+                if (!"password".equalsIgnoreCase(key) && !"accessToken".equalsIgnoreCase(key))
                     LOGGER.info(key + ": " + value);
             }
         }
