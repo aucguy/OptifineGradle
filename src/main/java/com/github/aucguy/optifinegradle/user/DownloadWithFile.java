@@ -17,14 +17,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  * USA
  */
-package net.minecraftforge.gradle.tasks;
+package com.github.aucguy.optifinegradle.user;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
-
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -39,7 +40,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import com.google.common.io.Closeables;
 
-public class Download extends CachedTask
+public class DownloadWithFile extends CachedTask
 {
     @Input
     private Object url;
@@ -49,20 +50,31 @@ public class Download extends CachedTask
     private Object output;
 
     @TaskAction
-    public void doTask() throws IOException
+    public void doTask() throws IOException, URISyntaxException
     {
         File outputFile = getProject().file(getOutput());
         outputFile.getParentFile().mkdirs();
         outputFile.createNewFile();
 
-        getLogger().info("Downloading " + getUrl() + " to " + outputFile);
+        URL url = new URL(getUrl());
+        ReadableByteChannel inChannel;
+        if(url.getProtocol().equals("file"))
+        {
+            File file = new File(url.toString().replace("file://", ""));
+            inChannel = Channels.newChannel(new FileInputStream(file));
+        }
+        else
+        {
+            getLogger().info("Downloading " + getUrl() + " to " + outputFile);
 
-        HttpURLConnection connect = (HttpURLConnection) (new URL(getUrl())).openConnection();
-        connect.setRequestProperty("User-Agent", Constants.USER_AGENT);
-        connect.setInstanceFollowRedirects(true);
+            HttpURLConnection connect = (HttpURLConnection) (url).openConnection();
+            connect.setRequestProperty("User-Agent", Constants.USER_AGENT);
+            connect.setInstanceFollowRedirects(true);
 
-        try (ReadableByteChannel  inChannel  = Channels.newChannel(connect.getInputStream());
-             FileOutputStream     outFile = new FileOutputStream(outputFile);
+            inChannel  = Channels.newChannel(connect.getInputStream());
+        }
+
+        try (FileOutputStream     outFile = new FileOutputStream(outputFile);
              FileChannel          outChannel = outFile.getChannel())
         {
             // If length is longer than what is available, it copies what is available according to java docs.
