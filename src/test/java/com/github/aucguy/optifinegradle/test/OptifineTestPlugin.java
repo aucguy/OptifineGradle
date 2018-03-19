@@ -5,11 +5,11 @@ import net.minecraftforge.gradle.patcher.PatcherProject;
 import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DEOBF;
 import static com.github.aucguy.optifinegradle.test.OptifineTestConstants.*;
 import static net.minecraftforge.gradle.common.Constants.CSV_FIELD;
 import static net.minecraftforge.gradle.common.Constants.CSV_METHOD;
 import static net.minecraftforge.gradle.common.Constants.CSV_PARAM;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.JAR_DEOBF;
 
 import org.gradle.api.Task;
 

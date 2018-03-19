@@ -21,7 +21,7 @@ package net.minecraftforge.gradle.patcher;
 
 import net.minecraftforge.gradle.common.Constants;
 
-public final class PatcherConstants
+final class PatcherConstants
 {
     // @formatter:off
     private PatcherConstants() {}
@@ -44,24 +44,24 @@ public final class PatcherConstants
     static final String DIR_EXTRACTED_START      = "/src/main/start";
 
     static final String REPLACE_PROJECT_NAME     = "{NAME}";
-    public static final String REPLACE_PROJECT_CAP_NAME = "{CAPNAME}";
+    static final String REPLACE_PROJECT_CAP_NAME = "{CAPNAME}";
 
     // the only actually cached thing
     static final String DEOBF_DATA               = Constants.DIR_MCP_DATA + "/deobfuscation_data-" + Constants.REPLACE_MC_VERSION + ".lzma";
 
     // cached stuff
-    public static final String DIR_LOCAL_CACHE          = Constants.REPLACE_BUILD_DIR + "/localCache";
-    public static final String JAR_DEOBF                = DIR_LOCAL_CACHE + "/deobfuscated.jar";
+    static final String DIR_LOCAL_CACHE          = Constants.REPLACE_BUILD_DIR + "/localCache";
+    static final String JAR_DEOBF                = DIR_LOCAL_CACHE + "/deobfuscated.jar";
     static final String JAR_DECOMP               = DIR_LOCAL_CACHE + "/decompiled.zip";
     static final String JAR_DECOMP_POST          = DIR_LOCAL_CACHE + "/decompiled-processed.zip";
     static final String JAR_REMAPPED             = DIR_LOCAL_CACHE + "/remapped-clean.zip";
 
     // cached project stuff
-    public static final String DIR_PROJECT_CACHE        = DIR_LOCAL_CACHE + "/" + REPLACE_PROJECT_CAP_NAME;
-    public static final String JAR_PROJECT_PATCHED      = DIR_PROJECT_CACHE + "/patched.zip";
+    static final String DIR_PROJECT_CACHE        = DIR_LOCAL_CACHE + "/" + REPLACE_PROJECT_CAP_NAME;
+    static final String JAR_PROJECT_PATCHED      = DIR_PROJECT_CACHE + "/patched.zip";
     static final String JAR_PROJECT_RECOMPILED   = DIR_PROJECT_CACHE + "/recompiled.jar";
     static final String JAR_PROJECT_REMAPPED     = DIR_PROJECT_CACHE + "/mcp-named.zip";
-    public static final String JAR_PROJECT_RETROMAPPED  = DIR_PROJECT_CACHE + "/retromapped-mc.zip";
+    static final String JAR_PROJECT_RETROMAPPED  = DIR_PROJECT_CACHE + "/retromapped-mc.zip";
     static final String JAR_PROJECT_RETRO_NONMC  = DIR_PROJECT_CACHE + "/retromapped-nonMc.zip";
     static final String RANGEMAP_PROJECT         = DIR_PROJECT_CACHE + "/rangemap.txt";
     static final String EXC_PROJECT              = DIR_PROJECT_CACHE + "/extracted.exc";
@@ -127,7 +127,7 @@ public final class PatcherConstants
     // project tasks
     static final String TASK_PROJECT_SETUP       = "setupProject" + REPLACE_PROJECT_CAP_NAME;
     static final String TASK_PROJECT_SETUP_DEV   = "setupDevProject" + REPLACE_PROJECT_CAP_NAME;
-    public static final String TASK_PROJECT_PATCH       = "patch" + REPLACE_PROJECT_CAP_NAME + "Jar";
+    static final String TASK_PROJECT_PATCH       = "patch" + REPLACE_PROJECT_CAP_NAME + "Jar";
     static final String TASK_PROJECT_REMAP_JAR   = "remap" + REPLACE_PROJECT_CAP_NAME + "Jar";
     static final String TASK_PROJECT_EXTRACT_SRC = "extract" + REPLACE_PROJECT_CAP_NAME + "Sources";
     static final String TASK_PROJECT_EXTRACT_RES = "extract" + REPLACE_PROJECT_CAP_NAME + "Resources";
@@ -139,7 +139,7 @@ public final class PatcherConstants
     static final String TASK_PROJECT_COMPILE     = "makeJar" + REPLACE_PROJECT_CAP_NAME + "";
     static final String TASK_PROJECT_GEN_EXC     = "extractExc" + REPLACE_PROJECT_CAP_NAME + "";
     static final String TASK_PROJECT_RANGEMAP    = "extract" + REPLACE_PROJECT_CAP_NAME + "Rangemap";
-    public static final String TASK_PROJECT_RETROMAP    = "retromapMc" + REPLACE_PROJECT_CAP_NAME;
+    static final String TASK_PROJECT_RETROMAP    = "retromapMc" + REPLACE_PROJECT_CAP_NAME;
     static final String TASK_PROJECT_RETRO_NONMC = "retromapNonMc" + REPLACE_PROJECT_CAP_NAME;
-    public static final String TASK_PROJECT_GEN_PATCHES = "gen" + REPLACE_PROJECT_CAP_NAME + "Patches";
+    static final String TASK_PROJECT_GEN_PATCHES = "gen" + REPLACE_PROJECT_CAP_NAME + "Patches";
 }

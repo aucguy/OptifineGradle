@@ -7,7 +7,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_RENAMES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_GEN_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_ZIP_PATCHES;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.TASK_PROJECT_GEN_PATCHES;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_GEN_PATCHES;
 
 import java.io.File;
 
@@ -15,11 +15,11 @@ import org.gradle.api.tasks.bundling.Zip;
 
 import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
+import com.github.aucguy.optifinegradle.TaskGenPatchesWrapper;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.patcher.PatcherPlugin;
 import net.minecraftforge.gradle.patcher.PatcherProject;
-import net.minecraftforge.gradle.patcher.TaskGenPatches;
 import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 
 public class OptifinePatcherPlugin extends PatcherPlugin
@@ -39,7 +39,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         super.applyPlugin();
         delegate.applyPlugin();
         
-        TaskGenPatches optifineGenPatches = makeTask(TASK_GEN_PATCHES, TaskGenPatches.class);
+        TaskGenPatchesWrapper optifineGenPatches = TaskGenPatchesWrapper.makeTask(this, TASK_GEN_PATCHES);
         {
             optifineGenPatches.setPatchDir(delayedFile(OPTIFINE_PATCH_DIR));
         }
@@ -75,8 +75,8 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             extractRenames.inZip = delayedFile(PATCH_RENAMES);
         }
         
-        TaskGenPatches modGenPatches = (TaskGenPatches) project.getTasks().getByName(projectString(TASK_PROJECT_GEN_PATCHES, projectMod));
-        TaskGenPatches optifineGenPatches = (TaskGenPatches) project.getTasks().getByName(TASK_GEN_PATCHES);
+        TaskGenPatchesWrapper modGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(projectString(TASK_PROJECT_GEN_PATCHES, projectMod)));
+        TaskGenPatchesWrapper optifineGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(TASK_GEN_PATCHES));
         {
             for(File file : modGenPatches.getOriginalSource())
             {

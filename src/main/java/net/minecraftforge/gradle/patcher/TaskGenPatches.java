@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraftforge.gradle.util.NormalizingInputSupplier;
 import net.minecraftforge.gradle.util.SequencedInputSupplier;
 import net.minecraftforge.srg2source.util.io.FolderSupplier;
 import net.minecraftforge.srg2source.util.io.InputSupplier;
@@ -55,7 +54,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
-public class TaskGenPatches extends DefaultTask
+class TaskGenPatches extends DefaultTask
 {
     //@formatter:off
     @OutputDirectory private Object patchDir;
@@ -165,7 +164,6 @@ public class TaskGenPatches extends DefaultTask
         {
             InputStream o = original.getInput(path); //Moved cuz sometimes shit can screw up...
             path = path.replace('\\', '/');
-            
             InputStream c = changed.getInput(path);
             try
             {

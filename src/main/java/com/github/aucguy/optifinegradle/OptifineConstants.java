@@ -1,8 +1,8 @@
 package com.github.aucguy.optifinegradle;
 
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.DIR_PROJECT_CACHE;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.REPLACE_PROJECT_CAP_NAME;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_MC_VERSION;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.DIR_PROJECT_CACHE;
-import static net.minecraftforge.gradle.patcher.PatcherConstants.REPLACE_PROJECT_CAP_NAME;
 
 /**
  * random constants
