@@ -23,9 +23,11 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CL
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DELETE_REJECTS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_EXTRACT_REJECTS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
 import groovy.lang.Closure;
@@ -53,6 +55,7 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.Zip;
 
 import com.github.aucguy.optifinegradle.RemapRejects;
+import com.github.aucguy.optifinegradle.RemoveExtras;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -140,19 +143,35 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             decompileJar.dependsOn(deobfJar);
         }
 
+        RemoveExtras removeExtras = null;
+        if(isOptifine)
+        {
+            removeExtras = makeTask(TASK_REMOVE_EXTRAS, RemoveExtras.class);
+            {
+                removeExtras.setInJar(delayedFile(JAR_DECOMP));
+                removeExtras.setOutJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
+                removeExtras.dependsOn(decompileJar);
+            }
+        }
+
         PostDecompileTask postDecompileJar = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
             if(isOptifine)
             {
                 postDecompileJar.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+                postDecompileJar.setInJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
+                postDecompileJar.dependsOn(removeExtras);
             }
-            postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
+            else
+            {
+                postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
+                postDecompileJar.dependsOn(decompileJar);
+            }
             postDecompileJar.setOutJar(delayedFile(JAR_DECOMP_POST, true));
             postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
             postDecompileJar.setInjects(delayedFile(MCP_INJECT));
             postDecompileJar.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
             postDecompileJar.setDoesCache(false);
-            postDecompileJar.dependsOn(decompileJar);
         }
 
         TaskGenSubprojects createProjects = makeTask(TASK_GEN_PROJECTS, TaskGenSubprojects.class);

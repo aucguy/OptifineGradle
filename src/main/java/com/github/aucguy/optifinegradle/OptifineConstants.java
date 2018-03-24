@@ -22,6 +22,7 @@ public class OptifineConstants
     public static final String TASK_EXTRACT_RENAMES   = "extractRenames";
     public static final String TASK_ASK_PERMISSION    = "askPermission";
     public static final String TASK_PREPROCESS        = "preprocess";
+    public static final String TASK_REMOVE_EXTRAS     = "removeExtras";
     
     //patching tasks
     public static final String TASK_PROJECT_DELETE_REJECTS    = "delete" + REPLACE_PROJECT_CAP_NAME + "Rejects";
@@ -38,6 +39,10 @@ public class OptifineConstants
             + "/minecraft-" + REPLACE_MC_VERSION + "-deobfuscatedClasses.txt";
     public static final String JAR_PREPROCESS       = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
             + "/minecraft-" + REPLACE_MC_VERSION + "-preprocessed.jar";
+    public static final String REMOVE_EXTRAS_OUT_USER      = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
+            + "/minecraft-" + REPLACE_MC_VERSION + "-extrasRemovedUser.jar";
+    public static final String REMOVE_EXTRAS_OUT_PATCHER   = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
+            + "/minecraft-" + REPLACE_MC_VERSION + "-extrasRemovedPatcher.jar";
     
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
     

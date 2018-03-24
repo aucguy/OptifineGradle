@@ -105,6 +105,8 @@ import net.minecraftforge.gradle.user.ReobfTaskFactory.ReobfTaskWrapper;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
 import net.minecraftforge.gradle.util.delayed.DelayedFile;
 
+import com.github.aucguy.optifinegradle.RemoveExtras;
+
 public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePlugin<T>
 {
     private boolean madeDecompTasks = false; // to gaurd against stupid programmers
@@ -341,18 +343,34 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             decompile.dependsOn(deobfDecomp);
         }
 
+        RemoveExtras removeExtras = null;
+        if(isOptifine)
+        {
+            removeExtras = makeTask(TASK_REMOVE_EXTRAS, RemoveExtras.class);
+            {
+                removeExtras.setInJar(decompJar);
+                removeExtras.setOutJar(delayedFile(REMOVE_EXTRAS_OUT_USER));
+                removeExtras.dependsOn(decompile);
+            }
+        }
+
         final PostDecompileTask postDecomp = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
             if(isOptifine)
             {
                 postDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+                postDecomp.setInJar(delayedFile(REMOVE_EXTRAS_OUT_USER));
+                postDecomp.dependsOn(removeExtras);
             }
-            postDecomp.setInJar(decompJar);
+            else
+            {
+                postDecomp.setInJar(decompJar);
+                postDecomp.dependsOn(decompile);
+            }
             postDecomp.setOutJar(postDecompJar);
             postDecomp.setPatches(mcpPatchSet);
             postDecomp.setInjects(mcpInject);
             postDecomp.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
-            postDecomp.dependsOn(decompile);
         }
 
         final RemapSources remap = makeTask(TASK_REMAP, RemapSources.class);
