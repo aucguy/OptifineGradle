@@ -20,7 +20,6 @@
 package net.minecraftforge.gradle.patcher;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DELETE_REJECTS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
@@ -119,11 +118,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
     {
         DeobfuscateJar deobfJar = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
-            if(isOptifine)
-            {
-                deobfJar.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
-                deobfJar.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
-            }
             deobfJar.setInJar(delayedFile(Constants.JAR_MERGED));
             deobfJar.setOutJar(delayedFile(JAR_DEOBF, true));
             deobfJar.setSrg(delayedFile(SRG_NOTCH_TO_SRG));

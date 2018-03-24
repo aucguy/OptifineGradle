@@ -20,6 +20,7 @@ import org.objectweb.asm.commons.SimpleRemapper;
 import com.github.aucguy.optifinegradle.AsmProcessingTask;
 import com.github.aucguy.optifinegradle.FieldRenamer;
 
+import net.md_5.specialsource.JarMapping;
 import net.minecraftforge.gradle.util.caching.Cached;
 import net.minecraftforge.gradle.util.delayed.DelayedString;
 
@@ -39,13 +40,14 @@ public class JoinJars extends AsmProcessingTask
     
     @OutputFile
     @Cached
-    public Object       obfuscatedClasses;
+    public Object       classList;
     
     @Input
     private Set<String> exclusions = new HashSet<String>();
     
     protected Remapper mapping;
-    protected OutputStream obfClasses;
+    protected OutputStream classListOutput;
+    protected Map<String, String> srgMapping;
 
     @Override
     public void middle() throws IOException
@@ -54,7 +56,10 @@ public class JoinJars extends AsmProcessingTask
     	Properties properties = new Properties();
     	properties.load(stream);
     	mapping = new SimpleRemapper((Map) properties);
-    	obfClasses = manager.openFileForWriting(obfuscatedClasses);
+    	classListOutput = manager.openFileForWriting(classList);
+    	JarMapping jarMapping = new JarMapping();
+    	jarMapping.loadMappings(getProject().file(srg));
+    	srgMapping = jarMapping.classes;
     	copyJars(optifine, client);
     }
 
@@ -65,7 +70,7 @@ public class JoinJars extends AsmProcessingTask
         {
             try
             {
-				Patching.addObfClass(name, obfClasses);
+				Patching.addObfClass(name, classListOutput, srgMapping);
 			} catch (UnsupportedEncodingException e)
             {
 				throw(new RuntimeException());

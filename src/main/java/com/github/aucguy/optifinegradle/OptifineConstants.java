@@ -34,8 +34,6 @@ public class OptifineConstants
             + "/minecraft-" + REPLACE_MC_VERSION + "-joined.jar";
     public static final String JAR_OPTIFINE_DIFFED    = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
             + "/minecraft-" + REPLACE_MC_VERSION + "-diffed.jar";
-    public static final String OBFUSCATED_CLASSES     = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
-            + "/minecraft-" + REPLACE_MC_VERSION + "-obfuscatedClasses.txt";
     public static final String DEOBFUSCATED_CLASSES   = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
             + "/minecraft-" + REPLACE_MC_VERSION + "-deobfuscatedClasses.txt";
     public static final String JAR_PREPROCESS       = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION

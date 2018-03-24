@@ -303,11 +303,6 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         final DeobfuscateJar deobfBin = makeTask(TASK_DEOBF_BIN, DeobfuscateJar.class);
         {
-            if(isOptifine)
-            {
-                deobfBin.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
-                deobfBin.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
-            }
             deobfBin.setSrg(delayedFile(SRG_NOTCH_TO_MCP));
             deobfBin.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfBin.setExceptorCfg(delayedFile(EXC_MCP));
@@ -328,11 +323,6 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         final DeobfuscateJar deobfDecomp = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
-            if(isOptifine)
-            {
-                deobfDecomp.setObfuscatedClasses(delayedFile(OBFUSCATED_CLASSES));
-                deobfDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
-            }
             deobfDecomp.setSrg(delayedFile(SRG_NOTCH_TO_SRG));
             deobfDecomp.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfDecomp.setExceptorCfg(delayedFile(EXC_SRG));

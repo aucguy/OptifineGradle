@@ -44,7 +44,6 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
-import com.github.aucguy.optifinegradle.user.Patching;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -90,15 +89,6 @@ public class DeobfuscateJar extends CachedTask
     @InputFile
     private Object            exceptorJson;
 
-    @InputFile
-    @Optional
-    private Object            obfuscatedClasses;
-
-    @Cached
-    @OutputFile
-    @Optional
-    private Object            deobfuscatedClasses;
-
     @Input
     private boolean           applyMarkers  = false;
 
@@ -128,7 +118,7 @@ public class DeobfuscateJar extends CachedTask
 
         // deobf
         getLogger().lifecycle("Applying SpecialSource...");
-        deobfJar(getInJar(), tempObfJar, getSrg(), ats, getObfuscatedClasses(), getDeobfuscatedClasses());
+        deobfJar(getInJar(), tempObfJar, getSrg(), ats);
 
         File log = getLog();
         if (log == null)
@@ -139,13 +129,11 @@ public class DeobfuscateJar extends CachedTask
         applyExceptor(tempObfJar, out, getExceptorCfg(), log, ats);
     }
 
-    private void deobfJar(File inJar, File outJar, File srg, Collection<File> ats, File obfClasses, File deobfClasses) throws IOException
+    private void deobfJar(File inJar, File outJar, File srg, Collection<File> ats) throws IOException
     {
         // load mapping
         JarMapping mapping = new JarMapping();
         mapping.loadMappings(srg);
-
-        Patching.deobfuscatedList(this, obfClasses, deobfClasses, mapping.classes);
 
         // load in ATs
         ErroringRemappingAccessMap accessMap = new ErroringRemappingAccessMap(new File[] { getMethodCsv(), getFieldCsv() });
@@ -513,27 +501,7 @@ public class DeobfuscateJar extends CachedTask
         this.methodCsv = methodCsv;
     }
 
-    public File getObfuscatedClasses()
-    {
-        return obfuscatedClasses == null ? null : getProject().file(obfuscatedClasses);
-    }
-
-    public void setObfuscatedClasses(Object obfuscatedClasses)
-    {
-        this.obfuscatedClasses = obfuscatedClasses;
-    }
-
-    public File getDeobfuscatedClasses()
-    {
-        return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);
-    }
-
-    public void setDeobfuscatedClasses(Object deobfuscatedClasses)
-    {
-        this.deobfuscatedClasses = deobfuscatedClasses;
-    }
-
-    public static final class ErroringRemappingAccessMap extends AccessMap
+    private static final class ErroringRemappingAccessMap extends AccessMap
     {
         private final Map<String, String> renames     = Maps.newHashMap();
         public final Map<String, String>  brokenLines = Maps.newTreeMap();

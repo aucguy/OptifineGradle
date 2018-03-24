@@ -576,13 +576,13 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
             {
                 join.client = delayedFile(JAR_CLIENT_FRESH);
                 join.optifine = delayedFile(JAR_OPTIFINE_DIFFED);
-                join.obfuscatedClasses = delayedFile(OBFUSCATED_CLASSES);
+                join.classList = delayedFile(DEOBFUSCATED_CLASSES);
                 join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
                 join.renames = delayedFile(RENAMES_FILE);
                 join.srg = delayedFile(SRG_NOTCH_TO_MCP);
                 join.exclude("javax/");
                 join.exclude("net/minecraftforge/");
-                join.dependsOn(dlClient, diff, extractRenames);
+                join.dependsOn(dlClient, diff, extractRenames, TASK_GENERATE_SRGS);
             }
             mergeClientJar = JAR_CLIENT_JOINED;
             mergeDependency = join;
