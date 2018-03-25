@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -105,6 +106,7 @@ import net.minecraftforge.gradle.user.ReobfTaskFactory.ReobfTaskWrapper;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
 import net.minecraftforge.gradle.util.delayed.DelayedFile;
 
+import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.RemoveExtras;
 
 public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePlugin<T>
@@ -344,6 +346,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
         }
 
         RemoveExtras removeExtras = null;
+        FilterPatches filterPatches = null;
         if(isOptifine)
         {
             removeExtras = makeTask(TASK_REMOVE_EXTRAS, RemoveExtras.class);
@@ -352,23 +355,32 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                 removeExtras.setOutJar(delayedFile(REMOVE_EXTRAS_OUT_USER));
                 removeExtras.dependsOn(decompile);
             }
+
+            filterPatches = makeTask(TASK_FILTER_MCP_PATCHES, FilterPatches.class);
+            {
+                filterPatches.patchesIn = mcpPatchSet;
+                filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+                filterPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
+                filterPatches.patchesOut = delayedFile(MCP_FILTERED_USER_PATCHES);
+                filterPatches.dependsOn(decompile);
+            }
         }
 
         final PostDecompileTask postDecomp = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
             if(isOptifine)
             {
-                postDecomp.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
                 postDecomp.setInJar(delayedFile(REMOVE_EXTRAS_OUT_USER));
-                postDecomp.dependsOn(removeExtras);
+                postDecomp.setPatches(delayedFile(MCP_FILTERED_USER_PATCHES));
+                postDecomp.dependsOn(removeExtras, filterPatches);
             }
             else
             {
                 postDecomp.setInJar(decompJar);
+                postDecomp.setPatches(mcpPatchSet);
                 postDecomp.dependsOn(decompile);
             }
             postDecomp.setOutJar(postDecompJar);
-            postDecomp.setPatches(mcpPatchSet);
             postDecomp.setInjects(mcpInject);
             postDecomp.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
         }

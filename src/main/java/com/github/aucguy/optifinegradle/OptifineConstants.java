@@ -2,6 +2,7 @@ package com.github.aucguy.optifinegradle;
 
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.DIR_PROJECT_CACHE;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.REPLACE_PROJECT_CAP_NAME;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.DIR_LOCAL_CACHE;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_MC_VERSION;
 
 /**
@@ -23,7 +24,8 @@ public class OptifineConstants
     public static final String TASK_ASK_PERMISSION    = "askPermission";
     public static final String TASK_PREPROCESS        = "preprocess";
     public static final String TASK_REMOVE_EXTRAS     = "removeExtras";
-    
+    public static final String TASK_FILTER_MCP_PATCHES = "filterMcpPatches";
+
     //patching tasks
     public static final String TASK_PROJECT_DELETE_REJECTS    = "delete" + REPLACE_PROJECT_CAP_NAME + "Rejects";
     public static final String TASK_PROJECT_REMAP_REJECTS     = "remap" + REPLACE_PROJECT_CAP_NAME + "Rejects";
@@ -43,12 +45,16 @@ public class OptifineConstants
             + "/minecraft-" + REPLACE_MC_VERSION + "-extrasRemovedUser.jar";
     public static final String REMOVE_EXTRAS_OUT_PATCHER   = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
             + "/minecraft-" + REPLACE_MC_VERSION + "-extrasRemovedPatcher.jar";
+    public static final String MCP_FILTERED_USER_PATCHES   = "{CACHE_DIR}/de/oceanlabs/mcp/mcp/" + REPLACE_MC_VERSION
+            + "/filteredUserPatches/";
     
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
     
     public static final String PATCH_ZIP              = OPTIFINE_CACHE + "{patchArchive}";
     public static final String RENAMES_BASE           = "optifine-renames.properties";
     public static final String RENAMES_FILE           = OPTIFINE_CACHE + RENAMES_BASE;
+    
+    public static final String EXTRA_PATCH_EXCLUSIONS = "net.minecraft.client.Minecraft";
     
     //patching files
     public static final String PATCHES_DIR            = "patches/";
@@ -60,6 +66,7 @@ public class OptifineConstants
     
     public static final String PROJECT_REJECTS_ZIP            = DIR_PROJECT_CACHE + "/rejects.zip";
     public static final String PROJECT_REMAPPED_REJECTS_ZIP   = DIR_PROJECT_CACHE + "/rejects-remapped.zip";
+    public static final String MCP_FILTERED_PATCHER_PATCHES   = DIR_LOCAL_CACHE + "/filteredPatcherPatches/";
     
     // defaults
     public static final String DEFAULT_OPTIFINE_VERSION = "1.12.2_HD_U_C7";

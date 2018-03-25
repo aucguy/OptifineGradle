@@ -20,6 +20,8 @@
 package net.minecraftforge.gradle.patcher;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DELETE_REJECTS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
@@ -28,12 +30,14 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_EX
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
 import groovy.lang.Closure;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -54,6 +58,7 @@ import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.Zip;
 
+import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.RemapRejects;
 import com.github.aucguy.optifinegradle.RemoveExtras;
 import com.google.common.base.Strings;
@@ -144,6 +149,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         }
 
         RemoveExtras removeExtras = null;
+        FilterPatches filterPatches = null;
         if(isOptifine)
         {
             removeExtras = makeTask(TASK_REMOVE_EXTRAS, RemoveExtras.class);
@@ -152,23 +158,32 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                 removeExtras.setOutJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
                 removeExtras.dependsOn(decompileJar);
             }
+
+            filterPatches = makeTask(TASK_FILTER_MCP_PATCHES, FilterPatches.class);
+            {
+                filterPatches.patchesIn = delayedFile(MCP_PATCHES_MERGED);
+                filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+                filterPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
+                filterPatches.patchesOut = delayedFile(MCP_FILTERED_PATCHER_PATCHES);
+                filterPatches.dependsOn(decompileJar);
+            }
         }
 
         PostDecompileTask postDecompileJar = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
             if(isOptifine)
             {
-                postDecompileJar.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
                 postDecompileJar.setInJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
-                postDecompileJar.dependsOn(removeExtras);
+                postDecompileJar.setPatches(delayedFile(MCP_FILTERED_PATCHER_PATCHES));
+                postDecompileJar.dependsOn(removeExtras, filterPatches);
             }
             else
             {
                 postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
+                postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
                 postDecompileJar.dependsOn(decompileJar);
             }
             postDecompileJar.setOutJar(delayedFile(JAR_DECOMP_POST, true));
-            postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
             postDecompileJar.setInjects(delayedFile(MCP_INJECT));
             postDecompileJar.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
             postDecompileJar.setDoesCache(false);

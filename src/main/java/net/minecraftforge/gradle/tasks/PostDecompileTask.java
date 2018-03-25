@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
@@ -50,14 +49,10 @@ import org.gradle.api.logging.LogLevel;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 
 import com.github.abrarsyed.jastyle.ASFormatter;
 import com.github.abrarsyed.jastyle.OptParser;
-
-import com.github.aucguy.optifinegradle.user.Patching;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
@@ -79,10 +74,6 @@ public class PostDecompileTask extends AbstractEditJarTask
     @InputFile
     private Object                       astyleConfig;
 
-    @InputFile
-    @Optional
-    private Object                       deobfuscatedClasses;
-
     @OutputFile
     @Cached
     private Object                       outJar;
@@ -99,13 +90,9 @@ public class PostDecompileTask extends AbstractEditJarTask
     @Override
     public void doStuffBefore() throws Exception
     {
-        Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
-
         for (File f : getPatches())
         {
             String name = f.getName();
-
-            if(Patching.shouldSkip(name, ignoredPatches, false)) continue;
 
             int patchIndex = name.indexOf(".patch");
 
@@ -264,7 +251,7 @@ public class PostDecompileTask extends AbstractEditJarTask
         if (fuzzed)
             getLogger().lifecycle("Patches Fuzzed!");
         if (error != null) {
-            //Throwables.propagate(error);
+            Throwables.propagate(error);
         }
     }
 
@@ -306,16 +293,6 @@ public class PostDecompileTask extends AbstractEditJarTask
     public void setAstyleConfig(Object astyleConfig)
     {
         this.astyleConfig = astyleConfig;
-    }
-
-    public File getDeobfuscatedClasses()
-    {
-        return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);
-    }
-
-    public void setDeobfuscatedClasses(Object deobfuscatedClasses)
-    {
-        this.deobfuscatedClasses = deobfuscatedClasses;
     }
 
     @InputFiles

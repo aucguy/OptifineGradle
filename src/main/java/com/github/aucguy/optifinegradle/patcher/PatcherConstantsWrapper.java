@@ -11,6 +11,7 @@ public final class PatcherConstantsWrapper
     public static final String DIR_PROJECT_CACHE = getStringConstant("DIR_PROJECT_CACHE");
     public static final String TASK_PROJECT_GEN_PATCHES = getStringConstant("TASK_PROJECT_GEN_PATCHES");
     public static final String JAR_DEOBF = getStringConstant("JAR_DEOBF");
+    public static final String DIR_LOCAL_CACHE = getStringConstant("DIR_LOCAL_CACHE");
     
     private static String getStringConstant(String name)
     {
