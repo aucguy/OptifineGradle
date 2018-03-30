@@ -32,12 +32,14 @@ import static net.minecraftforge.gradle.user.UserConstants.*;
 import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.*;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 
+import com.github.aucguy.optifinegradle.FilterPatches;
 import com.google.common.collect.ImmutableMap;
 
 import groovy.lang.Closure;
@@ -129,22 +131,39 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             final Object postDecompJar = chooseDeobfOutput(global, local, "", "decompFixed");
             final Object patchedJar = chooseDeobfOutput(global, local, "", "patched", true);
             
+            FilterPatches filterPatches = null;
+            if(isOptifine)
+            {
+                filterPatches = makeTask(TASK_FILTER_USER_FORGE_PATCHES, FilterPatches.class);
+                {
+                    filterPatches.patchesIn = delayedFile(ZIP_UD_PATCHES);
+                    filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+                    filterPatches.extraExclusions = null;
+                    filterPatches.patchesOut = delayedFile(FORGE_FILTERED_USER_PATCHES);
+                    filterPatches.dependsOn(TASK_POST_DECOMP);
+                }
+            }
+
             PatchSourcesTask patch = makeTask(TASK_PATCH, PatchSourcesTask.class);
             if(isOptifine)
             {
-                patch.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+                patch.setPatches(delayedFile(FORGE_FILTERED_USER_PATCHES));
                 patch.setOptifinePatches(delayedFile(PATCH_ZIP));
-                patch.dependsOn(TASK_DL_PATCHES);
+                patch.dependsOn(filterPatches, TASK_DL_PATCHES);
             }
-            patch.setPatches(delayedFile(ZIP_UD_PATCHES));
+            else
+            {
+                patch.setPatches(delayedFile(ZIP_UD_PATCHES));
+                patch.dependsOn(TASK_POST_DECOMP);
+            }
+
             patch.addInject(delayedFile(ZIP_UD_SRC));
             patch.addInject(delayedFile(ZIP_UD_RES)); // injecting teh resources too... the src jar needs them afterall.
-            patch.setFailOnError(!isOptifine); //false because the patches are broken
+            patch.setFailOnError(true); //false because the patches are broken
             patch.setMakeRejects(false);
             patch.setPatchStrip(1);
             patch.setInJar(postDecompJar);
             patch.setOutJar(patchedJar);
-            patch.dependsOn(TASK_POST_DECOMP);
 
             RemapSources remap = (RemapSources) project.getTasks().getByName(TASK_REMAP);
             remap.setInJar(patchedJar);

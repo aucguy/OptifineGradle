@@ -4,6 +4,7 @@ import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.D
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.REPLACE_PROJECT_CAP_NAME;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.DIR_LOCAL_CACHE;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_MC_VERSION;
+import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.DIR_USERDEV;
 
 /**
  * random constants
@@ -25,6 +26,7 @@ public class OptifineConstants
     public static final String TASK_PREPROCESS        = "preprocess";
     public static final String TASK_REMOVE_EXTRAS     = "removeExtras";
     public static final String TASK_FILTER_MCP_PATCHES = "filterMcpPatches";
+    public static final String TASK_FILTER_USER_FORGE_PATCHES = "filterUserForgePatches";
 
     //patching tasks
     public static final String TASK_PROJECT_DELETE_REJECTS    = "delete" + REPLACE_PROJECT_CAP_NAME + "Rejects";
@@ -47,6 +49,7 @@ public class OptifineConstants
             + "/minecraft-" + REPLACE_MC_VERSION + "-extrasRemovedPatcher.jar";
     public static final String MCP_FILTERED_USER_PATCHES   = "{CACHE_DIR}/de/oceanlabs/mcp/mcp/" + REPLACE_MC_VERSION
             + "/filteredUserPatches/";
+    public static final String FORGE_FILTERED_USER_PATCHES = DIR_USERDEV + "/filteredForgePatches";
     
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
     
@@ -81,6 +84,10 @@ public class OptifineConstants
     public static final String REPLACE_OPTIFINE_JAR   = "{optifineJar}";
     public static final String REPLACE_MAIN_DIR       = "{mainDir}";
     
+    //patching tasks
+    public static final String TASK_FILTER_PATCHER_FORGE_PATCHES = "filterForge" + REPLACE_PROJECT_CAP_NAME +"Patches";
+    public static final String FORGE_FILTERED_PATCHER_PATCHES = DIR_PROJECT_CACHE + "/filteredPatches/";
+
     // packaging setup tasks
     public static final String TASK_OPTIFINE_PATCH    = "optifinePatch";
     public static final String TASK_GEN_PATCHES       = "genOptifinePatches";

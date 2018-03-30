@@ -93,10 +93,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
     protected ContextProvider      context;
     private ArrayList<PatchedFile> loadedPatches = Lists.newArrayList();
 
-    @InputFile
-    @Optional
-    private Object deobfuscatedClasses;
-
     @OutputFile
     @Optional
     private Object rejectZip;
@@ -119,12 +115,11 @@ public class PatchSourcesTask extends AbstractEditJarTask
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
 
-        final Set<String> ignoredPatches = Patching.getIgnoredPatches(this, getDeobfuscatedClasses());
-        addPatchThingy(patchThingy, fuzz, ignoredPatches);
-        addPatchThingy(getOptifinePatches(), fuzz, null);
+        addPatchThingy(patchThingy, fuzz);
+        addPatchThingy(getOptifinePatches(), fuzz);
     }
     
-    protected void addPatchThingy(File patchThingy, final int fuzz, final Set<String> ignoredPatches) throws IOException
+    protected void addPatchThingy(File patchThingy, final int fuzz) throws IOException
     {
         if(patchThingy == null || !patchThingy.exists()) return;
         if (patchThingy.isDirectory())
@@ -135,13 +130,8 @@ public class PatchSourcesTask extends AbstractEditJarTask
                 {
                     continue;
                 }
-                File path = patchThingy.toPath().relativize(f.toPath()).toFile();
-                if(Patching.shouldSkip(path.getPath(), ignoredPatches, true))
-                {
-                    continue;
-                }
                 
-                loadedPatches.add(new PatchedFile(f, context, fuzz, ignoredPatches == null));
+                loadedPatches.add(new PatchedFile(f, context, fuzz));
             }
         }
         else if (patchThingy.getName().endsWith(".jar") || patchThingy.getName().endsWith(".zip"))
@@ -160,15 +150,10 @@ public class PatchSourcesTask extends AbstractEditJarTask
                 @Override
                 public void visitFile(FileVisitDetails details)
                 {
-                    if(Patching.shouldSkip(details.getPath(), ignoredPatches, true)) {
-                    	System.out.println("skipped patch " + details.getPath());
-                    	return;
-                    }
-
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     details.copyTo(stream);
                     String file = new String(stream.toByteArray(), Constants.CHARSET);
-                    loadedPatches.add(new PatchedFile(file, context, fuzz, ignoredPatches == null));
+                    loadedPatches.add(new PatchedFile(file, context, fuzz));
                 }
 
             });
@@ -284,7 +269,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
                             failed++;
                             getLogger().error("  " + hunk.getHunkID() + ": " + (hunk.getFailure() != null ? hunk.getFailure().getMessage() : "") + " @ " + hunk.getIndex());
 
-                            if (makeRejects && !patch.isOptifine)
+                            if (makeRejects)
                             {
                                 rejectBuilder.append(String.format("++++ REJECTED PATCH %d\n", hunk.getHunkID()));
                                 rejectBuilder.append(Joiner.on('\n').join(hunk.hunk.lines));
@@ -299,7 +284,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
                     getLogger().log(LogLevel.ERROR, "  {}/{} failed", failed, report.getHunks().size());
 
-                    if (makeRejects && !patch.isOptifine)
+                    if (makeRejects)
                     {
                         File reject = patch.makeRejectFile();
                         if (reject.exists())
@@ -510,20 +495,17 @@ public class PatchSourcesTask extends AbstractEditJarTask
     {
         public final File            fileToPatch;
         public final ContextualPatch patch;
-        public final boolean         isOptifine;
 
-        public PatchedFile(File file, ContextProvider provider, int maxFuzz, boolean isOptifine) throws IOException
+        public PatchedFile(File file, ContextProvider provider, int maxFuzz) throws IOException
         {
             this.fileToPatch = file;
             this.patch = ContextualPatch.create(Files.toString(file, Charset.defaultCharset()), provider).setAccessC14N(true).setMaxFuzz(maxFuzz);
-            this.isOptifine = isOptifine;
         }
 
-        public PatchedFile(String file, ContextProvider provider, int maxFuzz, boolean isOptifine)
+        public PatchedFile(String file, ContextProvider provider, int maxFuzz)
         {
             this.fileToPatch = null;
             this.patch = ContextualPatch.create(file, provider).setAccessC14N(true).setMaxFuzz(maxFuzz);
-            this.isOptifine = isOptifine;
         }
 
         public File makeRejectFile()
@@ -535,16 +517,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
             return new File(fileToPatch.getParentFile(), fileToPatch.getName() + ".rej");
         }
-    }
-
-    public File getDeobfuscatedClasses()
-    {
-        return deobfuscatedClasses == null ? null : getProject().file(deobfuscatedClasses);
-    }
-
-    public void setDeobfuscatedClasses(Object deobfuscatedClasses)
-    {
-        this.deobfuscatedClasses = deobfuscatedClasses;
     }
     
     public File getOptifinePatches()

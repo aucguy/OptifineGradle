@@ -2,8 +2,10 @@ package com.github.aucguy.optifinegradle;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.gradle.api.file.FileTree;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
 import org.gradle.api.tasks.Input;
@@ -48,7 +50,14 @@ public class FilterPatches extends CachedTask
         @Override
         public void visitFile(FileVisitDetails details)
         {
-            String name = new File(details.getPath()).getName();
+            File file = new File(details.getPath());
+            List<String> parts = new LinkedList<String>();
+            while(file != null)
+            {
+                parts.add(0, file.getName());
+                file = file.getParentFile();
+            }
+            String name = String.join(".", parts);
             if(name.endsWith(".java.patch"))
             {
                 name = name.substring(0, name.length() - 11);
@@ -72,9 +81,23 @@ public class FilterPatches extends CachedTask
         delete(dest);
         dest.mkdirs();
         List<String> exclusions = IOManager.readLines(manager.openFileForReading(excludeList));
-        exclusions.addAll(extraExclusions);
+        if(extraExclusions != null)
+        {
+            exclusions.addAll(extraExclusions);
+        }
         ExtractionVisitor visitor = new ExtractionVisitor(dest, exclusions);
-        getProject().fileTree(getProject().file(patchesIn)).visit(visitor);
+
+        File input = getProject().file(patchesIn);
+        FileTree tree;
+        if(input.isDirectory())
+        {
+            tree = getProject().fileTree(input);
+        }
+        else
+        {
+            tree = getProject().zipTree(input);
+        }
+        tree.visit(visitor);
         manager.closeAll();
     }
     

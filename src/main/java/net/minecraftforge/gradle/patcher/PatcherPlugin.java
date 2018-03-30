@@ -31,8 +31,12 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_PATCHER_FORGE_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
+import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
+
 import groovy.lang.Closure;
 
 import java.io.File;
@@ -468,16 +472,32 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
     protected void createProject(PatcherProject patcher)
     {
+        FilterPatches filterPatches = null;
+        if(isOptifine)
+        {
+            filterPatches = makeTask(projectString(TASK_FILTER_PATCHER_FORGE_PATCHES, patcher), FilterPatches.class);
+            {
+                filterPatches.patchesIn = patcher.getDelayedPatchDir();
+                filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+                filterPatches.extraExclusions = null;
+                filterPatches.patchesOut = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
+                filterPatches.dependsOn(TASK_DECOMP);
+            }
+        }
         PatchSourcesTask patch = makeTask(projectString(TASK_PROJECT_PATCH, patcher), PatchSourcesTask.class);
         {
             if(isOptifine)
             {
-                patch.setDeobfuscatedClasses(delayedFile(DEOBFUSCATED_CLASSES));
+                patch.setPatches(delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher)));
+                patch.setOptifinePatches(patcher.getDelayedOptifinePatchDir());
+                patch.dependsOn(filterPatches);
+            }
+            else
+            {
+                patch.setPatches(patcher.getDelayedPatchDir());
             }
             // inJar is set afterEvaluate depending on the patch order.
             patch.setOutJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
-            patch.setPatches(patcher.getDelayedPatchDir());
-            patch.setOptifinePatches(patcher.getDelayedOptifinePatchDir());
             patch.setRejectZip(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
             patch.setDoesCache(false);
             patch.setMaxFuzz(2);
