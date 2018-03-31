@@ -148,7 +148,6 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             if(isOptifine)
             {
                 patch.setPatches(delayedFile(FORGE_FILTERED_USER_PATCHES));
-                patch.setOptifinePatches(delayedFile(PATCH_ZIP));
                 patch.dependsOn(filterPatches, TASK_DL_PATCHES);
             }
             else
@@ -165,9 +164,30 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             patch.setInJar(postDecompJar);
             patch.setOutJar(patchedJar);
 
+            PatchSourcesTask optifinePatch = null;
+            if(isOptifine)
+            {
+                optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
+                optifinePatch.setPatches(delayedFile(PATCH_ZIP));
+                optifinePatch.setFailOnError(true);
+                optifinePatch.setMakeRejects(false);
+                optifinePatch.setPatchStrip(1);
+                optifinePatch.setInJar(patchedJar);
+                optifinePatch.setOutJar(delayedFile(OPTIFINE_PATCHED));
+                optifinePatch.dependsOn(patch);
+            }
+
             RemapSources remap = (RemapSources) project.getTasks().getByName(TASK_REMAP);
-            remap.setInJar(patchedJar);
-            remap.dependsOn(patch);
+            if(isOptifine)
+            {
+                remap.setInJar(delayedFile(OPTIFINE_PATCHED));
+                remap.dependsOn(optifinePatch);
+            }
+            else
+            {
+                remap.setInJar(patchedJar);
+                remap.dependsOn(patch);
+            }
         }
 
         // setup reobf

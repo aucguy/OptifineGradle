@@ -27,6 +27,7 @@ public class OptifineConstants
     public static final String TASK_REMOVE_EXTRAS     = "removeExtras";
     public static final String TASK_FILTER_MCP_PATCHES = "filterMcpPatches";
     public static final String TASK_FILTER_USER_FORGE_PATCHES = "filterUserForgePatches";
+    public static final String TASK_OPTIFINE_PATCH    = "optifinePatch";
 
     //patching tasks
     public static final String TASK_PROJECT_DELETE_REJECTS    = "delete" + REPLACE_PROJECT_CAP_NAME + "Rejects";
@@ -50,6 +51,8 @@ public class OptifineConstants
     public static final String MCP_FILTERED_USER_PATCHES   = "{CACHE_DIR}/de/oceanlabs/mcp/mcp/" + REPLACE_MC_VERSION
             + "/filteredUserPatches/";
     public static final String FORGE_FILTERED_USER_PATCHES = DIR_USERDEV + "/filteredForgePatches";
+    public static final String OPTIFINE_PATCHED            = "{CACHE_DIR}/net/minecraft/minecraft/" + REPLACE_MC_VERSION
+            + "/minecraft-" + REPLACE_MC_VERSION + "-optifinePatched.jar";
     
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
     
@@ -70,6 +73,8 @@ public class OptifineConstants
     public static final String PROJECT_REJECTS_ZIP            = DIR_PROJECT_CACHE + "/rejects.zip";
     public static final String PROJECT_REMAPPED_REJECTS_ZIP   = DIR_PROJECT_CACHE + "/rejects-remapped.zip";
     public static final String MCP_FILTERED_PATCHER_PATCHES   = DIR_LOCAL_CACHE + "/filteredPatcherPatches/";
+    public static final String OPTIFINE_PATCHED_PROJECT       = DIR_PROJECT_CACHE + "/optifinePatched.zip";
+    public static final String EMPTY_DIR                      = DIR_LOCAL_CACHE + "/empty/";
     
     // defaults
     public static final String DEFAULT_OPTIFINE_VERSION = "1.12.2_HD_U_C7";
@@ -87,9 +92,10 @@ public class OptifineConstants
     //patching tasks
     public static final String TASK_FILTER_PATCHER_FORGE_PATCHES = "filterForge" + REPLACE_PROJECT_CAP_NAME +"Patches";
     public static final String FORGE_FILTERED_PATCHER_PATCHES = DIR_PROJECT_CACHE + "/filteredPatches/";
+    public static final String TASK_OPTIFINE_PATCH_PROJECT = "optifinePatch" + REPLACE_PROJECT_CAP_NAME;
+    public static final String TASK_MAKE_EMPTY_DIR = "makeEmptyDir";
 
     // packaging setup tasks
-    public static final String TASK_OPTIFINE_PATCH    = "optifinePatch";
     public static final String TASK_GEN_PATCHES       = "genOptifinePatches";
     public static final String TASK_ZIP_PATCHES       = "zipOptifinePatches";
     

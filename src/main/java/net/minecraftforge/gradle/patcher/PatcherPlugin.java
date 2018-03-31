@@ -33,6 +33,10 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_O
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_PATCHER_FORGE_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH_PROJECT;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED_PROJECT;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_MAKE_EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
 import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
@@ -63,6 +67,7 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.Zip;
 
 import com.github.aucguy.optifinegradle.FilterPatches;
+import com.github.aucguy.optifinegradle.MakeDir;
 import com.github.aucguy.optifinegradle.RemapRejects;
 import com.github.aucguy.optifinegradle.RemoveExtras;
 import com.google.common.base.Strings;
@@ -128,6 +133,11 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
     protected void makeGeneralSetupTasks()
     {
+        MakeDir makeDir = makeTask(TASK_MAKE_EMPTY_DIR, MakeDir.class);
+        {
+            makeDir.directory = delayedFile(EMPTY_DIR);
+        }
+
         DeobfuscateJar deobfJar = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
             deobfJar.setInJar(delayedFile(Constants.JAR_MERGED));
@@ -489,7 +499,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             if(isOptifine)
             {
                 patch.setPatches(delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher)));
-                patch.setOptifinePatches(patcher.getDelayedOptifinePatchDir());
                 patch.dependsOn(filterPatches);
             }
             else
@@ -503,6 +512,21 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             patch.setMaxFuzz(2);
             patch.setFailOnError(false);
             patch.setMakeRejects(true);
+        }
+
+        PatchSourcesTask optifinePatch = null;
+        if(isOptifine)
+        {
+            optifinePatch = makeTask(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher), PatchSourcesTask.class);
+            optifinePatch.setPatches(patcher.getDelayedOptifinePatchDir());
+            optifinePatch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
+            optifinePatch.setOutJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
+            optifinePatch.setRejectZip(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
+            optifinePatch.setDoesCache(false);
+            optifinePatch.setMaxFuzz(2);
+            optifinePatch.setFailOnError(false);
+            optifinePatch.setMakeRejects(true);
+            optifinePatch.dependsOn(patch, TASK_MAKE_EMPTY_DIR);
         }
 
         Delete deleteRejects = makeTask(projectString(TASK_PROJECT_DELETE_REJECTS, patcher), Delete.class);
@@ -562,6 +586,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             extractSrc.setDoesCache(false);
             extractSrc.dependsOn(patch, remapTask, TASK_GEN_PROJECTS);
             // if depends on both remap and patch, itl happen after whichever is second.
+            if(isOptifine)
+            {
+                extractSrc.dependsOn(optifinePatch);
+            }
         }
 
         ExtractTask extractRes = makeTask(projectString(TASK_PROJECT_EXTRACT_RES, patcher), ExtractTask.class);
@@ -572,6 +600,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             extractRes.setDoesCache(false);
             extractRes.dependsOn(patch, remapTask, TASK_GEN_PROJECTS);
             // if depends on both remap and patch, itl happen after whichever is second.
+            if(isOptifine)
+            {
+                extractRes.dependsOn(optifinePatch);
+            }
         }
 
         Task setupTask = makeTask(projectString(TASK_PROJECT_SETUP, patcher));
@@ -864,7 +896,15 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                 }
 
                 // configure extract tasks to extract patched
-                Object patched = delayedFile(projectString(JAR_PROJECT_PATCHED, patcher));
+                Object patched;
+                if(isOptifine) //TODO test
+                {
+                    patched = delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher));
+                }
+                else
+                {
+                    patched = delayedFile(projectString(JAR_PROJECT_PATCHED, patcher));
+                }
                 ((ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher))).from(patched);
                 ((ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_RES, patcher))).from(patched);
             }
@@ -874,8 +914,17 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                 RemapSources remap = (RemapSources) project.getTasks().getByName(projectString(TASK_PROJECT_REMAP_JAR, patcher));
 
                 // configure the patches to happen AFTER remap
-                remap.dependsOn(patch);
-                remap.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
+
+                if(isOptifine) //TODO test
+                {
+                    remap.setInJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
+                    remap.dependsOn(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher));
+                }
+                else
+                {
+                    remap.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
+                    remap.dependsOn(patch);
+                }
                 // configure patching input and injects
                 if (lastPatcher != null && !isOptifine)
                 {

@@ -210,4 +210,14 @@ public class IOManager
     {
         return new String(readAll(inputStream), Constants.CHARSET);
     }
+
+    public static void delete(File f) throws IOException
+    {
+        if (f.isDirectory())
+        {
+            for (File c : f.listFiles())
+                delete(c);
+        }
+        f.delete();
+    }
 }

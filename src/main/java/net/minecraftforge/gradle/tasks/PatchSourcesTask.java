@@ -82,10 +82,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
     private Object                 patches;
     
-    @Input
-    @Optional
-    private Object                 optifinePatches;
-    
     @InputFiles
     private List<Object>           injects       = Lists.newArrayList();
 
@@ -115,13 +111,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
 
-        addPatchThingy(patchThingy, fuzz);
-        addPatchThingy(getOptifinePatches(), fuzz);
-    }
-    
-    protected void addPatchThingy(File patchThingy, final int fuzz) throws IOException
-    {
-        if(patchThingy == null || !patchThingy.exists()) return;
         if (patchThingy.isDirectory())
         {
             for (File f : getProject().fileTree(patchThingy))
@@ -517,29 +506,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
             return new File(fileToPatch.getParentFile(), fileToPatch.getName() + ".rej");
         }
-    }
-    
-    public File getOptifinePatches()
-    {
-        Object patches;
-        if (optifinePatches == null)
-        {
-            patches = null;
-        }
-        else if (optifinePatches instanceof Closure)
-        {
-            patches = ((Closure<?>) optifinePatches).call();
-        }
-        else
-        {
-            patches = optifinePatches;
-        }
-        return patches != null ? getProject().file(patches) : null;
-    }
-
-    public void setOptifinePatches(Object optifinePatches)
-    {
-        this.optifinePatches = optifinePatches;
     }
 
     public File getRejectZip()

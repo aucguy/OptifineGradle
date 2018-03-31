@@ -78,7 +78,7 @@ public class FilterPatches extends CachedTask
     {
         IOManager manager = new IOManager(this);
         File dest = getProject().file(patchesOut);
-        delete(dest);
+        IOManager.delete(dest);
         dest.mkdirs();
         List<String> exclusions = IOManager.readLines(manager.openFileForReading(excludeList));
         if(extraExclusions != null)
@@ -99,15 +99,5 @@ public class FilterPatches extends CachedTask
         }
         tree.visit(visitor);
         manager.closeAll();
-    }
-    
-    private void delete(File f) throws IOException
-    {
-        if (f.isDirectory())
-        {
-            for (File c : f.listFiles())
-                delete(c);
-        }
-        f.delete();
     }
 }

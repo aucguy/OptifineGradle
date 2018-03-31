@@ -23,6 +23,7 @@ import static net.minecraftforge.gradle.patcher.PatcherConstants.DEFAULT_RES_DIR
 import static net.minecraftforge.gradle.patcher.PatcherConstants.DEFAULT_SRC_DIR;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.DEFAULT_TEST_RES_DIR;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.DEFAULT_TEST_SRC_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
 import groovy.lang.Closure;
 
 import java.io.File;
@@ -40,6 +41,7 @@ public class PatcherProject implements Serializable
     private static final long serialVersionUID = 1L;
 
     private final transient Project project;
+    private final transient PatcherPlugin plugin;
 
     private final String name;
     private final String capName;
@@ -73,6 +75,7 @@ public class PatcherProject implements Serializable
 
     protected PatcherProject(String name, PatcherPlugin plugin)
     {
+        this.plugin = plugin;
         this.name = name;
         this.project = plugin.project;
         rootDir = project.getProjectDir();
@@ -737,7 +740,12 @@ public class PatcherProject implements Serializable
         return new Closure<File>(project, this) {
             public File call()
             {
-                return getOptifinePatchDir();
+                File patchDir = getOptifinePatchDir();
+                if(patchDir == null)
+                {
+                    return plugin.delayedFile(EMPTY_DIR).call();
+                }
+                return patchDir;
             }
         };
     }
