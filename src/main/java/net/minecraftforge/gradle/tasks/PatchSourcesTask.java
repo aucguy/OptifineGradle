@@ -26,9 +26,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
@@ -44,18 +41,13 @@ import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.OutputFile;
 
 import com.cloudbees.diff.PatchException;
-import com.github.aucguy.optifinegradle.IOManager;
-import com.github.aucguy.optifinegradle.user.Patching;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-
-import groovy.lang.Closure;
 
 public class PatchSourcesTask extends AbstractEditJarTask
 {
@@ -72,7 +64,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private int                    maxFuzz       = 0;
 
     @Input
-    protected int                  patchStrip    = 3;
+    private int                    patchStrip    = 3;
 
     @Input
     private boolean                makeRejects   = true;
@@ -81,12 +73,12 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private boolean                failOnError   = false;
 
     private Object                 patches;
-    
+
     @InputFiles
     private List<Object>           injects       = Lists.newArrayList();
 
     // stateful pieces of this task
-    protected ContextProvider      context;
+    private ContextProvider        context;
     private ArrayList<PatchedFile> loadedPatches = Lists.newArrayList();
 
     @Override
@@ -96,20 +88,20 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
         // create context provider
         context = new ContextProvider(null, patchStrip); // add in the map later.
-        final int fuzz = getMaxFuzz();
 
         // collect patchFiles and add them to the listing
         File patchThingy = getPatches(); // cached for the if statements
+        final int fuzz = getMaxFuzz();
 
         if (patchThingy.isDirectory())
         {
-            for (File f : getProject().fileTree(patchThingy))
+            for (File f : getProject().fileTree(getPatches()))
             {
                 if (!f.exists() || f.isDirectory() || !f.getName().endsWith("patch"))
                 {
                     continue;
                 }
-                
+
                 loadedPatches.add(new PatchedFile(f, context, fuzz));
             }
         }
@@ -355,7 +347,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private File getPatchesDir()
     {
         File patch = getPatches();
-        if (patch != null && patch.isDirectory())
+        if (patch.isDirectory())
             return getPatches();
         else
             return null;
@@ -366,7 +358,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
     private File getPatchesZip()
     {
         File patch = getPatches();
-        if (patch != null && patch.isDirectory())
+        if (patch.isDirectory())
             return null;
         else
             return getPatches();
@@ -374,7 +366,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
     public File getPatches()
     {
-        return patches == null ? null : getProject().file(patches);
+        return getProject().file(patches);
     }
 
     public void setPatches(Object patchDir)
@@ -407,7 +399,7 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
     // START INNER CLASSES
 
-    public static class ContextProvider implements ContextualPatch.IContextProvider
+    private static class ContextProvider implements ContextualPatch.IContextProvider
     {
         public Map<String, String> fileMap;
 
