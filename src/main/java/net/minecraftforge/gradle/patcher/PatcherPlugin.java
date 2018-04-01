@@ -37,6 +37,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_P
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED_PROJECT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_MAKE_EMPTY_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_RETRIEVE_REJECTS;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
 import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
@@ -70,6 +71,7 @@ import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.MakeDir;
 import com.github.aucguy.optifinegradle.RemapRejects;
 import com.github.aucguy.optifinegradle.RemoveExtras;
+import com.github.aucguy.optifinegradle.RetrieveRejects;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -507,7 +509,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             }
             // inJar is set afterEvaluate depending on the patch order.
             patch.setOutJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
-            patch.setRejectZip(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
             patch.setDoesCache(false);
             patch.setMaxFuzz(2);
             patch.setFailOnError(false);
@@ -521,7 +522,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             optifinePatch.setPatches(patcher.getDelayedOptifinePatchDir());
             optifinePatch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
             optifinePatch.setOutJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
-            optifinePatch.setRejectZip(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
             optifinePatch.setDoesCache(false);
             optifinePatch.setMaxFuzz(2);
             optifinePatch.setFailOnError(false);
@@ -535,6 +535,12 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             //deletes and depending on depending on settings
         }
 
+        RetrieveRejects retrieveRejects = makeTask(projectString(TASK_PROJECT_RETRIEVE_REJECTS, patcher), RetrieveRejects.class);
+        {
+            retrieveRejects.inFolder = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
+            retrieveRejects.outZip = delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher));
+        }
+
         RemapRejects remapRejects = makeTask(projectString(TASK_PROJECT_REMAP_REJECTS, patcher), RemapRejects.class);
         {
             remapRejects.setInJar(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
@@ -544,7 +550,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             remapRejects.setParamsCsv(delayedFile(Constants.CSV_PARAM));
             remapRejects.setAddsJavadocs(false);
             remapRejects.setDoesCache(false);
-            remapRejects.dependsOn(patch);
+            remapRejects.dependsOn(retrieveRejects);
         }
 
         ExtractTask extractRejects = makeTask(projectString(TASK_PROJECT_EXTRACT_REJECTS, patcher), ExtractTask.class);

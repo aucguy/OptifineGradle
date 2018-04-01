@@ -89,19 +89,9 @@ public class PatchSourcesTask extends AbstractEditJarTask
     protected ContextProvider      context;
     private ArrayList<PatchedFile> loadedPatches = Lists.newArrayList();
 
-    @OutputFile
-    @Optional
-    private Object rejectZip;
-
     @Override
     public void doStuffBefore() throws IOException
     {
-        File rejectZip = getRejectZip();
-        if(rejectZip != null && rejectZip.exists())
-        {
-            rejectZip.delete();
-        }
-
         getLogger().info("Reading patches");
 
         // create context provider
@@ -226,16 +216,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
     {
         boolean fuzzed = false;
         Throwable failure = null;
-        IOManager manager = new IOManager(this);
-        ZipOutputStream rejectOut;
-        if(getRejectZip() == null)
-        {
-            rejectOut = null;
-        }
-        else
-        {
-            rejectOut = manager.openZipForWriting(getRejectZip());
-        }
 
         for (PatchedFile patch : loadedPatches)
         {
@@ -281,8 +261,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
                             reject.delete();
                         }
                         Files.append(rejectBuilder.toString(),reject, Charsets.UTF_8);
-                        rejectOut.putNextEntry(new ZipEntry(patch.fileToPatch.getName() + ".rej"));
-                        rejectOut.write(rejectBuilder.toString().getBytes());
                         getLogger().log(LogLevel.ERROR, "  Rejects written to {}", reject.getAbsolutePath());
                     }
 
@@ -328,7 +306,6 @@ public class PatchSourcesTask extends AbstractEditJarTask
         {
             getLogger().lifecycle("Patches Fuzzed!");
         }
-        manager.closeAll();
     }
 
     // START GETTERS/SETTERS HERE
@@ -506,28 +483,5 @@ public class PatchSourcesTask extends AbstractEditJarTask
 
             return new File(fileToPatch.getParentFile(), fileToPatch.getName() + ".rej");
         }
-    }
-
-    public File getRejectZip()
-    {
-        Object folder;
-        if (rejectZip == null)
-        {
-            folder = null;
-        }
-        else if (rejectZip instanceof Closure)
-        {
-            folder = ((Closure<?>) rejectZip).call();
-        }
-        else
-        {
-            folder = rejectZip;
-        }
-        return folder != null ? getProject().file(folder) : null;
-    }
-
-    public void setRejectZip(Object rejectZip)
-    {
-        this.rejectZip = rejectZip;
     }
 }

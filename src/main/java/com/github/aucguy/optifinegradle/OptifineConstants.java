@@ -94,6 +94,7 @@ public class OptifineConstants
     public static final String FORGE_FILTERED_PATCHER_PATCHES = DIR_PROJECT_CACHE + "/filteredPatches/";
     public static final String TASK_OPTIFINE_PATCH_PROJECT = "optifinePatch" + REPLACE_PROJECT_CAP_NAME;
     public static final String TASK_MAKE_EMPTY_DIR = "makeEmptyDir";
+    public static final String TASK_PROJECT_RETRIEVE_REJECTS = "retrieve" + REPLACE_PROJECT_CAP_NAME + "Rejects";
 
     // packaging setup tasks
     public static final String TASK_GEN_PATCHES       = "genOptifinePatches";
