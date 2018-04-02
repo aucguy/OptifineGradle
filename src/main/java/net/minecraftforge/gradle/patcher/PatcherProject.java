@@ -50,13 +50,10 @@ public class PatcherProject implements Serializable
 
     private File rootDir;
     private File patchDir;
-    private File outputPatchDir;
-    private File optifinePatchDir;
     private File sourcesDir;
     private File resourcesDir;
     private File testSourcesDir;
     private File testResourcesDir;
-    private File rejectFolder;
 
     private String mainClassClient = "GradleStart";
     private String mainClassServer = "GradleStartServer";
@@ -70,7 +67,6 @@ public class PatcherProject implements Serializable
 
     private boolean genMcpPatches = false;
     private boolean applyMcpPatches = false;
-    private boolean modified = true;
     private boolean s2sKeepImports = true;
 
     protected PatcherProject(String name, PatcherPlugin plugin)
@@ -241,26 +237,6 @@ public class PatcherProject implements Serializable
         this.patchDir = project.file(patchDir);
     }
     
-    public File getOptifinePatchDir()
-    {
-        return optifinePatchDir;
-    }
-    
-    public void setOptifinePatchDir(Object optifinePatchDir)
-    {
-       this.optifinePatchDir = optifinePatchDir == null ? null : project.file(optifinePatchDir);
-    }
-    
-    public File getOutputPatchDir()
-    {
-        return outputPatchDir != null ? outputPatchDir : getPatchDir();
-    }
-    
-    public void setOutputPatchDir(Object outputPatchDir)
-    {
-        this.outputPatchDir = outputPatchDir == null ? null : project.file(outputPatchDir);
-    }
-    
     /**
      * The directory where the patches are found, and to witch generated patches should be saved.
      * By default this is rootDir/patches
@@ -269,16 +245,6 @@ public class PatcherProject implements Serializable
     public void patchDir(Object patchDir)
     {
         setPatchDir(patchDir);
-    }
-    
-    public void optifinePatchDir(Object optifinePatchDir)
-    {
-        setOptifinePatchDir(optifinePatchDir);
-    }
-    
-    public void outputPatchDir(Object outputPatchDir)
-    {
-        setOutputPatchDir(outputPatchDir);
     }
 
     public File getSourcesDir()
@@ -361,16 +327,6 @@ public class PatcherProject implements Serializable
         return getFile(testResourcesDir, DEFAULT_TEST_RES_DIR);
     }
 
-    public File getRejectFolder()
-    {
-        return rejectFolder;
-    }
-
-    public void setRejectFolder(Object rejectFolder)
-    {
-       this.rejectFolder = rejectFolder == null ? null : project.file(rejectFolder);
-    }
-
     /**
      * The directory where the non-patch resources for this project are.
      * By default this is rootDir/src/test/resources
@@ -389,11 +345,6 @@ public class PatcherProject implements Serializable
     public void testResourcesDir(Object testResourcesDir)
     {
         setTestResourcesDir(testResourcesDir);
-    }
-
-    public void rejectFolder(Object rejectFolder)
-    {
-        setRejectFolder(rejectFolder);
     }
 
     public String getMainClassClient()
@@ -588,16 +539,6 @@ public class PatcherProject implements Serializable
     {
         this.applyMcpPatches = applyMcpPatches;
     }
-    
-    public boolean getsModified()
-    {
-        return modified || (getGenPatchesFrom() != null && "clean".equals(getGenPatchesFrom().toLowerCase()));
-    }
-    
-    public void setModified(boolean modified)
-    {
-        this.modified = modified;
-    }
 
     public boolean isS2sKeepImports()
     {
@@ -730,33 +671,6 @@ public class PatcherProject implements Serializable
             public File call()
             {
                 return getPatchDir();
-            }
-        };
-    }
-
-    @SuppressWarnings("serial")
-    protected Closure<File> getDelayedOptifinePatchDir()
-    {
-        return new Closure<File>(project, this) {
-            public File call()
-            {
-                File patchDir = getOptifinePatchDir();
-                if(patchDir == null)
-                {
-                    return plugin.delayedFile(EMPTY_DIR).call();
-                }
-                return patchDir;
-            }
-        };
-    }
-
-    @SuppressWarnings("serial")
-    protected Closure<File> getDelayedRejectFolder()
-    {
-        return new Closure<File>(project, this) {
-            public File call()
-            {
-                return getRejectFolder();
             }
         };
     }

@@ -72,6 +72,7 @@ import com.github.aucguy.optifinegradle.MakeDir;
 import com.github.aucguy.optifinegradle.RemapRejects;
 import com.github.aucguy.optifinegradle.RemoveExtras;
 import com.github.aucguy.optifinegradle.RetrieveRejects;
+import com.github.aucguy.optifinegradle.patcher.PatcherProjectExtras;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -519,7 +520,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         if(isOptifine)
         {
             optifinePatch = makeTask(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher), PatchSourcesTask.class);
-            optifinePatch.setPatches(patcher.getDelayedOptifinePatchDir());
+            optifinePatch.setPatches(PatcherProjectExtras.getDelayedOptifinePatchDir(this, patcher));
             optifinePatch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
             optifinePatch.setOutJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
             optifinePatch.setDoesCache(false);
@@ -870,13 +871,13 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         {
             patcher.validate(); // validate project
 
-            if(patcher.getRejectFolder() != null)
+            if(PatcherProjectExtras.getRejectFolder(this, patcher) != null)
             {
                 ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher));
                 ExtractTask extractRejects = (ExtractTask) project.getTasks().getByName(projectString("extract{CAPNAME}Rejects", patcher));
                 Delete deleteRejects = (Delete) project.getTasks().getByName(projectString("delete{CAPNAME}Rejects", patcher));
-                extractRejects.into(patcher.getDelayedRejectFolder());
-                deleteRejects.delete(patcher.getDelayedRejectFolder());
+                extractRejects.into(PatcherProjectExtras.getRejectFolder(this, patcher));
+                deleteRejects.delete(PatcherProjectExtras.getRejectFolder(this, patcher));
                 extractSrc.dependsOn(extractRejects);
             }
 
@@ -997,7 +998,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             if (patcher.doesGenPatches())
             {
                 TaskGenPatches genPatches = makeTask(projectString(TASK_PROJECT_GEN_PATCHES, patcher), TaskGenPatches.class);
-                genPatches.setPatchDir(patcher.getOutputPatchDir());
+                genPatches.setPatchDir(PatcherProjectExtras.getOutputPatchDir(patcher));
                 genPatches.setOriginalPrefix(patcher.getPatchPrefixOriginal());
                 genPatches.setChangedPrefix(patcher.getPatchPrefixChanged());
                 //genPatches.getOutputs().upToDateWhen(CALL_FALSE);
@@ -1034,7 +1035,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                     else
                     {
                         PatcherProject genFrom = getExtension().getProjects().getByName(patcher.getGenPatchesFrom());
-                        if(genFrom.getsModified())
+                        if(PatcherProjectExtras.getsModified(genFrom))
                         {
                             genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETROMAPPED, genFrom)));
                             genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETRO_NONMC, genFrom)));

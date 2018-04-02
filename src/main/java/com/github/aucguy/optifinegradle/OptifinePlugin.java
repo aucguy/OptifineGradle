@@ -9,6 +9,7 @@ import net.minecraftforge.gradle.common.BasePlugin;
 public class OptifinePlugin
 {
     protected BasePlugin<?> plugin;
+    public OptifineExtension extension;
     
     public OptifinePlugin(BasePlugin<?> x)
     {
@@ -20,18 +21,17 @@ public class OptifinePlugin
         plugin.isOptifine = true;
     }
 
-    public void applyPlugin()
+    public void applyPlugin(Class<? extends OptifineExtension> extensionClass)
     {
-    	plugin.project.getExtensions().create(EXTENSION, OptifineExtension.class);
+    	extension = plugin.project.getExtensions().create(EXTENSION, extensionClass);
     }
 
     public void afterEvaluate()
     {
-        OptifineExtension ext = (OptifineExtension) plugin.project.getExtensions().getByName(EXTENSION);
-        plugin.replacer.putReplacement(REPLACE_OPTIFINE_VERSION, ext.getOptifineVersion());
-        plugin.replacer.putReplacement(REPLACE_PATCH_ARCHIVE, ext.getPatchArchive());
-        plugin.replacer.putReplacement(REPLACE_PATCH_URL, ext.getPatchURL());
-        plugin.replacer.putReplacement(REPLACE_OPTIFINE_JAR, ext.getOptifineJar());
+        plugin.replacer.putReplacement(REPLACE_OPTIFINE_VERSION, extension.getOptifineVersion());
+        plugin.replacer.putReplacement(REPLACE_PATCH_ARCHIVE, extension.getPatchArchive());
+        plugin.replacer.putReplacement(REPLACE_PATCH_URL, extension.getPatchURL());
+        plugin.replacer.putReplacement(REPLACE_OPTIFINE_JAR, extension.getOptifineJar());
         plugin.replacer.putReplacement(REPLACE_MAIN_DIR, plugin.project.getBuildFile().getParent());
     }
 

@@ -8,6 +8,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.USER_RENAMES;
 
 import com.github.aucguy.optifinegradle.ExtractRenames;
+import com.github.aucguy.optifinegradle.OptifineExtension;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 
 import net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin;
@@ -27,7 +28,7 @@ public class OptifineUserPlugin extends ForgePlugin
     public void applyUserPlugin()
     {
         super.applyUserPlugin();
-        delegate.applyPlugin();
+        delegate.applyPlugin(OptifineExtension.class);
         
         DownloadWithFile dlPatches = makeTask(TASK_DL_PATCHES, DownloadWithFile.class);
         {
