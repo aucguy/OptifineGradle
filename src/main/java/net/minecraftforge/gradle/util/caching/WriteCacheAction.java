@@ -54,12 +54,7 @@ public class WriteCacheAction implements Action<Task>
 
         try
         {
-            Object f = annot.getValue(task);
-            if(f == null)
-            {
-                return;
-            }
-            File outFile = task.getProject().file(f);
+            File outFile = task.getProject().file(annot.getValue(task));
             if (outFile.exists())
             {
                 File hashFile = CacheUtil.getHashFile(outFile);
