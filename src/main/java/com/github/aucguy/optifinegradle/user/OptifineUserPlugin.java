@@ -2,18 +2,24 @@ package com.github.aucguy.optifinegradle.user;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_USER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_USER_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_URL;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_USER;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DL_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_USER_FORGE_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.USER_RENAMES;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 import static net.minecraftforge.gradle.user.UserConstants.*;
+import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.TASK_PATCH;
+import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.ZIP_UD_PATCHES;
 
 import java.util.Arrays;
 import java.io.File;
@@ -25,7 +31,9 @@ import com.github.aucguy.optifinegradle.OptifinePlugin;
 import com.github.aucguy.optifinegradle.RemoveExtras;
 
 import groovy.lang.Closure;
+import net.minecraftforge.gradle.tasks.PatchSourcesTask;
 import net.minecraftforge.gradle.tasks.PostDecompileTask;
+import net.minecraftforge.gradle.tasks.RemapSources;
 import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 import net.minecraftforge.gradle.user.patcherUser.forge.ForgePlugin;
 
@@ -78,20 +86,58 @@ public class OptifineUserPlugin extends ForgePlugin
             removeExtras.dependsOn(decompile);
         }
 
-        FilterPatches filterPatches = makeTask(TASK_FILTER_MCP_PATCHES, FilterPatches.class);
+        FilterPatches filterMcpPatches = makeTask(TASK_FILTER_MCP_PATCHES, FilterPatches.class);
         {
-            filterPatches.patchesIn = delayedFile(MCP_PATCHES_MERGED);
-            filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
-            filterPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
-            filterPatches.patchesOut = delayedFile(MCP_FILTERED_USER_PATCHES);
-            filterPatches.dependsOn(decompile);
+            filterMcpPatches.patchesIn = delayedFile(MCP_PATCHES_MERGED);
+            filterMcpPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+            filterMcpPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
+            filterMcpPatches.patchesOut = delayedFile(MCP_FILTERED_USER_PATCHES);
+            filterMcpPatches.dependsOn(decompile);
         }
 
         PostDecompileTask postDecomp = (PostDecompileTask) project.getTasks().getByName(TASK_POST_DECOMP);
         {
             postDecomp.setInJar(delayedFile(REMOVE_EXTRAS_OUT_USER));
             postDecomp.setPatches(delayedFile(MCP_FILTERED_USER_PATCHES));
-            postDecomp.dependsOn(removeExtras, filterPatches);
+            postDecomp.dependsOn(removeExtras, filterMcpPatches);
+        }
+
+        FilterPatches filterForgePatches = makeTask(TASK_FILTER_USER_FORGE_PATCHES, FilterPatches.class);
+        {
+            filterForgePatches.patchesIn = delayedFile(ZIP_UD_PATCHES);
+            filterForgePatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+            filterForgePatches.extraExclusions = null;
+            filterForgePatches.patchesOut = delayedFile(FORGE_FILTERED_USER_PATCHES);
+            filterForgePatches.dependsOn(TASK_POST_DECOMP);
+        }
+
+        PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(TASK_PATCH);
+        {
+            patch.setPatches(delayedFile(FORGE_FILTERED_USER_PATCHES));
+            patch.dependsOn(filterForgePatches, dlPatches);
+        }
+
+        PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
+        {
+            optifinePatch.setPatches(delayedFile(PATCH_ZIP));
+            optifinePatch.setFailOnError(true);
+            optifinePatch.setMakeRejects(false);
+            optifinePatch.setPatchStrip(1);
+            optifinePatch.setInJar(new Closure<File>(null)
+            {
+                public File call()
+                {
+                    return patch.getOutJar();
+                }
+            });
+            optifinePatch.setOutJar(delayedFile(OPTIFINE_PATCHED));
+            optifinePatch.dependsOn(patch);
+        }
+
+        RemapSources remap = (RemapSources) project.getTasks().getByName(TASK_REMAP);
+        {
+            remap.setInJar(delayedFile(OPTIFINE_PATCHED));
+            remap.dependsOn(optifinePatch);
         }
     }
     

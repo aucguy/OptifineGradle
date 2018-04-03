@@ -130,32 +130,9 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         {
             final Object postDecompJar = chooseDeobfOutput(global, local, "", "decompFixed");
             final Object patchedJar = chooseDeobfOutput(global, local, "", "patched", true);
-            
-            FilterPatches filterPatches = null;
-            if(isOptifine)
-            {
-                filterPatches = makeTask(TASK_FILTER_USER_FORGE_PATCHES, FilterPatches.class);
-                {
-                    filterPatches.patchesIn = delayedFile(ZIP_UD_PATCHES);
-                    filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
-                    filterPatches.extraExclusions = null;
-                    filterPatches.patchesOut = delayedFile(FORGE_FILTERED_USER_PATCHES);
-                    filterPatches.dependsOn(TASK_POST_DECOMP);
-                }
-            }
 
             PatchSourcesTask patch = makeTask(TASK_PATCH, PatchSourcesTask.class);
-            if(isOptifine)
-            {
-                patch.setPatches(delayedFile(FORGE_FILTERED_USER_PATCHES));
-                patch.dependsOn(filterPatches, TASK_DL_PATCHES);
-            }
-            else
-            {
-                patch.setPatches(delayedFile(ZIP_UD_PATCHES));
-                patch.dependsOn(TASK_POST_DECOMP);
-            }
-
+            patch.setPatches(delayedFile(ZIP_UD_PATCHES));
             patch.addInject(delayedFile(ZIP_UD_SRC));
             patch.addInject(delayedFile(ZIP_UD_RES)); // injecting teh resources too... the src jar needs them afterall.
             patch.setFailOnError(true); //false because the patches are broken
@@ -163,31 +140,11 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
             patch.setPatchStrip(1);
             patch.setInJar(postDecompJar);
             patch.setOutJar(patchedJar);
-
-            PatchSourcesTask optifinePatch = null;
-            if(isOptifine)
-            {
-                optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
-                optifinePatch.setPatches(delayedFile(PATCH_ZIP));
-                optifinePatch.setFailOnError(true);
-                optifinePatch.setMakeRejects(false);
-                optifinePatch.setPatchStrip(1);
-                optifinePatch.setInJar(patchedJar);
-                optifinePatch.setOutJar(delayedFile(OPTIFINE_PATCHED));
-                optifinePatch.dependsOn(patch);
-            }
+            patch.dependsOn(TASK_POST_DECOMP);
 
             RemapSources remap = (RemapSources) project.getTasks().getByName(TASK_REMAP);
-            if(isOptifine)
-            {
-                remap.setInJar(delayedFile(OPTIFINE_PATCHED));
-                remap.dependsOn(optifinePatch);
-            }
-            else
-            {
-                remap.setInJar(patchedJar);
-                remap.dependsOn(patch);
-            }
+            remap.setInJar(patchedJar);
+            remap.dependsOn(patch);
         }
 
         // setup reobf
