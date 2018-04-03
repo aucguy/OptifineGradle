@@ -1,31 +1,54 @@
 package com.github.aucguy.optifinegradle.patcher;
 
+import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
+import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_GEN_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_MAKE_EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_ZIP_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_GEN_PATCHES;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DECOMP;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_DECOMP;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_GEN_PROJECTS;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_DEOBF;
+import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
+import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
+import org.gradle.api.Task;
 import org.gradle.api.tasks.bundling.Zip;
 
 import com.github.aucguy.optifinegradle.ExtractRenames;
+import com.github.aucguy.optifinegradle.FilterPatches;
+import com.github.aucguy.optifinegradle.MakeDir;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
+import com.github.aucguy.optifinegradle.RemoveExtras;
 import com.github.aucguy.optifinegradle.TaskGenPatchesWrapper;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.patcher.PatcherPlugin;
 import net.minecraftforge.gradle.patcher.PatcherProject;
-import net.minecraftforge.gradle.patcher.PatcherProjectFactory;
+import net.minecraftforge.gradle.tasks.DeobfuscateJar;
+import net.minecraftforge.gradle.tasks.PostDecompileTask;
 import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
 
@@ -102,6 +125,44 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             testFernFlower.setDoesCache(false);
             testFernFlower.setClasspath(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS));
             testFernFlower.setForkedClasspath(project.getConfigurations().getByName(Constants.CONFIG_FFI_DEPS));
+        }
+
+        MakeDir makeDir = makeTask(TASK_MAKE_EMPTY_DIR, MakeDir.class);
+        {
+            makeDir.directory = delayedFile(EMPTY_DIR);
+        }
+
+        DeobfuscateJar deobfJar = (DeobfuscateJar) project.getTasks().getByName(TASK_DEOBF);
+        {
+            deobfJar.dependsOn(TASK_PREPROCESS);
+        }
+
+        RemoveExtras removeExtras = makeTask(TASK_REMOVE_EXTRAS, RemoveExtras.class);
+        {
+            removeExtras.setInJar(delayedFile(JAR_DECOMP));
+            removeExtras.setOutJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
+            removeExtras.dependsOn(TASK_DECOMP);
+        }
+
+        FilterPatches filterPatches = makeTask(TASK_FILTER_MCP_PATCHES, FilterPatches.class);
+        {
+            filterPatches.patchesIn = delayedFile(MCP_PATCHES_MERGED);
+            filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+            filterPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
+            filterPatches.patchesOut = delayedFile(MCP_FILTERED_PATCHER_PATCHES);
+            filterPatches.dependsOn(TASK_DECOMP); //change dependency to not be so expensive
+        }
+
+        PostDecompileTask postDecompileJar = (PostDecompileTask) project.getTasks().getByName(TASK_POST_DECOMP);
+        {
+            postDecompileJar.setInJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
+            postDecompileJar.setPatches(delayedFile(MCP_FILTERED_PATCHER_PATCHES));
+            postDecompileJar.dependsOn(removeExtras, filterPatches);
+        }
+
+        Task createProjects = project.getTasks().getByName(TASK_GEN_PROJECTS);
+        {
+            TaskGenSubProjectsWrapper.removeProject(createProjects, "clean");
         }
     }
     

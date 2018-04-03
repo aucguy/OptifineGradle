@@ -136,11 +136,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
     protected void makeGeneralSetupTasks()
     {
-        MakeDir makeDir = makeTask(TASK_MAKE_EMPTY_DIR, MakeDir.class);
-        {
-            makeDir.directory = delayedFile(EMPTY_DIR);
-        }
-
         DeobfuscateJar deobfJar = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
             deobfJar.setInJar(delayedFile(Constants.JAR_MERGED, true));
@@ -150,9 +145,8 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             deobfJar.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
             deobfJar.setApplyMarkers(true);
             deobfJar.setDoesCache(false);
-            deobfJar.setFailOnAtError(!isOptifine);
             // access transformers are added afterEvaluate
-            deobfJar.dependsOn(TASK_PREPROCESS, TASK_GENERATE_SRGS);
+            deobfJar.dependsOn(TASK_MERGE_JARS, TASK_GENERATE_SRGS);
         }
 
         ApplyFernFlowerTask decompileJar = makeTask(TASK_DECOMP, ApplyFernFlowerTask.class);
@@ -165,55 +159,22 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             decompileJar.dependsOn(deobfJar);
         }
 
-        RemoveExtras removeExtras = null;
-        FilterPatches filterPatches = null;
-        if(isOptifine)
-        {
-            removeExtras = makeTask(TASK_REMOVE_EXTRAS, RemoveExtras.class);
-            {
-                removeExtras.setInJar(delayedFile(JAR_DECOMP));
-                removeExtras.setOutJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
-                removeExtras.dependsOn(decompileJar);
-            }
-
-            filterPatches = makeTask(TASK_FILTER_MCP_PATCHES, FilterPatches.class);
-            {
-                filterPatches.patchesIn = delayedFile(MCP_PATCHES_MERGED);
-                filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
-                filterPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
-                filterPatches.patchesOut = delayedFile(MCP_FILTERED_PATCHER_PATCHES);
-                filterPatches.dependsOn(decompileJar);
-            }
-        }
-
         PostDecompileTask postDecompileJar = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
-            if(isOptifine)
-            {
-                postDecompileJar.setInJar(delayedFile(REMOVE_EXTRAS_OUT_PATCHER));
-                postDecompileJar.setPatches(delayedFile(MCP_FILTERED_PATCHER_PATCHES));
-                postDecompileJar.dependsOn(removeExtras, filterPatches);
-            }
-            else
-            {
-                postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
-                postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
-                postDecompileJar.dependsOn(decompileJar);
-            }
+            postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
+            postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
             postDecompileJar.setOutJar(delayedFile(JAR_DECOMP_POST, true));
             postDecompileJar.setInjects(delayedFile(MCP_INJECT));
             postDecompileJar.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
             postDecompileJar.setDoesCache(false);
+            postDecompileJar.dependsOn(decompileJar);
         }
 
         TaskGenSubprojects createProjects = makeTask(TASK_GEN_PROJECTS, TaskGenSubprojects.class);
         {
             createProjects.setWorkspaceDir(getExtension().getDelayedWorkspaceDir());
             createProjects.addRepo("minecraft", Constants.URL_LIBRARY);
-            if(!isOptifine)
-            {
-                createProjects.putProject("Clean", null, null, null, null);
-            }
+            createProjects.putProject("Clean", null, null, null, null);
             createProjects.setJavaLevel("1.8");
         }
 

@@ -12,6 +12,10 @@ public final class PatcherConstantsWrapper
     public static final String TASK_PROJECT_GEN_PATCHES = getStringConstant("TASK_PROJECT_GEN_PATCHES");
     public static final String JAR_DEOBF = getStringConstant("JAR_DEOBF");
     public static final String DIR_LOCAL_CACHE = getStringConstant("DIR_LOCAL_CACHE");
+    public static final String JAR_DECOMP = getStringConstant("JAR_DECOMP");
+    public static final String TASK_DECOMP = getStringConstant("TASK_DECOMP");
+    public static final String TASK_GEN_PROJECTS = getStringConstant("TASK_GEN_PROJECTS");
+    public static final String TASK_DEOBF = getStringConstant("TASK_DEOBF");
     
     private static String getStringConstant(String name)
     {
