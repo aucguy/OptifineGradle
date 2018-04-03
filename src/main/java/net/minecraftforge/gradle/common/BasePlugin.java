@@ -547,78 +547,16 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
             splitServer.dependsOn(dlServer);
         }
-        
-        String mergeClientJar;
-        Task mergeDependency;
-        if(isOptifine)
-        {
-            ExtractRenames extractRenames = makeTask(TASK_EXTRACT_RENAMES, ExtractRenames.class);
-            {
-                extractRenames.extractTo = delayedFile(RENAMES_FILE);
-            }
-
-        	CacheWrapper diff = makeTask(TASK_DIFF_OPTIFINE, CacheWrapper.class);
-        	{
-        		Exec task = makeTask(TASK_DIFF_EXEC, Exec.class);
-        		task.executable("java");
-        		task.args("-cp", delayedString(JAR_OPTIFINE_FRESH), "optifine.Patcher", 
-        			delayedString(JAR_CLIENT_FRESH), delayedString(JAR_OPTIFINE_FRESH), delayedString(JAR_OPTIFINE_DIFFED));
-        		task.setStandardOutput(System.out);
-        		task.setErrorOutput(System.err);
-        		diff.task = task;
-        		diff.input1 = delayedFile(JAR_CLIENT_FRESH);
-        		diff.input2 = delayedFile(JAR_OPTIFINE_FRESH);
-        		diff.output = delayedFile(JAR_OPTIFINE_DIFFED);
-        		diff.dependsOn(dlClient);
-        	}
-        	
-            JoinJars join = makeTask(TASK_JOIN_JARS, JoinJars.class);
-            {
-                join.client = delayedFile(JAR_CLIENT_FRESH);
-                join.optifine = delayedFile(JAR_OPTIFINE_DIFFED);
-                join.classList = delayedFile(DEOBFUSCATED_CLASSES);
-                join.outJar = delayedFile(JAR_CLIENT_JOINED, true);
-                join.renames = delayedFile(RENAMES_FILE);
-                join.srg = delayedFile(SRG_NOTCH_TO_MCP);
-                join.exclude("javax/");
-                join.exclude("net/minecraftforge/");
-                join.dependsOn(dlClient, diff, extractRenames, TASK_GENERATE_SRGS);
-            }
-            mergeClientJar = JAR_CLIENT_JOINED;
-            mergeDependency = join;
-        }
-        else
-        {
-            mergeClientJar = JAR_CLIENT_FRESH;
-            mergeDependency = dlClient;
-        }
 
         MergeJars merge = makeTask(TASK_MERGE_JARS, MergeJars.class);
         {
-            merge.setClient(delayedFile(mergeClientJar));
+            merge.setClient(delayedFile(JAR_CLIENT_FRESH));
             merge.setServer(delayedFile(JAR_SERVER_PURE));
-            if(isOptifine)
-            {
-                merge.setOutJar(delayedFile(JAR_PREPROCESS));
-            }
-            else
-            {
-                merge.setOutJar(delayedFile(JAR_MERGED, true));
-            }
-            merge.dependsOn(mergeDependency, splitServer);
+            merge.setOutJar(delayedFile(JAR_MERGED));
+            merge.dependsOn(dlClient, splitServer);
 
             merge.setGroup(null);
             merge.setDescription(null);
-        }
-
-        if(isOptifine)
-        {
-            PreProcess preprocess = makeTask(TASK_PREPROCESS, PreProcess.class);
-            {
-                preprocess.inJar = delayedFile(JAR_PREPROCESS);
-                preprocess.outJar = delayedFile(JAR_MERGED, true);
-                preprocess.dependsOn(merge);
-            }
         }
 
         ExtractConfigTask extractMcpData = makeTask(TASK_EXTRACT_MCP, ExtractConfigTask.class);

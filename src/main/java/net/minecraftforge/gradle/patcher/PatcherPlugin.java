@@ -143,7 +143,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
         DeobfuscateJar deobfJar = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
-            deobfJar.setInJar(delayedFile(Constants.JAR_MERGED));
+            deobfJar.setInJar(delayedFile(Constants.JAR_MERGED, true));
             deobfJar.setOutJar(delayedFile(JAR_DEOBF, true));
             deobfJar.setSrg(delayedFile(SRG_NOTCH_TO_SRG));
             deobfJar.setExceptorCfg(delayedFile(EXC_SRG));

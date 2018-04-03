@@ -68,7 +68,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
 
         getExtension().atSources(main, api);
 
-        this.makeDecompTasks(global, local, delayedFile(JAR_MERGED), isOptifine ? TASK_PREPROCESS : TASK_MERGE_JARS, delayedFile(MCP_PATCHES_MERGED), delayedFile(MCP_INJECT));
+        this.makeDecompTasks(global, local, delayedFile(JAR_MERGED, true), isOptifine ? TASK_PREPROCESS : TASK_MERGE_JARS, delayedFile(MCP_PATCHES_MERGED), delayedFile(MCP_INJECT));
 
         // setup userdev
         {
