@@ -3,30 +3,42 @@ package com.github.aucguy.optifinegradle.patcher;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED_PROJECT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_PATCHER_FORGE_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_GEN_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_MAKE_EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH_PROJECT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_ZIP_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DELETE_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_EXTRACT_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_RETRIEVE_REJECTS;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_GEN_PATCHES;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DECOMP;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_DECOMP;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_GEN_PROJECTS;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_DEOBF;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_PROJECT_PATCHED;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_PATCH;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_EXTRACT_SRC;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_EXTRACT_RES;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,19 +47,24 @@ import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Task;
+import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.bundling.Zip;
 
 import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.MakeDir;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
+import com.github.aucguy.optifinegradle.RemapRejects;
 import com.github.aucguy.optifinegradle.RemoveExtras;
+import com.github.aucguy.optifinegradle.RetrieveRejects;
 import com.github.aucguy.optifinegradle.TaskGenPatchesWrapper;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.patcher.PatcherPlugin;
 import net.minecraftforge.gradle.patcher.PatcherProject;
 import net.minecraftforge.gradle.tasks.DeobfuscateJar;
+import net.minecraftforge.gradle.tasks.ExtractTask;
+import net.minecraftforge.gradle.tasks.PatchSourcesTask;
 import net.minecraftforge.gradle.tasks.PostDecompileTask;
 import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
@@ -166,6 +183,83 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         }
     }
     
+    @Override
+    public void createProject(PatcherProject patcher)
+    {
+        super.createProject(patcher);
+        FilterPatches filterPatches = makeTask(projectString(TASK_FILTER_PATCHER_FORGE_PATCHES, patcher), FilterPatches.class);
+        {
+            filterPatches.patchesIn = PatcherProjectWrapper.getDelayedPatchDir(patcher);
+            filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
+            filterPatches.extraExclusions = null;
+            filterPatches.patchesOut = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
+            filterPatches.dependsOn(TASK_DECOMP);
+        }
+        
+        PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(projectString(TASK_PROJECT_PATCH, patcher));
+        {
+            patch.setPatches(delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher)));
+            patch.dependsOn(filterPatches);
+        }
+
+        PatchSourcesTask optifinePatch = makeTask(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher), PatchSourcesTask.class);
+        {
+            optifinePatch.setPatches(PatcherProjectExtras.getDelayedOptifinePatchDir(this, patcher));
+            optifinePatch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
+            optifinePatch.setOutJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
+            optifinePatch.setDoesCache(false);
+            optifinePatch.setMaxFuzz(2);
+            optifinePatch.setFailOnError(false);
+            optifinePatch.setMakeRejects(true);
+            optifinePatch.dependsOn(patch, TASK_MAKE_EMPTY_DIR);
+        }
+
+        Delete deleteRejects = makeTask(projectString(TASK_PROJECT_DELETE_REJECTS, patcher), Delete.class);
+        {
+            deleteRejects.delete(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher));
+            //deletes and depending on depending on settings
+        }
+
+        RetrieveRejects retrieveRejects = makeTask(projectString(TASK_PROJECT_RETRIEVE_REJECTS, patcher), RetrieveRejects.class);
+        {
+            retrieveRejects.inFolder = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
+            retrieveRejects.outZip = delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher));
+        }
+
+        RemapRejects remapRejects = makeTask(projectString(TASK_PROJECT_REMAP_REJECTS, patcher), RemapRejects.class);
+        {
+            remapRejects.setInJar(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
+            remapRejects.setOutJar(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
+            remapRejects.setMethodsCsv(delayedFile(Constants.CSV_METHOD));
+            remapRejects.setFieldsCsv(delayedFile(Constants.CSV_FIELD));
+            remapRejects.setParamsCsv(delayedFile(Constants.CSV_PARAM));
+            remapRejects.setAddsJavadocs(false);
+            remapRejects.setDoesCache(false);
+            remapRejects.dependsOn(retrieveRejects);
+        }
+
+        ExtractTask extractRejects = makeTask(projectString(TASK_PROJECT_EXTRACT_REJECTS, patcher), ExtractTask.class);
+        {
+            // set into() thing in afterEval
+            extractRejects.from(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
+            extractRejects.include("*.java.patch.rej");
+            extractRejects.setDoesCache(false);
+            extractRejects.setClean(true);
+            extractRejects.dependsOn(remapRejects, deleteRejects);
+            //gets depended on depending on settings
+        }
+
+        ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher));
+        {
+            extractSrc.dependsOn(optifinePatch);
+        }
+
+        ExtractTask extractRes = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_RES, patcher));
+        {
+            extractRes.dependsOn(optifinePatch);
+        }
+    }
+
     @Override
     public void afterEvaluate()
     {

@@ -446,84 +446,15 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
     protected void createProject(PatcherProject patcher)
     {
-        FilterPatches filterPatches = null;
-        if(isOptifine)
-        {
-            filterPatches = makeTask(projectString(TASK_FILTER_PATCHER_FORGE_PATCHES, patcher), FilterPatches.class);
-            {
-                filterPatches.patchesIn = patcher.getDelayedPatchDir();
-                filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
-                filterPatches.extraExclusions = null;
-                filterPatches.patchesOut = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
-                filterPatches.dependsOn(TASK_DECOMP);
-            }
-        }
         PatchSourcesTask patch = makeTask(projectString(TASK_PROJECT_PATCH, patcher), PatchSourcesTask.class);
         {
-            if(isOptifine)
-            {
-                patch.setPatches(delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher)));
-                patch.dependsOn(filterPatches);
-            }
-            else
-            {
-                patch.setPatches(patcher.getDelayedPatchDir());
-            }
+            patch.setPatches(patcher.getDelayedPatchDir());
             // inJar is set afterEvaluate depending on the patch order.
             patch.setOutJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
             patch.setDoesCache(false);
             patch.setMaxFuzz(2);
             patch.setFailOnError(false);
             patch.setMakeRejects(true);
-        }
-
-        PatchSourcesTask optifinePatch = null;
-        if(isOptifine)
-        {
-            optifinePatch = makeTask(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher), PatchSourcesTask.class);
-            optifinePatch.setPatches(PatcherProjectExtras.getDelayedOptifinePatchDir(this, patcher));
-            optifinePatch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
-            optifinePatch.setOutJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
-            optifinePatch.setDoesCache(false);
-            optifinePatch.setMaxFuzz(2);
-            optifinePatch.setFailOnError(false);
-            optifinePatch.setMakeRejects(true);
-            optifinePatch.dependsOn(patch, TASK_MAKE_EMPTY_DIR);
-        }
-
-        Delete deleteRejects = makeTask(projectString(TASK_PROJECT_DELETE_REJECTS, patcher), Delete.class);
-        {
-            deleteRejects.delete(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher));
-            //deletes and depending on depending on settings
-        }
-
-        RetrieveRejects retrieveRejects = makeTask(projectString(TASK_PROJECT_RETRIEVE_REJECTS, patcher), RetrieveRejects.class);
-        {
-            retrieveRejects.inFolder = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
-            retrieveRejects.outZip = delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher));
-        }
-
-        RemapRejects remapRejects = makeTask(projectString(TASK_PROJECT_REMAP_REJECTS, patcher), RemapRejects.class);
-        {
-            remapRejects.setInJar(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
-            remapRejects.setOutJar(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
-            remapRejects.setMethodsCsv(delayedFile(Constants.CSV_METHOD));
-            remapRejects.setFieldsCsv(delayedFile(Constants.CSV_FIELD));
-            remapRejects.setParamsCsv(delayedFile(Constants.CSV_PARAM));
-            remapRejects.setAddsJavadocs(false);
-            remapRejects.setDoesCache(false);
-            remapRejects.dependsOn(retrieveRejects);
-        }
-
-        ExtractTask extractRejects = makeTask(projectString(TASK_PROJECT_EXTRACT_REJECTS, patcher), ExtractTask.class);
-        {
-            // set into() thing in afterEval
-            extractRejects.from(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
-            extractRejects.include("*.java.patch.rej");
-            extractRejects.setDoesCache(false);
-            extractRejects.setClean(true);
-            extractRejects.dependsOn(remapRejects, deleteRejects);
-            //gets depended on depending on settings
         }
 
         RemapSources remapTask = makeTask(projectString(TASK_PROJECT_REMAP_JAR, patcher), RemapSources.class);
@@ -554,10 +485,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             extractSrc.setDoesCache(false);
             extractSrc.dependsOn(patch, remapTask, TASK_GEN_PROJECTS);
             // if depends on both remap and patch, itl happen after whichever is second.
-            if(isOptifine)
-            {
-                extractSrc.dependsOn(optifinePatch);
-            }
         }
 
         ExtractTask extractRes = makeTask(projectString(TASK_PROJECT_EXTRACT_RES, patcher), ExtractTask.class);
@@ -568,10 +495,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             extractRes.setDoesCache(false);
             extractRes.dependsOn(patch, remapTask, TASK_GEN_PROJECTS);
             // if depends on both remap and patch, itl happen after whichever is second.
-            if(isOptifine)
-            {
-                extractRes.dependsOn(optifinePatch);
-            }
         }
 
         Task setupTask = makeTask(projectString(TASK_PROJECT_SETUP, patcher));
