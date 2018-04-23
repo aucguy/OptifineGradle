@@ -734,7 +734,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             }
         }
 
-        patchersList = sortByPatching(getExtension().getProjects());
+        List<PatcherProject> patchersList = sortByPatching(getExtension().getProjects());
 
         // tasks to be configured
         Task setupTask = project.getTasks().getByName(TASK_SETUP);
@@ -754,16 +754,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         for (PatcherProject patcher : patchersList)
         {
             patcher.validate(); // validate project
-
-            if(PatcherProjectExtras.getRejectFolder(this, patcher) != null)
-            {
-                ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher));
-                ExtractTask extractRejects = (ExtractTask) project.getTasks().getByName(projectString("extract{CAPNAME}Rejects", patcher));
-                Delete deleteRejects = (Delete) project.getTasks().getByName(projectString("delete{CAPNAME}Rejects", patcher));
-                extractRejects.into(PatcherProjectExtras.getRejectFolder(this, patcher));
-                deleteRejects.delete(PatcherProjectExtras.getRejectFolder(this, patcher));
-                extractSrc.dependsOn(extractRejects);
-            }
 
             if (patcher.isApplyMcpPatches())
             {
@@ -787,15 +777,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                 }
 
                 // configure extract tasks to extract patched
-                Object patched;
-                if(isOptifine) //TODO test
-                {
-                    patched = delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher));
-                }
-                else
-                {
-                    patched = delayedFile(projectString(JAR_PROJECT_PATCHED, patcher));
-                }
+                Object patched = delayedFile(projectString(JAR_PROJECT_PATCHED, patcher));;
                 ((ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher))).from(patched);
                 ((ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_RES, patcher))).from(patched);
             }
@@ -806,18 +788,11 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
                 // configure the patches to happen AFTER remap
 
-                if(isOptifine) //TODO test
-                {
-                    remap.setInJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
-                    remap.dependsOn(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher));
-                }
-                else
-                {
-                    remap.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
-                    remap.dependsOn(patch);
-                }
+                remap.dependsOn(patch);
+                remap.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
+                    
                 // configure patching input and injects
-                if (lastPatcher != null && !isOptifine)
+                if (lastPatcher != null)
                 {
                     patch.dependsOn(projectString(TASK_PROJECT_PATCH, lastPatcher));
                     patch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, lastPatcher)));
@@ -882,7 +857,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             if (patcher.doesGenPatches())
             {
                 TaskGenPatches genPatches = makeTask(projectString(TASK_PROJECT_GEN_PATCHES, patcher), TaskGenPatches.class);
-                genPatches.setPatchDir(PatcherProjectExtras.getOutputPatchDir(patcher));
+                genPatches.setPatchDir(patcher.getPatchDir());
                 genPatches.setOriginalPrefix(patcher.getPatchPrefixOriginal());
                 genPatches.setChangedPrefix(patcher.getPatchPrefixChanged());
                 //genPatches.getOutputs().upToDateWhen(CALL_FALSE);
@@ -919,17 +894,9 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                     else
                     {
                         PatcherProject genFrom = getExtension().getProjects().getByName(patcher.getGenPatchesFrom());
-                        if(PatcherProjectExtras.getsModified(genFrom))
-                        {
-                            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETROMAPPED, genFrom)));
-                            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETRO_NONMC, genFrom)));
-                            genPatches.dependsOn(projectString(TASK_PROJECT_RETROMAP, genFrom), projectString(TASK_PROJECT_RETRO_NONMC, genFrom));
-                        }
-                        else
-                        {
-                            genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_PATCHED, genFrom)));
-                            genPatches.dependsOn(projectString(TASK_PROJECT_PATCH, genFrom));
-                        }
+                        genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETROMAPPED, genFrom)));
+                        genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_RETRO_NONMC, genFrom)));
+                        genPatches.dependsOn(projectString(TASK_PROJECT_RETROMAP, genFrom), projectString(TASK_PROJECT_RETRO_NONMC, genFrom));
                     }
                 }
             }

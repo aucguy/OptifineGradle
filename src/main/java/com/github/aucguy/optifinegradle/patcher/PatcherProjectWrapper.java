@@ -1,6 +1,7 @@
 package com.github.aucguy.optifinegradle.patcher;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.github.aucguy.optifinegradle.ReflectHelper;
@@ -11,9 +12,15 @@ import net.minecraftforge.gradle.patcher.PatcherProject;
 public class PatcherProjectWrapper
 {
     protected static Method getDelayedPatchDirMethod = ReflectHelper.getMethod(PatcherProject.class, "getDelayedPatchDir");
+    protected static Method doesGenPatchesMethod = ReflectHelper.getMethod(PatcherProject.class, "doesGenPatches");
     
     public static Closure<File> getDelayedPatchDir(PatcherProject patcher)
     {
         return (Closure<File>) ReflectHelper.invoke(getDelayedPatchDirMethod, patcher);
+    }
+
+    public static boolean doesGenPatches(PatcherProject patcher)
+    {
+        return (Boolean) ReflectHelper.invoke(doesGenPatchesMethod, patcher);
     }
 }

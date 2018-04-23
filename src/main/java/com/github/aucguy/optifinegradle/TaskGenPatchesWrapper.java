@@ -1,9 +1,11 @@
 package com.github.aucguy.optifinegradle;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -20,8 +22,9 @@ public class TaskGenPatchesWrapper
     private Method addOriginalSourceMethod;
     private Method getChangedSourceMethod;
     private Method addChangedSourceMethod;
+    private Field originalsField;
     
-    protected Task instance;
+    public Task instance;
     
     public TaskGenPatchesWrapper(Task instance)
     {
@@ -31,6 +34,8 @@ public class TaskGenPatchesWrapper
         addOriginalSourceMethod = getMethod("addOriginalSource");
         getChangedSourceMethod = getMethod("getChangedSource");
         addChangedSourceMethod = getMethod("addChangedSource");
+        setPatchDirMethod = getMethod("setPatchDir");
+        originalsField = getField("originals");
     }
     
     private Method getMethod(String name)
@@ -51,6 +56,24 @@ public class TaskGenPatchesWrapper
         throw(new RuntimeException("method not found: " + name));
     }
     
+    private Field getField(String name)
+    {
+        Class<?> clazz = instance.getClass();
+        while(clazz != null)
+        {
+            for(Field field : clazz.getDeclaredFields())
+            {
+                if(field.getName().equals(name))
+                {
+                    field.setAccessible(true);
+                    return field;
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+        throw(new RuntimeException("field not found: " + name));
+    }
+
     public static TaskGenPatchesWrapper makeTask(BasePlugin plugin, String name)
     {
         Class<?> clazz;
@@ -65,7 +88,7 @@ public class TaskGenPatchesWrapper
         return new TaskGenPatchesWrapper(plugin.makeTask(name, clazz));
     }
 
-    public void setPatchDir(DelayedFile delayedFile)
+    public void setPatchDir(Object delayedFile)
     {
         try
         {
@@ -89,7 +112,7 @@ public class TaskGenPatchesWrapper
         }
     }
 
-    public void addOriginalSource(File file)
+    public void addOriginalSource(Object file)
     {
         try
         {
@@ -133,5 +156,17 @@ public class TaskGenPatchesWrapper
     public void dependsOn(Object dependency)
     {
         instance.dependsOn(dependency);
+    }
+
+    public void setOriginals(LinkedList<Object> originals)
+    {
+        try
+        {
+            originalsField.set(instance, originals);
+        }
+        catch (IllegalArgumentException | IllegalAccessException e)
+        {
+            throw(new RuntimeException(e));
+        }
     }
 }

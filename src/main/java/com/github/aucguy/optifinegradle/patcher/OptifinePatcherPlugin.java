@@ -35,12 +35,17 @@ import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.J
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_PATCH;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_EXTRACT_SRC;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_EXTRACT_RES;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_REMAP_JAR;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DECOMP_POST;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_RETROMAP;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.gradle.api.Action;
@@ -66,6 +71,7 @@ import net.minecraftforge.gradle.tasks.DeobfuscateJar;
 import net.minecraftforge.gradle.tasks.ExtractTask;
 import net.minecraftforge.gradle.tasks.PatchSourcesTask;
 import net.minecraftforge.gradle.tasks.PostDecompileTask;
+import net.minecraftforge.gradle.tasks.RemapSources;
 import net.minecraftforge.gradle.tasks.fernflower.ApplyFernFlowerTask;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
 
@@ -266,6 +272,55 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         super.afterEvaluate();
         delegate.afterEvaluate();
         
+        List<PatcherProject> patchersList = PatcherPluginWrapper.sortByPatching(this, getExtension().getProjects());
+        for(PatcherProject patcher : patchersList)
+        {
+            if(PatcherProjectExtras.getRejectFolder(this, patcher) != null)
+            {
+                ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher));
+                ExtractTask extractRejects = (ExtractTask) project.getTasks().getByName(projectString("extract{CAPNAME}Rejects", patcher));
+                Delete deleteRejects = (Delete) project.getTasks().getByName(projectString("delete{CAPNAME}Rejects", patcher));
+                extractRejects.into(PatcherProjectExtras.getRejectFolder(this, patcher));
+                deleteRejects.delete(PatcherProjectExtras.getRejectFolder(this, patcher));
+                extractSrc.dependsOn(extractRejects);
+            }
+
+            if(patcher.isApplyMcpPatches())
+            {
+                throw(new RuntimeException("applyMcpPatches option for project " + patcher.getName() + " not supported for optifinegradle"));
+                //TODO remove JAR_PROJECT_PATCHED and add OPTIFINE_PATCHED_PROJECT to TASK_PROJECT_EXTRACT_SRC and TASK_PROJECT_EXTRACT_RES
+            }
+            else
+            {
+                PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(projectString(TASK_PROJECT_PATCH, patcher));
+                RemapSources remap = (RemapSources) project.getTasks().getByName(projectString(TASK_PROJECT_REMAP_JAR, patcher));
+                remap.setInJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
+                remap.dependsOn(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher));
+
+                patch.setInjects(new LinkedList<Object>());
+                patch.setInJar(delayedFile(JAR_DECOMP_POST));
+            }
+
+            if(PatcherProjectWrapper.doesGenPatches(patcher))
+            {
+                TaskGenPatchesWrapper genPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(projectString(TASK_PROJECT_GEN_PATCHES, patcher)));
+                PatcherProject genFrom = getExtension().getProjects().getByName(patcher.getGenPatchesFrom());
+                genPatches.setPatchDir(PatcherProjectExtras.getOutputPatchDir(patcher));
+
+                if(!PatcherProjectExtras.getsModified(genFrom))
+                {
+                    //clear from PatcherPlugin.afterEvaluate
+                    genPatches.setOriginals(new LinkedList<Object>());
+                    List<Object> dependencies = new LinkedList<Object>();
+                    dependencies.add(projectString(TASK_PROJECT_RETROMAP, patcher));
+                    genPatches.instance.setDependsOn(dependencies);
+
+                    genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_PATCHED, genFrom)));
+                    genPatches.dependsOn(projectString(TASK_PROJECT_PATCH, genFrom));
+                }
+            }
+        }
+
         for(OptifinePatcherProject optifinePatcherProject : projects.values())
         {
             for(PatcherProject patcherProject : patchersList)
