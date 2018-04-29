@@ -916,12 +916,12 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
     public DelayedFile delayedFile(String path, boolean optifine)
     {
-        String modpath = path.replace(".jar", "-optifine.jar");
+        /*String modpath = path.replace(".jar", "-optifine.jar");
         if((isOptifine && optifine) || optifineFiles.contains(path))
         {
             optifineFiles.add(path);
             path = modpath;
-        }
+        }*/
         return fileCache.getUnchecked(path);
     }
 

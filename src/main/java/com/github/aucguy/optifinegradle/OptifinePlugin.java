@@ -7,6 +7,9 @@ import static net.minecraftforge.gradle.common.Constants.SRG_NOTCH_TO_MCP;
 import static net.minecraftforge.gradle.common.Constants.TASK_GENERATE_SRGS;
 import static net.minecraftforge.gradle.common.Constants.TASK_DL_CLIENT;
 import static net.minecraftforge.gradle.common.Constants.TASK_MERGE_JARS;
+import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
+import static net.minecraftforge.gradle.common.Constants.REPLACE_PROJECT_CACHE_DIR;
+import static net.minecraftforge.gradle.common.Constants.REPLACE_BUILD_DIR;
 
 import java.util.Scanner;
 
@@ -34,7 +37,10 @@ public class OptifinePlugin
 
     public void applyPlugin(Class<? extends OptifineExtension> extensionClass)
     {
-    	extension = plugin.project.getExtensions().create(EXTENSION, extensionClass);
+        modifyReplacement(REPLACE_CACHE_DIR);
+        modifyReplacement(REPLACE_BUILD_DIR);
+        modifyReplacement(REPLACE_PROJECT_CACHE_DIR);
+        extension = plugin.project.getExtensions().create(EXTENSION, extensionClass);
 
     	ExtractRenames extractRenames = plugin.makeTask(TASK_EXTRACT_RENAMES, ExtractRenames.class);
         {
@@ -91,6 +97,15 @@ public class OptifinePlugin
         plugin.replacer.putReplacement(REPLACE_PATCH_URL, extension.getPatchURL());
         plugin.replacer.putReplacement(REPLACE_OPTIFINE_JAR, extension.getOptifineJar());
         plugin.replacer.putReplacement(REPLACE_MAIN_DIR, plugin.project.getBuildFile().getParent());
+    }
+
+    public void modifyReplacement(String key)
+    {
+        if (key.charAt(0) == '{' && key.charAt(key.length() - 1) == '}')
+        {
+            key = key.substring(1, key.length() - 1);
+        }
+        plugin.replacer.putReplacement(key, plugin.replacer.get(key) + "-optifine");
     }
 
     public void askPermission()
