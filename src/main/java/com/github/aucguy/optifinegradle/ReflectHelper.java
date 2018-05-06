@@ -1,5 +1,6 @@
 package com.github.aucguy.optifinegradle;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -34,6 +35,40 @@ public class ReflectHelper
             return method.invoke(self, parameters);
         }
         catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+        {
+            throw(new RuntimeException(e));
+        }
+    }
+
+    public static Field getField(Class<?> clazz, String name)
+    {
+        Field field = null;
+        while(clazz != null && field == null)
+        {
+            try
+            {
+                field = clazz.getDeclaredField(name);
+            }
+            catch(NoSuchFieldException | SecurityException e)
+            {
+            }
+            clazz = clazz.getSuperclass();
+        }
+        if(field == null)
+        {
+            throw(new RuntimeException(name + " method not found on class " + clazz.getName()));
+        }
+        field.setAccessible(true);
+        return field;
+    }
+
+    public static Object accessField(Field field, Object self)
+    {
+        try
+        {
+            return field.get(self);
+        }
+        catch (IllegalAccessException | IllegalArgumentException e)
         {
             throw(new RuntimeException(e));
         }

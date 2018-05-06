@@ -11,11 +11,14 @@ import static net.minecraftforge.gradle.common.Constants.CSV_FIELD;
 import static net.minecraftforge.gradle.common.Constants.CSV_METHOD;
 import static net.minecraftforge.gradle.common.Constants.CSV_PARAM;
 
+import java.util.List;
+
 import org.gradle.api.Task;
 
 import com.github.aucguy.optifinegradle.patcher.DeobfuscateJar;
 import com.github.aucguy.optifinegradle.patcher.GetCallersTask;
 import com.github.aucguy.optifinegradle.patcher.OptifinePatcherPlugin;
+import com.github.aucguy.optifinegradle.patcher.PatcherPluginWrapper;
 
 public class OptifineTestPlugin extends OptifinePatcherPlugin
 {	
@@ -47,16 +50,17 @@ public class OptifineTestPlugin extends OptifinePatcherPlugin
 	{
 		super.afterEvaluate();
         Task deobfuscateJar = project.getTasks().getByName(TASK_DEOBFUSCATE_JAR);
+        List<PatcherProject> patchersList = PatcherPluginWrapper.sortByPatching(this, getExtension().getProjects());
         
         for(PatcherProject patcher : patchersList)
         {
-        	DeobfuscateJar deobfTask = makeTask(projectString(TASK_PROJECT_DEOBFUSCATE, patcher), DeobfuscateJar.class);
+        	DeobfuscateJar deobfTask = makeTask(PatcherPluginWrapper.projectString(this, TASK_PROJECT_DEOBFUSCATE, patcher), DeobfuscateJar.class);
         	{
         		deobfTask.inJar = delayedFile(JAR_DEOBF);
         		deobfTask.methodsCsv = delayedFile(CSV_METHOD);
         		deobfTask.fieldsCsv = delayedFile(CSV_FIELD);
         		deobfTask.paramsCsv = delayedFile(CSV_PARAM);
-        		deobfTask.outJar = delayedFile(projectString(JAR_DEOBFUSCATED, patcher));
+        		deobfTask.outJar = delayedFile(PatcherPluginWrapper.projectString(this, JAR_DEOBFUSCATED, patcher));
         		deobfuscateJar.dependsOn(deobfTask);
         	}
         }
@@ -65,7 +69,7 @@ public class OptifineTestPlugin extends OptifinePatcherPlugin
         
         GetCallersTask getCallers = makeTask(TASK_GET_CALLERS, GetCallersTask.class);
         {
-        	getCallers.inJar = delayedFile(projectString(JAR_DEOBFUSCATED, projectMod));
+        	getCallers.inJar = delayedFile(PatcherPluginWrapper.projectString(this, JAR_DEOBFUSCATED, projectMod));
         	getCallers.searchMethod = (String) project.getProperties().get("searchMethod");
         	getCallers.setGroup(GROUP_OPTIFINE);
         	getCallers.setDescription("searches the deobfuscated binary jar for a call of a particular method");

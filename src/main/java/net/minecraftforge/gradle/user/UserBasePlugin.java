@@ -309,16 +309,15 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
             deobfBin.setMethodCsv(delayedFile(CSV_METHOD));
             deobfBin.setApplyMarkers(false);
             deobfBin.setInJar(inputJar);
-
-            deobfBin.setOutJar(chooseDeobfOutput(globalPattern, localPattern, "Bin", "", true));
+            deobfBin.setOutJar(chooseDeobfOutput(globalPattern, localPattern, "Bin", ""));
             deobfBin.dependsOn(inputTask, TASK_GENERATE_SRGS, TASK_EXTRACT_DEP_ATS, TASK_DD_COMPILE, TASK_DD_PROVIDED);
         }
 
-        final Object deobfDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "srgBin", true);
-        final Object decompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decomp", true);
-        final Object postDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decompFixed", true);
-        final Object remapped = chooseDeobfOutput(globalPattern, localPattern, "Src", "sources", true);
-        final Object recompiledJar = chooseDeobfOutput(globalPattern, localPattern, "Src", "", true);
+        final Object deobfDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "srgBin");
+        final Object decompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decomp");
+        final Object postDecompJar = chooseDeobfOutput(globalPattern, localPattern, "", "decompFixed");
+        final Object remapped = chooseDeobfOutput(globalPattern, localPattern, "Src", "sources");
+        final Object recompiledJar = chooseDeobfOutput(globalPattern, localPattern, "Src", "");
 
         final DeobfuscateJar deobfDecomp = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
@@ -343,8 +342,8 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
         final PostDecompileTask postDecomp = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
             postDecomp.setInJar(decompJar);
-            postDecomp.setPatches(mcpPatchSet);
             postDecomp.setOutJar(postDecompJar);
+            postDecomp.setPatches(mcpPatchSet);
             postDecomp.setInjects(mcpInject);
             postDecomp.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
             postDecomp.dependsOn(decompile);
@@ -451,21 +450,16 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
      * @return useable deobfsucated output file
      */
     @SuppressWarnings("serial")
-    protected final Object chooseDeobfOutput(final String globalPattern, final String localPattern, final String appendage, final String classifier, final boolean optifine)
+    protected final Object chooseDeobfOutput(final String globalPattern, final String localPattern, final String appendage, final String classifier)
     {
         return new Closure<DelayedFile>(UserBasePlugin.class) {
             public DelayedFile call()
             {
                 String classAdd = Strings.isNullOrEmpty(classifier) ? "" : "-" + classifier;
                 String str = useLocalCache(getExtension()) ? localPattern : globalPattern;
-                return delayedFile(String.format(str, appendage) + classAdd + ".jar", optifine);
+                return delayedFile(String.format(str, appendage) + classAdd + ".jar");
             }
         };
-    }
-
-    protected final Object chooseDeobfOutput(String globalPattern, String localPattern, String appendage, String classifier)
-    {
-        return chooseDeobfOutput(globalPattern, localPattern, appendage, classifier, false);
     }
 
     /**
@@ -823,6 +817,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                 retromap.dependsOn(TASK_GENERATE_SRGS, extractRangemap);
 
                 // TODO: add replacing extract task
+
 
                 // for replaced sources
                 rangeMap = delayedFile(getSourceSetFormatted(set, TMPL_RANGEMAP_RPL));

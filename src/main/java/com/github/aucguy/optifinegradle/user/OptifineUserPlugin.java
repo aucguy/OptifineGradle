@@ -16,12 +16,21 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.USER_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
+import static net.minecraftforge.gradle.common.Constants.REPLACE_ASSET_INDEX;
+import static net.minecraftforge.gradle.common.Constants.TASK_DL_VERSION_JSON;
+import static net.minecraftforge.gradle.common.Constants.TASK_MERGE_JARS;   
 import static net.minecraftforge.gradle.user.UserConstants.*;
 import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.TASK_PATCH;
 import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.ZIP_UD_PATCHES;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.io.File;
 
 import com.github.aucguy.optifinegradle.ExtractRenames;
@@ -29,8 +38,11 @@ import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.OptifineExtension;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 import com.github.aucguy.optifinegradle.RemoveExtras;
+import com.github.aucguy.optifinegradle.patcher.PatcherPluginWrapper;
 
 import groovy.lang.Closure;
+import net.minecraftforge.gradle.tasks.DeobfuscateJar;
+import net.minecraftforge.gradle.tasks.EtagDownloadTask;
 import net.minecraftforge.gradle.tasks.PatchSourcesTask;
 import net.minecraftforge.gradle.tasks.PostDecompileTask;
 import net.minecraftforge.gradle.tasks.RemapSources;
@@ -45,14 +57,35 @@ public class OptifineUserPlugin extends ForgePlugin
     {
         super();
         delegate = new OptifinePlugin(this);
-        delegate.init();
     }
     
     @Override
     public void applyUserPlugin()
     {
+        delegate.applyRenames();
         super.applyUserPlugin();
         delegate.applyPlugin(OptifineExtension.class);
+
+        replacer.putReplacement(REPLACE_ASSET_INDEX, "tmp");
+        EtagDownloadTask getVersionJson = (EtagDownloadTask) project.getTasks().getByName(TASK_DL_VERSION_JSON);
+        getVersionJson.doFirst(new Closure<Object>(OptifineUserPlugin.class)
+        {
+            @Override
+            public Object call()
+            {
+                Map<String, String> replaceMap = (Map<String, String>) ReplacementProviderWrapper.getReplaceMap(replacer);
+                replaceMap.remove(REPLACE_ASSET_INDEX);
+                return null;
+            }
+        });
+
+        DeobfuscateJar deobfBin = (DeobfuscateJar) project.getTasks().getByName(TASK_DEOBF);
+        {
+            List<Object> dependencies = new LinkedList<Object>(deobfBin.getDependsOn());
+            dependencies.remove(TASK_MERGE_JARS);
+            dependencies.add(0, TASK_PREPROCESS);
+            deobfBin.setDependsOn(dependencies);
+        }
 
         DownloadWithFile dlPatches = makeTask(TASK_DL_PATCHES, DownloadWithFile.class);
         {

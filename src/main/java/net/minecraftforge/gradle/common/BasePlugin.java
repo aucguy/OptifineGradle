@@ -19,7 +19,6 @@
  */
 package net.minecraftforge.gradle.common;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.common.Constants.*;
 
 import java.io.File;
@@ -29,11 +28,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.minecraftforge.gradle.util.json.version.ManifestVersion;
 import org.gradle.api.Action;
@@ -52,13 +50,8 @@ import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.Delete;
-import org.gradle.api.tasks.Exec;
 import org.gradle.testfixtures.ProjectBuilder;
 
-import com.github.aucguy.optifinegradle.CacheWrapper;
-import com.github.aucguy.optifinegradle.ExtractRenames;
-import com.github.aucguy.optifinegradle.PreProcess;
-import com.github.aucguy.optifinegradle.user.JoinJars;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -96,18 +89,13 @@ import net.minecraftforge.gradle.util.json.fgversion.FGBuildStatus;
 import net.minecraftforge.gradle.util.json.fgversion.FGVersion;
 import net.minecraftforge.gradle.util.json.fgversion.FGVersionWrapper;
 import net.minecraftforge.gradle.util.json.version.Version;
-
 public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Project>
 {
-    public boolean isOptifine = false;
     private static final Logger LOGGER = Logging.getLogger(BasePlugin.class);
 
     public Project       project;
     public BasePlugin<?> otherPlugin;
     public ReplacementProvider replacer = new ReplacementProvider();
-
-
-    public Set<String> optifineFiles = new HashSet<String>();
 
     private Map<String, ManifestVersion> mcManifest;
     private Version                      mcVersionJson;
@@ -153,11 +141,10 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
             replacer.putReplacement(REPLACE_PROJECT_CACHE_DIR, projectCacheDir.getAbsolutePath());
 
-            //commented out temporary
             FileLogListenner listener = new FileLogListenner(new File(projectCacheDir, "gradle.log"));
-            /*project.getLogging().addStandardOutputListener(listener);
+            project.getLogging().addStandardOutputListener(listener);
             project.getLogging().addStandardErrorListener(listener);
-            project.getGradle().addBuildListener(listener);*/
+            project.getGradle().addBuildListener(listener);
         }
 
         // extension objects
@@ -447,7 +434,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                         Files.write(buf.toString().getBytes(Charsets.UTF_8), json);
 
                         // grab the AssetIndex if it isnt already there
-                        if (replacer.get(REPLACE_ASSET_INDEX) == null || replacer.get(REPLACE_ASSET_INDEX) == "tmp")
+                        if (!replacer.hasReplacement(REPLACE_ASSET_INDEX))
                         {
                             parseAndStoreVersion(json, json.getParentFile());
                         }
@@ -467,9 +454,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 }
             });
         }
-        
-        replacer.putReplacement(REPLACE_ASSET_INDEX, "tmp");
-        
+
         ExtractConfigTask extractNatives = makeTask(TASK_EXTRACT_NATIVES, ExtractConfigTask.class);
         {
             extractNatives.setDestinationDir(delayedFile(DIR_NATIVES));
@@ -621,7 +606,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
     public <T extends Task> T makeTask(String name, Class<T> type)
     {
-        return makeTask(project, name, type, isOptifine);
+        return makeTask(project, name, type);
     }
 
     public <T extends Task> T maybeMakeTask(String name, Class<T> type)
@@ -634,7 +619,7 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
         return (T) proj.getTasks().maybeCreate(name, type);
     }
 
-    public static <T extends Task> T makeTask(Project proj, String name, Class<T> type, boolean optifine)
+    public static <T extends Task> T makeTask(Project proj, String name, Class<T> type)
     {
         return (T) proj.getTasks().create(name, type);
     }
@@ -911,17 +896,6 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
 
     public DelayedFile delayedFile(String path)
     {
-        return delayedFile(path, false);
-    }
-
-    public DelayedFile delayedFile(String path, boolean optifine)
-    {
-        /*String modpath = path.replace(".jar", "-optifine.jar");
-        if((isOptifine && optifine) || optifineFiles.contains(path))
-        {
-            optifineFiles.add(path);
-            path = modpath;
-        }*/
         return fileCache.getUnchecked(path);
     }
 

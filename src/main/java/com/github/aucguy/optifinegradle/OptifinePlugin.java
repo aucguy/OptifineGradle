@@ -1,6 +1,7 @@
 package com.github.aucguy.optifinegradle;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.*;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_RETROMAP;
 import static net.minecraftforge.gradle.common.Constants.JAR_CLIENT_FRESH;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
 import static net.minecraftforge.gradle.common.Constants.SRG_NOTCH_TO_MCP;
@@ -11,10 +12,14 @@ import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_PROJECT_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_BUILD_DIR;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
+import org.gradle.api.Task;
 import org.gradle.api.tasks.Exec;
 
+import com.github.aucguy.optifinegradle.patcher.PatcherPluginWrapper;
 import com.github.aucguy.optifinegradle.user.JoinJars;
 
 import net.minecraftforge.gradle.common.BasePlugin;
@@ -30,16 +35,15 @@ public class OptifinePlugin
         plugin = x;
     }
     
-    public void init()
-    {
-        plugin.isOptifine = true;
-    }
-
-    public void applyPlugin(Class<? extends OptifineExtension> extensionClass)
+    public void applyRenames()
     {
         modifyReplacement(REPLACE_CACHE_DIR);
         modifyReplacement(REPLACE_BUILD_DIR);
         modifyReplacement(REPLACE_PROJECT_CACHE_DIR);
+    }
+
+    public void applyPlugin(Class<? extends OptifineExtension> extensionClass)
+    {
         extension = plugin.project.getExtensions().create(EXTENSION, extensionClass);
 
     	ExtractRenames extractRenames = plugin.makeTask(TASK_EXTRACT_RENAMES, ExtractRenames.class);
@@ -67,7 +71,7 @@ public class OptifinePlugin
             join.client = plugin.delayedFile(JAR_CLIENT_FRESH);
             join.optifine = plugin.delayedFile(JAR_OPTIFINE_DIFFED);
             join.classList = plugin.delayedFile(DEOBFUSCATED_CLASSES);
-            join.outJar = plugin.delayedFile(JAR_CLIENT_JOINED, true);
+            join.outJar = plugin.delayedFile(JAR_CLIENT_JOINED);
             join.renames = plugin.delayedFile(RENAMES_FILE);
             join.srg = plugin.delayedFile(SRG_NOTCH_TO_MCP);
             join.exclude("javax/");
@@ -85,7 +89,7 @@ public class OptifinePlugin
         PreProcess preprocess = plugin.makeTask(TASK_PREPROCESS, PreProcess.class);
         {
             preprocess.inJar = plugin.delayedFile(JAR_PREPROCESS);
-            preprocess.outJar = plugin.delayedFile(JAR_MERGED, true);
+            preprocess.outJar = plugin.delayedFile(JAR_MERGED);
             preprocess.dependsOn(merge);
         }
     }

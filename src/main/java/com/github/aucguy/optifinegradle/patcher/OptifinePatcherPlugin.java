@@ -38,8 +38,8 @@ import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.T
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_REMAP_JAR;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DECOMP_POST;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_RETROMAP;
+import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_POST_DECOMP;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
-import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
 
 import java.io.File;
 import java.util.Arrays;
@@ -84,13 +84,13 @@ public class OptifinePatcherPlugin extends PatcherPlugin
     {
         super();
         delegate = new OptifinePlugin(this);
-        delegate.init();
         projects = new HashMap<String, OptifinePatcherProject>();
     }
     
     @Override
     public void applyPlugin()
     {
+        delegate.applyRenames();
         super.applyPlugin();
         delegate.applyPlugin(OptifinePatcherExtension.class);
 
@@ -193,26 +193,26 @@ public class OptifinePatcherPlugin extends PatcherPlugin
     public void createProject(PatcherProject patcher)
     {
         super.createProject(patcher);
-        FilterPatches filterPatches = makeTask(projectString(TASK_FILTER_PATCHER_FORGE_PATCHES, patcher), FilterPatches.class);
+        FilterPatches filterPatches = makeTask(PatcherPluginWrapper.projectString(this, TASK_FILTER_PATCHER_FORGE_PATCHES, patcher), FilterPatches.class);
         {
             filterPatches.patchesIn = PatcherProjectWrapper.getDelayedPatchDir(patcher);
             filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
             filterPatches.extraExclusions = null;
-            filterPatches.patchesOut = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
+            filterPatches.patchesOut = delayedFile(PatcherPluginWrapper.projectString(this, FORGE_FILTERED_PATCHER_PATCHES, patcher));
             filterPatches.dependsOn(TASK_DECOMP);
         }
         
-        PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(projectString(TASK_PROJECT_PATCH, patcher));
+        PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_PATCH, patcher));
         {
-            patch.setPatches(delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher)));
+            patch.setPatches(delayedFile(PatcherPluginWrapper.projectString(this, FORGE_FILTERED_PATCHER_PATCHES, patcher)));
             patch.dependsOn(filterPatches);
         }
 
-        PatchSourcesTask optifinePatch = makeTask(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher), PatchSourcesTask.class);
+        PatchSourcesTask optifinePatch = makeTask(PatcherPluginWrapper.projectString(this, TASK_OPTIFINE_PATCH_PROJECT, patcher), PatchSourcesTask.class);
         {
             optifinePatch.setPatches(PatcherProjectExtras.getDelayedOptifinePatchDir(this, patcher));
-            optifinePatch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
-            optifinePatch.setOutJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
+            optifinePatch.setInJar(delayedFile(PatcherPluginWrapper.projectString(this, JAR_PROJECT_PATCHED, patcher)));
+            optifinePatch.setOutJar(delayedFile(PatcherPluginWrapper.projectString(this, OPTIFINE_PATCHED_PROJECT, patcher)));
             optifinePatch.setDoesCache(false);
             optifinePatch.setMaxFuzz(2);
             optifinePatch.setFailOnError(false);
@@ -220,22 +220,22 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             optifinePatch.dependsOn(patch, TASK_MAKE_EMPTY_DIR);
         }
 
-        Delete deleteRejects = makeTask(projectString(TASK_PROJECT_DELETE_REJECTS, patcher), Delete.class);
+        Delete deleteRejects = makeTask(PatcherPluginWrapper.projectString(this, TASK_PROJECT_DELETE_REJECTS, patcher), Delete.class);
         {
-            deleteRejects.delete(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher));
+            deleteRejects.delete(PatcherPluginWrapper.projectString(this, PROJECT_REMAPPED_REJECTS_ZIP, patcher));
             //deletes and depending on depending on settings
         }
 
-        RetrieveRejects retrieveRejects = makeTask(projectString(TASK_PROJECT_RETRIEVE_REJECTS, patcher), RetrieveRejects.class);
+        RetrieveRejects retrieveRejects = makeTask(PatcherPluginWrapper.projectString(this, TASK_PROJECT_RETRIEVE_REJECTS, patcher), RetrieveRejects.class);
         {
-            retrieveRejects.inFolder = delayedFile(projectString(FORGE_FILTERED_PATCHER_PATCHES, patcher));
-            retrieveRejects.outZip = delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher));
+            retrieveRejects.inFolder = delayedFile(PatcherPluginWrapper.projectString(this, FORGE_FILTERED_PATCHER_PATCHES, patcher));
+            retrieveRejects.outZip = delayedFile(PatcherPluginWrapper.projectString(this, PROJECT_REJECTS_ZIP, patcher));
         }
 
-        RemapRejects remapRejects = makeTask(projectString(TASK_PROJECT_REMAP_REJECTS, patcher), RemapRejects.class);
+        RemapRejects remapRejects = makeTask(PatcherPluginWrapper.projectString(this, TASK_PROJECT_REMAP_REJECTS, patcher), RemapRejects.class);
         {
-            remapRejects.setInJar(delayedFile(projectString(PROJECT_REJECTS_ZIP, patcher)));
-            remapRejects.setOutJar(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
+            remapRejects.setInJar(delayedFile(PatcherPluginWrapper.projectString(this, PROJECT_REJECTS_ZIP, patcher)));
+            remapRejects.setOutJar(delayedFile(PatcherPluginWrapper.projectString(this, PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
             remapRejects.setMethodsCsv(delayedFile(Constants.CSV_METHOD));
             remapRejects.setFieldsCsv(delayedFile(Constants.CSV_FIELD));
             remapRejects.setParamsCsv(delayedFile(Constants.CSV_PARAM));
@@ -244,10 +244,10 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             remapRejects.dependsOn(retrieveRejects);
         }
 
-        ExtractTask extractRejects = makeTask(projectString(TASK_PROJECT_EXTRACT_REJECTS, patcher), ExtractTask.class);
+        ExtractTask extractRejects = makeTask(PatcherPluginWrapper.projectString(this, TASK_PROJECT_EXTRACT_REJECTS, patcher), ExtractTask.class);
         {
             // set into() thing in afterEval
-            extractRejects.from(delayedFile(projectString(PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
+            extractRejects.from(delayedFile(PatcherPluginWrapper.projectString(this, PROJECT_REMAPPED_REJECTS_ZIP, patcher)));
             extractRejects.include("*.java.patch.rej");
             extractRejects.setDoesCache(false);
             extractRejects.setClean(true);
@@ -255,12 +255,12 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             //gets depended on depending on settings
         }
 
-        ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher));
+        ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_EXTRACT_SRC, patcher));
         {
             extractSrc.dependsOn(optifinePatch);
         }
 
-        ExtractTask extractRes = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_RES, patcher));
+        ExtractTask extractRes = (ExtractTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_EXTRACT_RES, patcher));
         {
             extractRes.dependsOn(optifinePatch);
         }
@@ -277,9 +277,9 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         {
             if(PatcherProjectExtras.getRejectFolder(this, patcher) != null)
             {
-                ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher));
-                ExtractTask extractRejects = (ExtractTask) project.getTasks().getByName(projectString("extract{CAPNAME}Rejects", patcher));
-                Delete deleteRejects = (Delete) project.getTasks().getByName(projectString("delete{CAPNAME}Rejects", patcher));
+                ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_EXTRACT_SRC, patcher));
+                ExtractTask extractRejects = (ExtractTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, "extract{CAPNAME}Rejects", patcher));
+                Delete deleteRejects = (Delete) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, "delete{CAPNAME}Rejects", patcher));
                 extractRejects.into(PatcherProjectExtras.getRejectFolder(this, patcher));
                 deleteRejects.delete(PatcherProjectExtras.getRejectFolder(this, patcher));
                 extractSrc.dependsOn(extractRejects);
@@ -292,10 +292,10 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             }
             else
             {
-                PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(projectString(TASK_PROJECT_PATCH, patcher));
-                RemapSources remap = (RemapSources) project.getTasks().getByName(projectString(TASK_PROJECT_REMAP_JAR, patcher));
-                remap.setInJar(delayedFile(projectString(OPTIFINE_PATCHED_PROJECT, patcher)));
-                remap.dependsOn(projectString(TASK_OPTIFINE_PATCH_PROJECT, patcher));
+                PatchSourcesTask patch = (PatchSourcesTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_PATCH, patcher));
+                RemapSources remap = (RemapSources) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_REMAP_JAR, patcher));
+                remap.setInJar(delayedFile(PatcherPluginWrapper.projectString(this, OPTIFINE_PATCHED_PROJECT, patcher)));
+                remap.dependsOn(PatcherPluginWrapper.projectString(this, TASK_OPTIFINE_PATCH_PROJECT, patcher));
 
                 patch.setInjects(new LinkedList<Object>());
                 patch.setInJar(delayedFile(JAR_DECOMP_POST));
@@ -303,7 +303,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
 
             if(PatcherProjectWrapper.doesGenPatches(patcher))
             {
-                TaskGenPatchesWrapper genPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(projectString(TASK_PROJECT_GEN_PATCHES, patcher)));
+                TaskGenPatchesWrapper genPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_GEN_PATCHES, patcher)));
                 PatcherProject genFrom = getExtension().getProjects().getByName(patcher.getGenPatchesFrom());
                 genPatches.setPatchDir(PatcherProjectExtras.getOutputPatchDir(patcher));
 
@@ -312,11 +312,11 @@ public class OptifinePatcherPlugin extends PatcherPlugin
                     //clear from PatcherPlugin.afterEvaluate
                     genPatches.setOriginals(new LinkedList<Object>());
                     List<Object> dependencies = new LinkedList<Object>();
-                    dependencies.add(projectString(TASK_PROJECT_RETROMAP, patcher));
+                    dependencies.add(PatcherPluginWrapper.projectString(this, TASK_PROJECT_RETROMAP, patcher));
                     genPatches.instance.setDependsOn(dependencies);
 
-                    genPatches.addOriginalSource(delayedFile(projectString(JAR_PROJECT_PATCHED, genFrom)));
-                    genPatches.dependsOn(projectString(TASK_PROJECT_PATCH, genFrom));
+                    genPatches.addOriginalSource(delayedFile(PatcherPluginWrapper.projectString(this, JAR_PROJECT_PATCHED, genFrom)));
+                    genPatches.dependsOn(PatcherPluginWrapper.projectString(this, TASK_PROJECT_PATCH, genFrom));
                 }
             }
         }
@@ -341,7 +341,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             extractRenames.inZip = delayedFile(PATCH_RENAMES);
         }
         
-        TaskGenPatchesWrapper modGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(projectString(TASK_PROJECT_GEN_PATCHES, projectMod)));
+        TaskGenPatchesWrapper modGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_GEN_PATCHES, projectMod)));
         TaskGenPatchesWrapper optifineGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(TASK_GEN_PATCHES));
         {
             for(File file : modGenPatches.getOriginalSource())

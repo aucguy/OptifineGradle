@@ -19,34 +19,12 @@
  */
 package net.minecraftforge.gradle.patcher;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DELETE_REJECTS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_EXTRACT_REJECTS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_PATCHER_FORGE_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH_PROJECT;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED_PROJECT;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_MAKE_EMPTY_DIR;
-import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_RETRIEVE_REJECTS;
 import static net.minecraftforge.gradle.common.Constants.*;
 import static net.minecraftforge.gradle.patcher.PatcherConstants.*;
-import static net.minecraftforge.gradle.user.UserConstants.TASK_POST_DECOMP;
-
 import groovy.lang.Closure;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -67,12 +45,6 @@ import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.Zip;
 
-import com.github.aucguy.optifinegradle.FilterPatches;
-import com.github.aucguy.optifinegradle.MakeDir;
-import com.github.aucguy.optifinegradle.RemapRejects;
-import com.github.aucguy.optifinegradle.RemoveExtras;
-import com.github.aucguy.optifinegradle.RetrieveRejects;
-import com.github.aucguy.optifinegradle.patcher.PatcherProjectExtras;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -82,8 +54,6 @@ import com.google.common.io.Resources;
 
 public class PatcherPlugin extends BasePlugin<PatcherExtension>
 {
-    protected List<PatcherProject> patchersList;
-    
     @Override
     public void applyPlugin()
     {
@@ -138,8 +108,8 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
     {
         DeobfuscateJar deobfJar = makeTask(TASK_DEOBF, DeobfuscateJar.class);
         {
-            deobfJar.setInJar(delayedFile(Constants.JAR_MERGED, true));
-            deobfJar.setOutJar(delayedFile(JAR_DEOBF, true));
+            deobfJar.setInJar(delayedFile(Constants.JAR_MERGED));
+            deobfJar.setOutJar(delayedFile(JAR_DEOBF));
             deobfJar.setSrg(delayedFile(SRG_NOTCH_TO_SRG));
             deobfJar.setExceptorCfg(delayedFile(EXC_SRG));
             deobfJar.setExceptorJson(delayedFile(MCP_DATA_EXC_JSON));
@@ -152,7 +122,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         ApplyFernFlowerTask decompileJar = makeTask(TASK_DECOMP, ApplyFernFlowerTask.class);
         {
             decompileJar.setInJar(delayedFile(JAR_DEOBF));
-            decompileJar.setOutJar(delayedFile(JAR_DECOMP, true));
+            decompileJar.setOutJar(delayedFile(JAR_DECOMP));
             decompileJar.setDoesCache(false);
             decompileJar.setClasspath(project.getConfigurations().getByName(Constants.CONFIG_MC_DEPS));
             decompileJar.setForkedClasspath(project.getConfigurations().getByName(Constants.CONFIG_FFI_DEPS));
@@ -161,9 +131,9 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
 
         PostDecompileTask postDecompileJar = makeTask(TASK_POST_DECOMP, PostDecompileTask.class);
         {
-            postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
             postDecompileJar.setInJar(delayedFile(JAR_DECOMP));
-            postDecompileJar.setOutJar(delayedFile(JAR_DECOMP_POST, true));
+            postDecompileJar.setOutJar(delayedFile(JAR_DECOMP_POST));
+            postDecompileJar.setPatches(delayedFile(MCP_PATCHES_MERGED));
             postDecompileJar.setInjects(delayedFile(MCP_INJECT));
             postDecompileJar.setAstyleConfig(delayedFile(MCP_DATA_STYLE));
             postDecompileJar.setDoesCache(false);
@@ -448,13 +418,14 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
     {
         PatchSourcesTask patch = makeTask(projectString(TASK_PROJECT_PATCH, patcher), PatchSourcesTask.class);
         {
-            patch.setPatches(patcher.getDelayedPatchDir());
             // inJar is set afterEvaluate depending on the patch order.
             patch.setOutJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
+            patch.setPatches(patcher.getDelayedPatchDir());
             patch.setDoesCache(false);
             patch.setMaxFuzz(2);
             patch.setFailOnError(false);
             patch.setMakeRejects(true);
+            patch.dependsOn(TASK_POST_DECOMP);
         }
 
         RemapSources remapTask = makeTask(projectString(TASK_PROJECT_REMAP_JAR, patcher), RemapSources.class);
@@ -466,6 +437,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             remapTask.setParamsCsv(delayedFile(Constants.CSV_PARAM));
             remapTask.setAddsJavadocs(false);
             remapTask.setDoesCache(false);
+            remapTask.dependsOn(TASK_POST_DECOMP, TASK_EXTRACT_MAPPINGS);
             // depend on patch task in afterEval
         }
 
@@ -656,9 +628,6 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         project.getTasks().remove(project.getTasks().getByName(projectString(TASK_PROJECT_RANGEMAP, patcher)));
         project.getTasks().remove(project.getTasks().getByName(projectString(TASK_PROJECT_RETROMAP, patcher)));
         project.getTasks().remove(project.getTasks().getByName(projectString(TASK_PROJECT_RETRO_NONMC, patcher)));
-
-        project.getTasks().remove(project.getTasks().getByName(projectString("remapRejects", patcher)));
-        project.getTasks().remove(project.getTasks().getByName(projectString("extractRejects", patcher)));
     }
 
     public void afterEvaluate()
@@ -770,14 +739,12 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                     remap.setInJar(delayedFile(projectString(JAR_PROJECT_REMAPPED, lastPatcher)));
                     patch.addInject(lastPatcher.getDelayedSourcesDir());
                     patch.addInject(lastPatcher.getDelayedResourcesDir());
-                }
-                else
-                {
+                } else {
                     remap.setInJar(delayedFile(JAR_DECOMP_POST));
                 }
 
                 // configure extract tasks to extract patched
-                Object patched = delayedFile(projectString(JAR_PROJECT_PATCHED, patcher));;
+                Object patched = delayedFile(projectString(JAR_PROJECT_PATCHED, patcher));
                 ((ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_SRC, patcher))).from(patched);
                 ((ExtractTask) project.getTasks().getByName(projectString(TASK_PROJECT_EXTRACT_RES, patcher))).from(patched);
             }
@@ -787,10 +754,8 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                 RemapSources remap = (RemapSources) project.getTasks().getByName(projectString(TASK_PROJECT_REMAP_JAR, patcher));
 
                 // configure the patches to happen AFTER remap
-
                 remap.dependsOn(patch);
                 remap.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, patcher)));
-                    
                 // configure patching input and injects
                 if (lastPatcher != null)
                 {
@@ -798,9 +763,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                     patch.setInJar(delayedFile(projectString(JAR_PROJECT_PATCHED, lastPatcher)));
                     patch.addInject(lastPatcher.getDelayedSourcesDir());
                     patch.addInject(lastPatcher.getDelayedResourcesDir());
-                }
-                else
-                {
+                } else {
                     patch.setInJar(delayedFile(JAR_DECOMP_POST));
                 }
 
@@ -899,6 +862,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
                         genPatches.dependsOn(projectString(TASK_PROJECT_RETROMAP, genFrom), projectString(TASK_PROJECT_RETRO_NONMC, genFrom));
                     }
                 }
+
             }
 
             // add patch sets to bin patches
@@ -1016,7 +980,7 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         return getExtension().getDelayedSubWorkspaceDir(path);
     }
 
-    protected String projectString(String str, PatcherProject project)
+    private String projectString(String str, PatcherProject project)
     {
         return str.replace("{CAPNAME}", project.getCapName()).replace("{NAME}", project.getName());
     }

@@ -19,7 +19,6 @@
  */
 package net.minecraftforge.gradle.user.patcherUser;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.*;
 import static net.minecraftforge.gradle.common.Constants.DIR_JSONS;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
 import static net.minecraftforge.gradle.common.Constants.MCP_INJECT;
@@ -32,14 +31,12 @@ import static net.minecraftforge.gradle.user.UserConstants.*;
 import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.*;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 
-import com.github.aucguy.optifinegradle.FilterPatches;
 import com.google.common.collect.ImmutableMap;
 
 import groovy.lang.Closure;
@@ -68,7 +65,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
 
         getExtension().atSources(main, api);
 
-        this.makeDecompTasks(global, local, delayedFile(JAR_MERGED, true), isOptifine ? TASK_PREPROCESS : TASK_MERGE_JARS, delayedFile(MCP_PATCHES_MERGED), delayedFile(MCP_INJECT));
+        this.makeDecompTasks(global, local, delayedFile(JAR_MERGED), TASK_MERGE_JARS, delayedFile(MCP_PATCHES_MERGED), delayedFile(MCP_INJECT));
 
         // setup userdev
         {
@@ -108,7 +105,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
 
         // setup binpatching
         {
-            final Object patchedJar = chooseDeobfOutput(global, local, "", "binpatched", true);
+            final Object patchedJar = chooseDeobfOutput(global, local, "", "binpatched");
 
             TaskApplyBinPatches task = makeTask(TASK_BINPATCH, TaskApplyBinPatches.class);
             task.setInJar(delayedFile(JAR_MERGED));
@@ -129,13 +126,13 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         // setup source patching
         {
             final Object postDecompJar = chooseDeobfOutput(global, local, "", "decompFixed");
-            final Object patchedJar = chooseDeobfOutput(global, local, "", "patched", true);
+            final Object patchedJar = chooseDeobfOutput(global, local, "", "patched");
 
             PatchSourcesTask patch = makeTask(TASK_PATCH, PatchSourcesTask.class);
             patch.setPatches(delayedFile(ZIP_UD_PATCHES));
             patch.addInject(delayedFile(ZIP_UD_SRC));
             patch.addInject(delayedFile(ZIP_UD_RES)); // injecting teh resources too... the src jar needs them afterall.
-            patch.setFailOnError(true); //false because the patches are broken
+            patch.setFailOnError(true);
             patch.setMakeRejects(false);
             patch.setPatchStrip(1);
             patch.setInJar(postDecompJar);
@@ -205,9 +202,8 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         String group = getApiGroup(exten);
         String artifact = getApiName(exten) + (isDecomp ? "Src" : "Bin");
         String version = getApiVersion(exten) + (useLocalCache ? "-PROJECT(" + project.getName() + ")" : "");
-        String classifier = isOptifine ? "optifine" : "";
 
-        project.getDependencies().add(CONFIG_MC, ImmutableMap.of("group", group, "name", artifact, "version", version, "classifier", classifier));
+        project.getDependencies().add(CONFIG_MC, ImmutableMap.of("group", group, "name", artifact, "version", version));
     }
 
     @Override
