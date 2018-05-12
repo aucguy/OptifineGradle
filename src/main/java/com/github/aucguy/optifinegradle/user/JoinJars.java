@@ -46,8 +46,8 @@ public class JoinJars extends AsmProcessingTask
     private Set<String> exclusions = new HashSet<String>();
     
     protected Remapper mapping;
-    protected OutputStream classListOutput;
     protected Map<String, String> srgMapping;
+    protected Set<String> optifineClasses = new HashSet<String>();
 
     @Override
     public void middle() throws IOException
@@ -56,11 +56,17 @@ public class JoinJars extends AsmProcessingTask
     	Properties properties = new Properties();
     	properties.load(stream);
     	mapping = new SimpleRemapper((Map) properties);
-    	classListOutput = manager.openFileForWriting(classList);
     	JarMapping jarMapping = new JarMapping();
     	jarMapping.loadMappings(getProject().file(srg));
     	srgMapping = jarMapping.classes;
     	copyJars(optifine, client);
+    	
+    	OutputStream classListOutput = manager.openFileForWriting(classList);
+    	for(String name : optifineClasses)
+    	{
+    	    classListOutput.write(name.getBytes("UTF-8"));
+    	    classListOutput.write('\n');
+    	}
     }
 
 	@Override
@@ -68,16 +74,7 @@ public class JoinJars extends AsmProcessingTask
 	{
         if (inJar == optifine && name.endsWith(".class"))
         {
-            try
-            {
-				Patching.addObfClass(name, classListOutput, srgMapping);
-			} catch (UnsupportedEncodingException e)
-            {
-				throw(new RuntimeException());
-			} catch (IOException e)
-            {
-				throw(new RuntimeException());
-			}
+            addObfClass(name);
             data = processAsm(data, new TransformerFactory()
             {
 				@Override
@@ -114,5 +111,23 @@ public class JoinJars extends AsmProcessingTask
     		return ((DelayedString) obj).call();
     	}
     	return (String) obj;
+    }
+    
+    public void addObfClass(String name)
+    {
+        if (name.endsWith(".class"))
+        {
+            name = name.substring(0, name.length() - 6);
+        }
+        if (srgMapping.containsKey(name))
+        {
+            name = srgMapping.get(name);
+            if (name.contains("$"))
+            {
+                name = name.split("\\$")[0];
+            }
+        }
+        name = name.replace('/', '.');
+        optifineClasses.add(name);
     }
 }
