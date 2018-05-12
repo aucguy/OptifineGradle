@@ -138,7 +138,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             zipPatches.from(delayedFile(OPTIFINE_PATCH_DIR));
             zipPatches.setGroup(GROUP_OPTIFINE);
             zipPatches.setDescription("Create the optifine patch archive");
-            zipPatches.dependsOn(optifineGenPatches);
+            zipPatches.dependsOn(optifineGenPatches.instance);
         }
 
         ApplyFernFlowerTask testFernFlower = makeTask("testFernFlower", ApplyFernFlowerTask.class);
@@ -273,6 +273,19 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         delegate.afterEvaluate();
         
         List<PatcherProject> patchersList = PatcherPluginWrapper.sortByPatching(this, getExtension().getProjects());
+        for(OptifinePatcherProject optifinePatcherProject : projects.values())
+        {
+            for(PatcherProject patcherProject : patchersList)
+            {
+                if(patcherProject.getName().equals(optifinePatcherProject.name))
+                {
+                    optifinePatcherProject.patcherProject = patcherProject;
+                    PatcherProjectExtras.mappings.put(patcherProject, optifinePatcherProject);
+                    break;
+                }
+            }
+        }
+
         for(PatcherProject patcher : patchersList)
         {
             if(PatcherProjectExtras.getRejectFolder(this, patcher) != null)
@@ -317,19 +330,6 @@ public class OptifinePatcherPlugin extends PatcherPlugin
 
                     genPatches.addOriginalSource(delayedFile(PatcherPluginWrapper.projectString(this, JAR_PROJECT_PATCHED, genFrom)));
                     genPatches.dependsOn(PatcherPluginWrapper.projectString(this, TASK_PROJECT_PATCH, genFrom));
-                }
-            }
-        }
-
-        for(OptifinePatcherProject optifinePatcherProject : projects.values())
-        {
-            for(PatcherProject patcherProject : patchersList)
-            {
-                if(patcherProject.getName().equals(optifinePatcherProject.name))
-                {
-                    optifinePatcherProject.patcherProject = patcherProject;
-                    PatcherProjectExtras.mappings.put(patcherProject, optifinePatcherProject);
-                    break;
                 }
             }
         }

@@ -77,7 +77,7 @@ public class OptifineConstants
     public static final String EMPTY_DIR                      = DIR_LOCAL_CACHE + "/empty/";
     
     // defaults
-    public static final String DEFAULT_OPTIFINE_VERSION = "1.12.2_HD_U_C7";
+    public static final String DEFAULT_OPTIFINE_VERSION = "1.12.2_HD_U_D2";
     public static final String DEFAULT_PATCH_URL      = "https://aucguy.github.io/downloads/optifinegradle/patches/{patchArchive}";
     public static final String DEFAULT_PATCH_ARCHIVE  = "patches-{optifineVersion}.zip";
     public static final String DEFAULT_OPTIFINE_JAR   = "{mainDir}/OptiFine_{optifineVersion}.jar";
