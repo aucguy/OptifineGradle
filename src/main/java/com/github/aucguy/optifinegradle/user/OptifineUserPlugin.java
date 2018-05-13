@@ -1,22 +1,24 @@
 package com.github.aucguy.optifinegradle.user;
 
+import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_ZIP_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_USER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_USER_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_CACHE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_URL;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_USER;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DL_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_USER_FORGE_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.USER_RENAMES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_USER_CONFIG;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_ASSET_INDEX;
 import static net.minecraftforge.gradle.common.Constants.TASK_DL_VERSION_JSON;
@@ -31,9 +33,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.gradle.api.Task;
+
 import java.io.File;
 
-import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.OptifineExtension;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
@@ -43,6 +47,7 @@ import com.github.aucguy.optifinegradle.patcher.PatcherPluginWrapper;
 import groovy.lang.Closure;
 import net.minecraftforge.gradle.tasks.DeobfuscateJar;
 import net.minecraftforge.gradle.tasks.EtagDownloadTask;
+import net.minecraftforge.gradle.tasks.ExtractTask;
 import net.minecraftforge.gradle.tasks.PatchSourcesTask;
 import net.minecraftforge.gradle.tasks.PostDecompileTask;
 import net.minecraftforge.gradle.tasks.RemapSources;
@@ -94,15 +99,22 @@ public class OptifineUserPlugin extends ForgePlugin
         	dlPatches.dependsOn(net.minecraftforge.gradle.common.Constants.TASK_DL_ASSET_INDEX);
         }
 
-    	ExtractRenames extractRenames = (ExtractRenames) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
+
+        ExtractTask extractUserConfig = makeTask(TASK_EXTRACT_USER_CONFIG, ExtractTask.class);
     	{
-    	    extractRenames.inZip = delayedFile(USER_RENAMES);
-    		extractRenames.dependsOn(dlPatches);
+    	    extractUserConfig.from(delayedFile(PATCH_ZIP));
+    	    extractUserConfig.into(delayedFile(OPTIFINE_CACHE));
+    	    extractUserConfig.include(CONFIG_ZIP_DIR);
+    	    extractUserConfig.dependsOn(dlPatches);
     	}
+    	
+        Task extractConfig = project.getTasks().getByName(TASK_EXTRACT_CONFIG);
+        extractConfig.dependsOn(extractUserConfig);
 
         JoinJars join = (JoinJars) project.getTasks().getByName(TASK_JOIN_JARS);
         {
-        	join.dependsOn(extractRenames);
+            //TODO remove redundant dependency (other in OptifinePlugin)
+        	join.dependsOn(extractConfig);
         }
 
         ApplyFernFlowerTask decompile = (ApplyFernFlowerTask) project.getTasks().getByName(TASK_DECOMPILE);

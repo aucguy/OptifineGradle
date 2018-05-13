@@ -1,19 +1,22 @@
 package com.github.aucguy.optifinegradle.patcher;
 
+import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_ZIP_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_CACHE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED_PROJECT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PATCHES_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_RENAMES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_PATCHER_FORGE_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_GEN_PATCHES;
@@ -26,6 +29,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DE
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_EXTRACT_REJECTS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_RETRIEVE_REJECTS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_PATCHER_CONFIG;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_GEN_PATCHES;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DECOMP;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_DECOMP;
@@ -52,10 +56,10 @@ import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Task;
+import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.bundling.Zip;
 
-import com.github.aucguy.optifinegradle.ExtractRenames;
 import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.MakeDir;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
@@ -336,11 +340,16 @@ public class OptifinePatcherPlugin extends PatcherPlugin
 
         final PatcherProject projectMod = patchersList.get(patchersList.size() - 1);
         
-        ExtractRenames extractRenames = (ExtractRenames) project.getTasks().getByName(TASK_EXTRACT_RENAMES);
+        Copy extractPatcherConfig = makeTask(TASK_EXTRACT_PATCHER_CONFIG, Copy.class);
         {
-            extractRenames.inZip = delayedFile(PATCH_RENAMES);
+            extractPatcherConfig.from(delayedFile(PATCHES_DIR));
+            extractPatcherConfig.into(delayedFile(OPTIFINE_CACHE));
+            extractPatcherConfig.include(CONFIG_ZIP_DIR);
         }
         
+        Task extractConfig = project.getTasks().getByName(TASK_EXTRACT_CONFIG);
+        extractConfig.dependsOn(extractPatcherConfig);
+
         TaskGenPatchesWrapper modGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_GEN_PATCHES, projectMod)));
         TaskGenPatchesWrapper optifineGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(TASK_GEN_PATCHES));
         {
@@ -363,7 +372,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             File out = delayedFile(OPTIFINE_PATCH_ZIP).call();
             zipPatches.setDestinationDir(out.getParentFile());
             zipPatches.setArchiveName(out.getName());
-            zipPatches.from(delayedFile(PATCH_RENAMES));
+            zipPatches.from(delayedFile(PATCHES_DIR));
         }
     }
 }

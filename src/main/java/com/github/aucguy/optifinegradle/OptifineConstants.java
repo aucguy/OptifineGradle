@@ -21,7 +21,9 @@ public class OptifineConstants
     public static final String TASK_DIFF_OPTIFINE     = "diffOptifine";
     public static final String TASK_DIFF_EXEC         = "diffExecOptifine";
     public static final String TASK_DL_PATCHES        = "dlPatches";
-    public static final String TASK_EXTRACT_RENAMES   = "extractRenames";
+    public static final String TASK_EXTRACT_CONFIG    = "extractConfig";
+    public static final String TASK_EXTRACT_USER_CONFIG = "extractUserConfig";
+    public static final String TASK_EXTRACT_PATCHER_CONFIG = "extractPatcherConfig";
     public static final String TASK_ASK_PERMISSION    = "askPermission";
     public static final String TASK_PREPROCESS        = "preprocess";
     public static final String TASK_REMOVE_EXTRAS     = "removeExtras";
@@ -57,15 +59,17 @@ public class OptifineConstants
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
     
     public static final String PATCH_ZIP              = OPTIFINE_CACHE + "{patchArchive}";
+    public static final String CONFIG_ZIP_DIR         = "config/";
+    public static final String CONFIG_DIR             = OPTIFINE_CACHE + "config/";
     public static final String RENAMES_BASE           = "optifine-renames.properties";
-    public static final String RENAMES_FILE           = OPTIFINE_CACHE + RENAMES_BASE;
+    public static final String RENAMES_FILE           = CONFIG_DIR + RENAMES_BASE;
+    public static final String REMOVED_METHODS_BASE   = "optifine-removed-methods.properties";
+    public static final String REMOVED_METHODS_FILE   = CONFIG_DIR + REMOVED_METHODS_BASE;
     
     public static final String EXTRA_PATCH_EXCLUSIONS = "net.minecraft.client.Minecraft";
     
     //patching files
     public static final String PATCHES_DIR            = "patches/";
-    public static final String PATCH_RENAMES          = PATCHES_DIR + RENAMES_BASE;
-    public static final String USER_RENAMES           = PATCH_ZIP + "/" + RENAMES_BASE;
     
     public static final String PATCH_ARCHIVE          = "{patchArchive}";
     public static final String PATCH_URL              = "{patchUrl}";

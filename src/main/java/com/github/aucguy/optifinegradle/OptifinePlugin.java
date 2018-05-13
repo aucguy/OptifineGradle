@@ -23,6 +23,7 @@ import com.github.aucguy.optifinegradle.patcher.PatcherPluginWrapper;
 import com.github.aucguy.optifinegradle.user.JoinJars;
 
 import net.minecraftforge.gradle.common.BasePlugin;
+import net.minecraftforge.gradle.tasks.ExtractTask;
 import net.minecraftforge.gradle.tasks.MergeJars;
 
 public class OptifinePlugin
@@ -46,10 +47,7 @@ public class OptifinePlugin
     {
         extension = plugin.project.getExtensions().create(EXTENSION, extensionClass);
 
-    	ExtractRenames extractRenames = plugin.makeTask(TASK_EXTRACT_RENAMES, ExtractRenames.class);
-        {
-            extractRenames.extractTo = plugin.delayedFile(RENAMES_FILE);
-        }
+        Task extractConfig = plugin.makeTask(TASK_EXTRACT_CONFIG, Task.class);
 
         CacheWrapper diff = plugin.makeTask(TASK_DIFF_OPTIFINE, CacheWrapper.class);
         {
@@ -76,7 +74,7 @@ public class OptifinePlugin
             join.srg = plugin.delayedFile(SRG_NOTCH_TO_MCP);
             join.exclude("javax/");
             join.exclude("net/minecraftforge/");
-            join.dependsOn(TASK_DL_CLIENT, diff, extractRenames, TASK_GENERATE_SRGS);
+            join.dependsOn(TASK_DL_CLIENT, diff, extractConfig, TASK_GENERATE_SRGS);
         }
 
         MergeJars merge = (MergeJars) plugin.project.getTasks().getByName(TASK_MERGE_JARS);
@@ -89,8 +87,9 @@ public class OptifinePlugin
         PreProcess preprocess = plugin.makeTask(TASK_PREPROCESS, PreProcess.class);
         {
             preprocess.inJar = plugin.delayedFile(JAR_PREPROCESS);
+            preprocess.removedMethods = plugin.delayedFile(REMOVED_METHODS_FILE);
             preprocess.outJar = plugin.delayedFile(JAR_MERGED);
-            preprocess.dependsOn(merge);
+            preprocess.dependsOn(merge, extractConfig);
         }
     }
 
