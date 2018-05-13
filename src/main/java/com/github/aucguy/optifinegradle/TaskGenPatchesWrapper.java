@@ -12,7 +12,6 @@ import java.util.Set;
 import org.gradle.api.Task;
 
 import net.minecraftforge.gradle.common.BasePlugin;
-import net.minecraftforge.gradle.util.delayed.DelayedFile;
 
 public class TaskGenPatchesWrapper
 {

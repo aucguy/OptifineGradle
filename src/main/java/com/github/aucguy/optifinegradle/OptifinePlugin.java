@@ -1,29 +1,41 @@
 package com.github.aucguy.optifinegradle;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.*;
-import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.TASK_PROJECT_RETROMAP;
+import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EXTENSION;
+import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_CLIENT_JOINED;
+import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_OPTIFINE_DIFFED;
+import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_OPTIFINE_FRESH;
+import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVED_METHODS_FILE;
+import static com.github.aucguy.optifinegradle.OptifineConstants.RENAMES_FILE;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REPLACE_MAIN_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REPLACE_OPTIFINE_JAR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REPLACE_OPTIFINE_VERSION;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REPLACE_PATCH_ARCHIVE;
+import static com.github.aucguy.optifinegradle.OptifineConstants.REPLACE_PATCH_URL;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DIFF_EXEC;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DIFF_OPTIFINE;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static net.minecraftforge.gradle.common.Constants.JAR_CLIENT_FRESH;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
-import static net.minecraftforge.gradle.common.Constants.SRG_NOTCH_TO_MCP;
-import static net.minecraftforge.gradle.common.Constants.TASK_GENERATE_SRGS;
-import static net.minecraftforge.gradle.common.Constants.TASK_DL_CLIENT;
-import static net.minecraftforge.gradle.common.Constants.TASK_MERGE_JARS;
+import static net.minecraftforge.gradle.common.Constants.REPLACE_BUILD_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_PROJECT_CACHE_DIR;
-import static net.minecraftforge.gradle.common.Constants.REPLACE_BUILD_DIR;
+import static net.minecraftforge.gradle.common.Constants.SRG_NOTCH_TO_MCP;
+import static net.minecraftforge.gradle.common.Constants.TASK_DL_CLIENT;
+import static net.minecraftforge.gradle.common.Constants.TASK_GENERATE_SRGS;
+import static net.minecraftforge.gradle.common.Constants.TASK_MERGE_JARS;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 import org.gradle.api.Task;
 import org.gradle.api.tasks.Exec;
 
-import com.github.aucguy.optifinegradle.patcher.PatcherPluginWrapper;
 import com.github.aucguy.optifinegradle.user.JoinJars;
 
 import net.minecraftforge.gradle.common.BasePlugin;
-import net.minecraftforge.gradle.tasks.ExtractTask;
 import net.minecraftforge.gradle.tasks.MergeJars;
 
 public class OptifinePlugin
