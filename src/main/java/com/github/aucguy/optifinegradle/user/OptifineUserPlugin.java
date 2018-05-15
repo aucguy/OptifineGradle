@@ -2,7 +2,7 @@ package com.github.aucguy.optifinegradle.user;
 
 import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_ZIP_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCL_FILE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_USER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_USER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_CACHE;
@@ -27,13 +27,9 @@ import static net.minecraftforge.gradle.user.UserConstants.*;
 import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.TASK_PATCH;
 import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.ZIP_UD_PATCHES;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.gradle.api.Task;
 
 import java.io.File;
@@ -42,8 +38,6 @@ import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.OptifineExtension;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 import com.github.aucguy.optifinegradle.RemoveExtras;
-import com.github.aucguy.optifinegradle.patcher.PatcherPluginWrapper;
-
 import groovy.lang.Closure;
 import net.minecraftforge.gradle.tasks.DeobfuscateJar;
 import net.minecraftforge.gradle.tasks.EtagDownloadTask;
@@ -135,7 +129,7 @@ public class OptifineUserPlugin extends ForgePlugin
         {
             filterMcpPatches.patchesIn = delayedFile(MCP_PATCHES_MERGED);
             filterMcpPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
-            filterMcpPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
+            filterMcpPatches.extraExclusions = delayedFile(EXTRA_PATCH_EXCL_FILE);
             filterMcpPatches.patchesOut = delayedFile(MCP_FILTERED_USER_PATCHES);
             filterMcpPatches.dependsOn(decompile);
         }

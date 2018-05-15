@@ -25,7 +25,7 @@ public class FilterPatches extends CachedTask
     public Object excludeList;
     
     @Input
-    public List<String> extraExclusions;
+    public Object extraExclusions;
     
     @OutputDirectory
     public Object patchesOut;
@@ -83,7 +83,7 @@ public class FilterPatches extends CachedTask
         List<String> exclusions = IOManager.readLines(manager.openFileForReading(excludeList));
         if(extraExclusions != null)
         {
-            exclusions.addAll(extraExclusions);
+            exclusions.addAll(IOManager.readLines(manager.openFileForReading(extraExclusions)));
         }
         ExtractionVisitor visitor = new ExtractionVisitor(dest, exclusions);
 

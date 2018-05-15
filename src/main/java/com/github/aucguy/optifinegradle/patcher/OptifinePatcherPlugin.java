@@ -3,7 +3,7 @@ package com.github.aucguy.optifinegradle.patcher;
 import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_ZIP_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
-import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCLUSIONS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCL_FILE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
@@ -45,7 +45,6 @@ import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.T
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -174,7 +173,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         {
             filterPatches.patchesIn = delayedFile(MCP_PATCHES_MERGED);
             filterPatches.excludeList = delayedFile(DEOBFUSCATED_CLASSES);
-            filterPatches.extraExclusions = Arrays.asList(EXTRA_PATCH_EXCLUSIONS.split(";"));
+            filterPatches.extraExclusions = delayedFile(EXTRA_PATCH_EXCL_FILE);
             filterPatches.patchesOut = delayedFile(MCP_FILTERED_PATCHER_PATCHES);
             filterPatches.dependsOn(TASK_DECOMP); //change dependency to not be so expensive
         }
