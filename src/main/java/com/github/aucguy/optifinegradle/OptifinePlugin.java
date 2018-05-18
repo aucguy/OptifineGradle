@@ -18,14 +18,15 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DIFF_OPTIF
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_VERSION;
 import static net.minecraftforge.gradle.common.Constants.JAR_CLIENT_FRESH;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
-import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_PROJECT_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.SRG_NOTCH_TO_MCP;
 import static net.minecraftforge.gradle.common.Constants.TASK_DL_CLIENT;
 import static net.minecraftforge.gradle.common.Constants.TASK_GENERATE_SRGS;
 import static net.minecraftforge.gradle.common.Constants.TASK_MERGE_JARS;
+import static net.minecraftforge.gradle.common.Constants.REPLACE_MC_VERSION;
 
 import java.util.Scanner;
 
@@ -49,7 +50,6 @@ public class OptifinePlugin
     
     public void applyRenames()
     {
-        modifyReplacement(REPLACE_CACHE_DIR);
         modifyReplacement(REPLACE_PROJECT_CACHE_DIR);
     }
 
@@ -105,6 +105,7 @@ public class OptifinePlugin
 
     public void afterEvaluate()
     {
+        modifyReplacement(REPLACE_MC_VERSION);
         plugin.replacer.putReplacement(REPLACE_OPTIFINE_VERSION, extension.getOptifineVersion());
         plugin.replacer.putReplacement(REPLACE_PATCH_ARCHIVE, extension.getPatchArchive());
         plugin.replacer.putReplacement(REPLACE_PATCH_URL, extension.getPatchURL());
@@ -118,7 +119,7 @@ public class OptifinePlugin
         {
             key = key.substring(1, key.length() - 1);
         }
-        plugin.replacer.putReplacement(key, plugin.replacer.get(key) + "-optifine");
+        plugin.replacer.putReplacement(key, plugin.replacer.get(key) + "-optifine-" + OPTIFINE_VERSION);
     }
 
     public void askPermission()

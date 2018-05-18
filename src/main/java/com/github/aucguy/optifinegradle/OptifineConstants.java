@@ -80,9 +80,10 @@ public class OptifineConstants
     public static final String MCP_FILTERED_PATCHER_PATCHES   = DIR_LOCAL_CACHE + "/filteredPatcherPatches/";
     public static final String OPTIFINE_PATCHED_PROJECT       = DIR_PROJECT_CACHE + "/optifinePatched.zip";
     public static final String EMPTY_DIR                      = DIR_LOCAL_CACHE + "/empty/";
+    public static final String OPTIFINE_VERSION               = "D2";
     
     // defaults
-    public static final String DEFAULT_OPTIFINE_VERSION = "1.12.2_HD_U_D2";
+    public static final String DEFAULT_OPTIFINE_VERSION = "1.12.2_HD_U_" + OPTIFINE_VERSION;
     public static final String DEFAULT_PATCH_URL      = "https://aucguy.github.io/downloads/optifinegradle/patches/{patchArchive}";
     public static final String DEFAULT_PATCH_ARCHIVE  = "patches-{optifineVersion}.zip";
     public static final String DEFAULT_OPTIFINE_JAR   = "{mainDir}/OptiFine_{optifineVersion}.jar";
