@@ -20,7 +20,6 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static net.minecraftforge.gradle.common.Constants.JAR_CLIENT_FRESH;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
-import static net.minecraftforge.gradle.common.Constants.REPLACE_BUILD_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_PROJECT_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.SRG_NOTCH_TO_MCP;
@@ -51,7 +50,6 @@ public class OptifinePlugin
     public void applyRenames()
     {
         modifyReplacement(REPLACE_CACHE_DIR);
-        modifyReplacement(REPLACE_BUILD_DIR);
         modifyReplacement(REPLACE_PROJECT_CACHE_DIR);
     }
 
