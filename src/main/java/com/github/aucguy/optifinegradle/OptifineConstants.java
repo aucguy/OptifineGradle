@@ -59,19 +59,19 @@ public class OptifineConstants
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
     
     //TODO combine bases and files into one
+    public static final String PATCHES_DIR            = "patches/";
     public static final String PATCH_ZIP              = OPTIFINE_CACHE + "{patchArchive}";
-    public static final String CONFIG_ZIP_DIR         = "config/";
-    public static final String CONFIG_DIR             = OPTIFINE_CACHE + "config/";
+    public static final String CONFIG_ZIP_DIR         = "optifine-config/";
+    public static final String CONFIG_DIR             = OPTIFINE_CACHE + CONFIG_ZIP_DIR;
     public static final String RENAMES_BASE           = "optifine-renames.properties";
     public static final String RENAMES_FILE           = CONFIG_DIR + RENAMES_BASE;
     public static final String REMOVED_METHODS_BASE   = "optifine-removed-methods.properties";
     public static final String REMOVED_METHODS_FILE   = CONFIG_DIR + REMOVED_METHODS_BASE;
     public static final String EXTRA_PATCH_EXCL_BASE  = "extra-patch-exclusions.txt";
     public static final String EXTRA_PATCH_EXCL_FILE  = CONFIG_DIR + EXTRA_PATCH_EXCL_BASE;
+    public static final String PATCH_CONFIG_DIR       = PATCHES_DIR + CONFIG_ZIP_DIR;
     
     //patching files
-    public static final String PATCHES_DIR            = "patches/";
-    
     public static final String PATCH_ARCHIVE          = "{patchArchive}";
     public static final String PATCH_URL              = "{patchUrl}";
     
