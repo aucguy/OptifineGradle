@@ -1,5 +1,7 @@
 package com.github.aucguy.optifinegradle;
 
+import java.io.File;
+
 import org.gradle.api.internal.AbstractTask;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
@@ -25,6 +27,8 @@ public class CacheWrapper extends CachedTask
 	@TaskAction
 	public void doAction()
 	{
+	    File outFile = getProject().file(output);
+	    outFile.getParentFile().mkdirs();
 		task.execute();
 	}
 }

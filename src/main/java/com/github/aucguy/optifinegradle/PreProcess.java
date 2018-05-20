@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.gradle.api.tasks.InputFile;
 import org.objectweb.asm.ClassVisitor;
 
+//TODO rename class/task
 public class PreProcess extends AsmProcessingTask
 {
     @InputFile

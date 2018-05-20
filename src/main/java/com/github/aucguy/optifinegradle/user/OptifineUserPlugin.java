@@ -3,22 +3,24 @@ package com.github.aucguy.optifinegradle.user;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_EXTRACT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCL_FILE;
-import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_USER_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_USER_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_URL;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_USER;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DL_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_USER_FORGE_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_USER_CONFIG;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_DIR;
+
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.TASK_EXTRACT_USER_CONFIG;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.PATCH_DIR;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.FORGE_FILTERED_USER_PATCHES;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.MCP_FILTERED_USER_PATCHES;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.OPTIFINE_PATCHED;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.PATCH_URL;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.PATCH_ARCHIVE;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.REMOVE_EXTRAS_OUT_USER;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.TASK_DL_PATCHES;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.TASK_FILTER_USER_FORGE_PATCHES;
+import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.TASK_OPTIFINE_PATCH;
+
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_ASSET_INDEX;
 import static net.minecraftforge.gradle.common.Constants.TASK_DL_VERSION_JSON;
@@ -88,7 +90,7 @@ public class OptifineUserPlugin extends ForgePlugin
 
         DownloadWithFile dlPatches = makeTask(TASK_DL_PATCHES, DownloadWithFile.class);
         {
-        	dlPatches.setOutput(delayedFile(PATCH_ZIP));
+        	dlPatches.setOutput(delayedFile(PATCH_ARCHIVE));
         	dlPatches.setUrl(delayedString(PATCH_URL));
         	dlPatches.dependsOn(net.minecraftforge.gradle.common.Constants.TASK_DL_ASSET_INDEX);
         }
@@ -96,7 +98,7 @@ public class OptifineUserPlugin extends ForgePlugin
 
         ExtractTask extractUserConfig = makeTask(TASK_EXTRACT_USER_CONFIG, ExtractTask.class);
     	{
-    	    extractUserConfig.from(delayedFile(PATCH_ZIP));
+    	    extractUserConfig.from(delayedFile(PATCH_ARCHIVE));
     	    extractUserConfig.into(delayedFile(PATCH_EXTRACT));
     	    extractUserConfig.dependsOn(dlPatches);
     	}

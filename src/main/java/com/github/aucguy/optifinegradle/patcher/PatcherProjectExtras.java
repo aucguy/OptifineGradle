@@ -1,6 +1,6 @@
 package com.github.aucguy.optifinegradle.patcher;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.EMPTY_DIR;
 
 import java.io.File;
 import java.util.HashMap;

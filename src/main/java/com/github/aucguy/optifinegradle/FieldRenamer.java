@@ -8,6 +8,7 @@ import org.objectweb.asm.Opcodes;
 /**
  * removes '__OBFID' fields
  */
+//TODO rename class
 public class FieldRenamer extends ClassVisitor
 {
 	public String className;

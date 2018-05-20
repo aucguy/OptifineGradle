@@ -1,33 +1,35 @@
 package com.github.aucguy.optifinegradle.patcher;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_CONFIG_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCL_FILE;
-import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
-import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED_PROJECT;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_DIR;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_PATCHER_CONFIG;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_PATCHER_FORGE_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_GEN_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_MAKE_EMPTY_DIR;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_PATCH_PROJECT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_DELETE_REJECTS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_EXTRACT_REJECTS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_REMAP_REJECTS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PROJECT_RETRIEVE_REJECTS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_ZIP_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_DIR;
+
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.PATCH_CONFIG_DIR;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.FORGE_FILTERED_PATCHER_PATCHES;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.MCP_FILTERED_PATCHER_PATCHES;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.OPTIFINE_PATCHED_PROJECT;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.OPTIFINE_PATCH_DIR;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.OPTIFINE_PATCH_ZIP;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.PROJECT_REJECTS_ZIP;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.PROJECT_REMAPPED_REJECTS_ZIP;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.REMOVE_EXTRAS_OUT_PATCHER;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_EXTRACT_PATCHER_CONFIG;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_FILTER_PATCHER_FORGE_PATCHES;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_GEN_PATCHES;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_MAKE_EMPTY_DIR;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_OPTIFINE_PATCH_PROJECT;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_PROJECT_DELETE_REJECTS;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_PROJECT_EXTRACT_REJECTS;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_PROJECT_REMAP_REJECTS;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_PROJECT_RETRIEVE_REJECTS;
+import static com.github.aucguy.optifinegradle.patcher.OptifinePatcherConstants.TASK_ZIP_PATCHES;
+
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DECOMP;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_DECOMP_POST;
 import static com.github.aucguy.optifinegradle.patcher.PatcherConstantsWrapper.JAR_PROJECT_PATCHED;
@@ -292,6 +294,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         {
             if(PatcherProjectExtras.getRejectFolder(this, patcher) != null)
             {
+                //TODO use constant
                 ExtractTask extractSrc = (ExtractTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_EXTRACT_SRC, patcher));
                 ExtractTask extractRejects = (ExtractTask) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, "extract{CAPNAME}Rejects", patcher));
                 Delete deleteRejects = (Delete) project.getTasks().getByName(PatcherPluginWrapper.projectString(this, "delete{CAPNAME}Rejects", patcher));

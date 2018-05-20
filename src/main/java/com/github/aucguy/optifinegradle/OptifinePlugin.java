@@ -83,7 +83,7 @@ public class OptifinePlugin
             join.outJar = plugin.delayedFile(JAR_CLIENT_JOINED);
             join.renames = plugin.delayedFile(RENAMES_FILE);
             join.srg = plugin.delayedFile(SRG_NOTCH_TO_MCP);
-            join.exclude("javax/");
+            join.exclude("javax/"); //TODO put into a constant
             join.exclude("net/minecraftforge/");
             join.dependsOn(TASK_DL_CLIENT, diff, extractConfig, TASK_GENERATE_SRGS);
         }
@@ -122,6 +122,7 @@ public class OptifinePlugin
         plugin.replacer.putReplacement(key, plugin.replacer.get(key) + "-optifine-" + OPTIFINE_VERSION);
     }
 
+    //TODO remove
     public void askPermission()
     {
         plugin.project.getLogger().warn("WARNING. This will overwrite you workspace. Continue (Y/N)");
