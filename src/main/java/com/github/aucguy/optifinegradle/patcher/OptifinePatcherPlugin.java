@@ -1,6 +1,5 @@
 package com.github.aucguy.optifinegradle.patcher;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_ZIP_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_CONFIG_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EMPTY_DIR;
@@ -8,11 +7,9 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXC
 import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_PATCHER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_PATCHER_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_CACHE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED_PROJECT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCH_ZIP;
-import static com.github.aucguy.optifinegradle.OptifineConstants.PATCHES_DIR;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PROJECT_REMAPPED_REJECTS_ZIP;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVE_EXTRAS_OUT_PATCHER;
@@ -58,7 +55,6 @@ import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
-import org.gradle.api.tasks.bundling.Zip;
 
 import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.MakeDir;
@@ -141,6 +137,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         {
             zipPatches.outZip = delayedFile(OPTIFINE_PATCH_ZIP);
             zipPatches.addFiles(delayedFile(PATCH_CONFIG_DIR), "config");
+            zipPatches.addFiles(delayedFile(OPTIFINE_PATCH_DIR), "patches");
             zipPatches.setGroup(GROUP_OPTIFINE);
             zipPatches.setDescription("Create the optifine patch archive");
             zipPatches.dependsOn(optifineGenPatches.instance);
@@ -341,12 +338,10 @@ public class OptifinePatcherPlugin extends PatcherPlugin
 
         final PatcherProject projectMod = patchersList.get(patchersList.size() - 1);
         
-        //TODO use PATCH_CONFIG_DIR
         Copy extractPatcherConfig = makeTask(TASK_EXTRACT_PATCHER_CONFIG, Copy.class);
         {
-            extractPatcherConfig.from(delayedFile(PATCHES_DIR));
-            extractPatcherConfig.into(delayedFile(OPTIFINE_CACHE));
-            extractPatcherConfig.include(CONFIG_ZIP_DIR);
+            extractPatcherConfig.from(delayedFile(PATCH_CONFIG_DIR));
+            extractPatcherConfig.into(delayedFile(CONFIG_DIR));
         }
         
         Task extractConfig = project.getTasks().getByName(TASK_EXTRACT_CONFIG);
@@ -367,11 +362,6 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             {
                 optifineGenPatches.dependsOn(dependency);
             }
-        }
-        
-        ZipPatches zipPatches = (ZipPatches) project.getTasks().getByName(TASK_ZIP_PATCHES);
-        {
-            zipPatches.addFiles(PatcherProjectExtras.getOutputPatchDir(projectMod), "patches");
         }
     }
 }

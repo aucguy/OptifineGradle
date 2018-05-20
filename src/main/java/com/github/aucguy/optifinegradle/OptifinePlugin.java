@@ -26,7 +26,7 @@ import static net.minecraftforge.gradle.common.Constants.SRG_NOTCH_TO_MCP;
 import static net.minecraftforge.gradle.common.Constants.TASK_DL_CLIENT;
 import static net.minecraftforge.gradle.common.Constants.TASK_GENERATE_SRGS;
 import static net.minecraftforge.gradle.common.Constants.TASK_MERGE_JARS;
-import static net.minecraftforge.gradle.common.Constants.REPLACE_MC_VERSION;
+import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
 
 import java.util.Scanner;
 
@@ -50,6 +50,7 @@ public class OptifinePlugin
     
     public void applyRenames()
     {
+        modifyReplacement(REPLACE_CACHE_DIR);
         modifyReplacement(REPLACE_PROJECT_CACHE_DIR);
     }
 
@@ -105,7 +106,6 @@ public class OptifinePlugin
 
     public void afterEvaluate()
     {
-        modifyReplacement(REPLACE_MC_VERSION);
         plugin.replacer.putReplacement(REPLACE_OPTIFINE_VERSION, extension.getOptifineVersion());
         plugin.replacer.putReplacement(REPLACE_PATCH_ARCHIVE, extension.getPatchArchive());
         plugin.replacer.putReplacement(REPLACE_PATCH_URL, extension.getPatchURL());

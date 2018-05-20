@@ -11,6 +11,13 @@ import static net.minecraftforge.gradle.user.patcherUser.PatcherUserConstants.DI
  */
 public class OptifineConstants
 {
+    // replacements
+    public static final String REPLACE_OPTIFINE_VERSION = "{optifineVersion}";
+    public static final String REPLACE_PATCH_ARCHIVE  = "{patchArchive}";
+    public static final String REPLACE_PATCH_URL      = "{patchUrl}";
+    public static final String REPLACE_OPTIFINE_JAR   = "{optifineJar}";
+    public static final String REPLACE_MAIN_DIR       = "{mainDir}";
+
     // normal setup
     // general
     public static final String EXTENSION              = "optifine";
@@ -59,10 +66,12 @@ public class OptifineConstants
     public static final String OPTIFINE_CACHE         = "{CACHE_DIR}/com/github/aucguy/optifinegradle/";
     
     //TODO combine bases and files into one
+    //TODO rename patches_dir and patch_dir
     public static final String PATCHES_DIR            = "patches/";
-    public static final String PATCH_ZIP              = OPTIFINE_CACHE + "{patchArchive}";
+    public static final String PATCH_ZIP              = OPTIFINE_CACHE + "patchArchives/" + "{patchArchive}";
+    public static final String PATCH_EXTRACT          = OPTIFINE_CACHE + "patchExtracts/" + REPLACE_OPTIFINE_VERSION + "/";
     public static final String CONFIG_ZIP_DIR         = "optifine-config/";
-    public static final String CONFIG_DIR             = OPTIFINE_CACHE + CONFIG_ZIP_DIR;
+    public static final String CONFIG_DIR             = PATCH_EXTRACT + "config/";
     public static final String RENAMES_BASE           = "optifine-renames.properties";
     public static final String RENAMES_FILE           = CONFIG_DIR + RENAMES_BASE;
     public static final String REMOVED_METHODS_BASE   = "optifine-removed-methods.properties";
@@ -70,6 +79,7 @@ public class OptifineConstants
     public static final String EXTRA_PATCH_EXCL_BASE  = "extra-patch-exclusions.txt";
     public static final String EXTRA_PATCH_EXCL_FILE  = CONFIG_DIR + EXTRA_PATCH_EXCL_BASE;
     public static final String PATCH_CONFIG_DIR       = PATCHES_DIR + CONFIG_ZIP_DIR;
+    public static final String PATCH_DIR              = PATCH_EXTRACT + "patches/";
     
     //patching files
     public static final String PATCH_ARCHIVE          = "{patchArchive}";
@@ -87,13 +97,6 @@ public class OptifineConstants
     public static final String DEFAULT_PATCH_URL      = "https://aucguy.github.io/downloads/optifinegradle/patches/{patchArchive}";
     public static final String DEFAULT_PATCH_ARCHIVE  = "patches-{optifineVersion}.zip";
     public static final String DEFAULT_OPTIFINE_JAR   = "{mainDir}/OptiFine_{optifineVersion}.jar";
-    
-    // replacements
-    public static final String REPLACE_OPTIFINE_VERSION = "{optifineVersion}";
-    public static final String REPLACE_PATCH_ARCHIVE  = "{patchArchive}";
-    public static final String REPLACE_PATCH_URL      = "{patchUrl}";
-    public static final String REPLACE_OPTIFINE_JAR   = "{optifineJar}";
-    public static final String REPLACE_MAIN_DIR       = "{mainDir}";
     
     //patching tasks
     public static final String TASK_FILTER_PATCHER_FORGE_PATCHES = "filterForge" + REPLACE_PROJECT_CAP_NAME +"Patches";

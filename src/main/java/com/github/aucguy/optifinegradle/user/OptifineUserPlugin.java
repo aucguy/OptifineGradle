@@ -1,11 +1,10 @@
 package com.github.aucguy.optifinegradle.user;
 
-import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_ZIP_DIR;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_EXTRACT;
 import static com.github.aucguy.optifinegradle.OptifineConstants.DEOBFUSCATED_CLASSES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXCL_FILE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.FORGE_FILTERED_USER_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.MCP_FILTERED_USER_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_CACHE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_PATCHED;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_URL;
 import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_ZIP;
@@ -19,6 +18,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_OPTIFINE_P
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_USER_CONFIG;
+import static com.github.aucguy.optifinegradle.OptifineConstants.PATCH_DIR;
 import static net.minecraftforge.gradle.common.Constants.MCP_PATCHES_MERGED;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_ASSET_INDEX;
 import static net.minecraftforge.gradle.common.Constants.TASK_DL_VERSION_JSON;
@@ -97,10 +97,10 @@ public class OptifineUserPlugin extends ForgePlugin
         ExtractTask extractUserConfig = makeTask(TASK_EXTRACT_USER_CONFIG, ExtractTask.class);
     	{
     	    extractUserConfig.from(delayedFile(PATCH_ZIP));
-    	    extractUserConfig.into(delayedFile(OPTIFINE_CACHE));
-    	    extractUserConfig.include(CONFIG_ZIP_DIR);
+    	    extractUserConfig.into(delayedFile(PATCH_EXTRACT));
     	    extractUserConfig.dependsOn(dlPatches);
     	}
+    	extractUserConfig.setDoesCache(false);
     	
         Task extractConfig = project.getTasks().getByName(TASK_EXTRACT_CONFIG);
         extractConfig.dependsOn(extractUserConfig);
@@ -158,7 +158,7 @@ public class OptifineUserPlugin extends ForgePlugin
 
         PatchSourcesTask optifinePatch = makeTask(TASK_OPTIFINE_PATCH, PatchSourcesTask.class);
         {
-            optifinePatch.setPatches(delayedFile(PATCH_ZIP));
+            optifinePatch.setPatches(delayedFile(PATCH_DIR));
             optifinePatch.setFailOnError(true);
             optifinePatch.setMakeRejects(false);
             optifinePatch.setPatchStrip(1);
