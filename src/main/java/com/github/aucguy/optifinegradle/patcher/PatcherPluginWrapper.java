@@ -12,8 +12,8 @@ import net.minecraftforge.gradle.patcher.PatcherProject;
 
 public class PatcherPluginWrapper
 {
-    protected static final Method sortByPatchingMethod = ReflectHelper.getMethod(PatcherPlugin.class, "sortByPatching", NamedDomainObjectContainer.class);
-    protected static final Method projectStringMethod = ReflectHelper.getMethod(PatcherPlugin.class, "projectString", String.class, PatcherProject.class);
+    protected static final Method sortByPatchingMethod = ReflectHelper.retrieveMethod(PatcherPlugin.class, "sortByPatching", NamedDomainObjectContainer.class);
+    protected static final Method projectStringMethod = ReflectHelper.retrieveMethod(PatcherPlugin.class, "projectString", String.class, PatcherProject.class);
     
     public static List<PatcherProject> sortByPatching(OptifinePatcherPlugin self, NamedDomainObjectContainer<PatcherProject> projects)
     {

@@ -6,7 +6,19 @@ import java.lang.reflect.Method;
 
 public class ReflectHelper
 {
-    public static Method getMethod(Class<?> clazz, String name, Class<?> ... parameters)
+    public static Class<?> retrieveClass(String name)
+    {
+        try
+        {
+            return ReflectHelper.class.getClassLoader().loadClass(name);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw(new RuntimeException(name + " not found"));
+        }
+    }
+
+    public static Method retrieveMethod(Class<?> clazz, String name, Class<?> ... parameters)
     {
         Method method = null;
         while(clazz != null && method == null)
@@ -27,6 +39,11 @@ public class ReflectHelper
         method.setAccessible(true);
         return method;
     }
+
+    public static Method retrieveMethod(String className, String name, Class<?> ... parameters)
+    {
+        return retrieveMethod(retrieveClass(className), name, parameters);
+    }
     
     public static Object invoke(Method method, Object self, Object ... parameters)
     {
@@ -40,7 +57,7 @@ public class ReflectHelper
         }
     }
 
-    public static Field getField(Class<?> clazz, String name)
+    public static Field retrieveField(Class<?> clazz, String name)
     {
         Field field = null;
         while(clazz != null && field == null)
@@ -62,13 +79,30 @@ public class ReflectHelper
         return field;
     }
 
-    public static Object accessField(Field field, Object self)
+    public static Field retrieveField(String className, String name)
+    {
+        return retrieveField(retrieveClass(className), name);
+    }
+
+    public static Object getField(Field field, Object self)
     {
         try
         {
             return field.get(self);
         }
         catch (IllegalAccessException | IllegalArgumentException e)
+        {
+            throw(new RuntimeException(e));
+        }
+    }
+
+    public static void setField(Field field, Object self, Object value)
+    {
+        try
+        {
+            field.set(self, value);
+        }
+        catch (IllegalArgumentException | IllegalAccessException e)
         {
             throw(new RuntimeException(e));
         }

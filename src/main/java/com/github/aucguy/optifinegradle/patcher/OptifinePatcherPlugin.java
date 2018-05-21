@@ -130,9 +130,9 @@ public class OptifinePatcherPlugin extends PatcherPlugin
 
         });
         
-        TaskGenPatchesWrapper optifineGenPatches = TaskGenPatchesWrapper.makeTask(this, TASK_GEN_PATCHES);
+        Task optifineGenPatches = makeTask(TASK_GEN_PATCHES, TaskGenPatchesWrapper.CLASS);
         {
-            optifineGenPatches.setPatchDir(delayedFile(OPTIFINE_PATCH_DIR));
+            TaskGenPatchesWrapper.setPatchDir(optifineGenPatches, delayedFile(OPTIFINE_PATCH_DIR));
         }
         
         ZipPatches zipPatches = makeTask(TASK_ZIP_PATCHES, ZipPatches.class);
@@ -142,7 +142,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
             zipPatches.addFiles(delayedFile(OPTIFINE_PATCH_DIR), "patches");
             zipPatches.setGroup(GROUP_OPTIFINE);
             zipPatches.setDescription("Create the optifine patch archive");
-            zipPatches.dependsOn(optifineGenPatches.instance);
+            zipPatches.dependsOn(optifineGenPatches);
         }
 
         ApplyFernFlowerTask testFernFlower = makeTask("testFernFlower", ApplyFernFlowerTask.class);
@@ -321,19 +321,19 @@ public class OptifinePatcherPlugin extends PatcherPlugin
 
             if(PatcherProjectWrapper.doesGenPatches(patcher))
             {
-                TaskGenPatchesWrapper genPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_GEN_PATCHES, patcher)));
+                Task genPatches = project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_GEN_PATCHES, patcher));
                 PatcherProject genFrom = getExtension().getProjects().getByName(patcher.getGenPatchesFrom());
-                genPatches.setPatchDir(PatcherProjectExtras.getOutputPatchDir(patcher));
+                TaskGenPatchesWrapper.setPatchDir(genPatches, PatcherProjectExtras.getOutputPatchDir(patcher));
 
                 if(!PatcherProjectExtras.getsModified(genFrom))
                 {
                     //clear from PatcherPlugin.afterEvaluate
-                    genPatches.setOriginals(new LinkedList<Object>());
+                    TaskGenPatchesWrapper.setOriginals(genPatches, new LinkedList<Object>());
                     List<Object> dependencies = new LinkedList<Object>();
                     dependencies.add(PatcherPluginWrapper.projectString(this, TASK_PROJECT_RETROMAP, patcher));
-                    genPatches.instance.setDependsOn(dependencies);
+                    genPatches.setDependsOn(dependencies);
 
-                    genPatches.addOriginalSource(delayedFile(PatcherPluginWrapper.projectString(this, JAR_PROJECT_PATCHED, genFrom)));
+                    TaskGenPatchesWrapper.addOriginalSource(genPatches, delayedFile(PatcherPluginWrapper.projectString(this, JAR_PROJECT_PATCHED, genFrom)));
                     genPatches.dependsOn(PatcherPluginWrapper.projectString(this, TASK_PROJECT_PATCH, genFrom));
                 }
             }
@@ -350,16 +350,16 @@ public class OptifinePatcherPlugin extends PatcherPlugin
         Task extractConfig = project.getTasks().getByName(TASK_EXTRACT_CONFIG);
         extractConfig.dependsOn(extractPatcherConfig);
 
-        TaskGenPatchesWrapper modGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_GEN_PATCHES, projectMod)));
-        TaskGenPatchesWrapper optifineGenPatches = new TaskGenPatchesWrapper(project.getTasks().getByName(TASK_GEN_PATCHES));
+        Task modGenPatches = project.getTasks().getByName(PatcherPluginWrapper.projectString(this, TASK_PROJECT_GEN_PATCHES, projectMod));
+        Task optifineGenPatches = project.getTasks().getByName(TASK_GEN_PATCHES);
         {
-            for(File file : modGenPatches.getOriginalSource())
+            for(File file : TaskGenPatchesWrapper.getOriginalSource(modGenPatches))
             {
-                optifineGenPatches.addOriginalSource(file);
+                TaskGenPatchesWrapper.addOriginalSource(optifineGenPatches, file);
             }
-            for(File file : modGenPatches.getChangedSource())
+            for(File file : TaskGenPatchesWrapper.getChangedSource(modGenPatches))
             {
-                optifineGenPatches.addChangedSource(file);
+                TaskGenPatchesWrapper.addChangedSource(optifineGenPatches, file);
             }
             for(Object dependency : modGenPatches.getDependsOn())
             {

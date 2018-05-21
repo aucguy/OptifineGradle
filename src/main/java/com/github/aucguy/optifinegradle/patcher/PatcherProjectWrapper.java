@@ -10,8 +10,8 @@ import net.minecraftforge.gradle.patcher.PatcherProject;
 
 public class PatcherProjectWrapper
 {
-    protected static Method getDelayedPatchDirMethod = ReflectHelper.getMethod(PatcherProject.class, "getDelayedPatchDir");
-    protected static Method doesGenPatchesMethod = ReflectHelper.getMethod(PatcherProject.class, "doesGenPatches");
+    protected static Method getDelayedPatchDirMethod = ReflectHelper.retrieveMethod(PatcherProject.class, "getDelayedPatchDir");
+    protected static Method doesGenPatchesMethod = ReflectHelper.retrieveMethod(PatcherProject.class, "doesGenPatches");
     
     public static Closure<File> getDelayedPatchDir(PatcherProject patcher)
     {

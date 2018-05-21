@@ -8,10 +8,10 @@ import net.minecraftforge.gradle.util.delayed.ReplacementProvider;
 
 public class ReplacementProviderWrapper
 {
-    protected static final Field replaceMapField = ReflectHelper.getField(ReplacementProvider.class, "replaceMap");
+    protected static final Field replaceMapField = ReflectHelper.retrieveField(ReplacementProvider.class, "replaceMap");
 
     public static Object getReplaceMap(ReplacementProvider self)
     {
-        return ReflectHelper.accessField(replaceMapField, self);
+        return ReflectHelper.getField(replaceMapField, self);
     }
 }
