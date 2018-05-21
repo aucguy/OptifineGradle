@@ -1,16 +1,13 @@
 package com.github.aucguy.optifinegradle;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.zip.ZipEntry;
@@ -26,8 +23,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.Remapper;
 
 import au.com.bytecode.opencsv.CSVReader;
-import net.md_5.specialsource.JarMapping;
-import net.md_5.specialsource.transformer.MappingTransformer;
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.caching.Cached;
 import net.minecraftforge.gradle.util.caching.CachedTask;
@@ -161,32 +156,6 @@ public abstract class AsmProcessingTask extends CachedTask
 	protected boolean acceptsFile(String name)
 	{
 		return true;
-	}
-	
-	public static Map<String, String> loadSrg(File srg, MappingTransformer inputTransformer, MappingTransformer outputTransformer, boolean reverse) throws IOException
-	{
-        JarMapping mapping = new JarMapping();
-        BufferedReader reader = new BufferedReader(new FileReader(srg));
-        mapping.loadMappings(reader, inputTransformer, outputTransformer, reverse);
-        Map<String, String> renames = new HashMap<String, String>();
-        addToRenames(renames, mapping.fields);
-        addToRenames(renames, mapping.methods);
-        return renames;
-	}
-	
-	protected static void addToRenames(Map<String, String> renames, Map<String, String> mappings)
-	{
-        for(Entry<String, String> entry : mappings.entrySet())
-        {
-        	String key = entry.getKey();
-        	int index = key.indexOf("(");
-        	index = index == -1 ? key.length() : index;
-        	index = key.lastIndexOf("/", index);
-        	index = key.lastIndexOf("/", index - 1);
-        	key = key.substring(index + 1, key.length());
-        	key = key.replace(" (", "(").replaceFirst("/", ".");
-        	renames.put(key, entry.getValue());
-        }
 	}
 	
 	public static Map<String, String> loadCsv(File methodsCsv, File fieldsCsv, File paramsCsv) throws IOException
