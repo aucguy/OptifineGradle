@@ -10,7 +10,7 @@ public class OptifinePatcherExtension extends OptifineExtension
 {
     NamedDomainObjectContainer<OptifinePatcherProject> container;
     
-    public void projects(Closure closure)
+    public void projects(Closure<?> closure)
     {
         container.configure(closure);
     }

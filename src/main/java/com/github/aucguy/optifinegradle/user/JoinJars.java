@@ -3,7 +3,6 @@ package com.github.aucguy.optifinegradle.user;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -50,6 +49,7 @@ public class JoinJars extends AsmProcessingTask
     protected Map<String, String> srgMapping;
     protected Set<String> optifineClasses = new HashSet<String>();
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void middle() throws IOException
     {

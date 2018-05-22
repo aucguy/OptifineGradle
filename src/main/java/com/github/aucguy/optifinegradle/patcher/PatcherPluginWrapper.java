@@ -15,6 +15,7 @@ public class PatcherPluginWrapper
     protected static final Method sortByPatchingMethod = ReflectHelper.retrieveMethod(PatcherPlugin.class, "sortByPatching", NamedDomainObjectContainer.class);
     protected static final Method projectStringMethod = ReflectHelper.retrieveMethod(PatcherPlugin.class, "projectString", String.class, PatcherProject.class);
     
+    @SuppressWarnings("unchecked")
     public static List<PatcherProject> sortByPatching(OptifinePatcherPlugin self, NamedDomainObjectContainer<PatcherProject> projects)
     {
         return (List<PatcherProject>) ReflectHelper.invoke(sortByPatchingMethod, self, projects);
