@@ -62,6 +62,7 @@ public class FilterPatches extends CachedTask
             {
                 name = name.substring(0, name.length() - 11);
             }
+            //TODO remove null case
             if(name == null || exclusions.contains(name))
             {
                 return;

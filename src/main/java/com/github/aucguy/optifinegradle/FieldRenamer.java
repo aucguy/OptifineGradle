@@ -8,7 +8,7 @@ import org.objectweb.asm.Opcodes;
 /**
  * removes '__OBFID' fields
  */
-//TODO rename class
+//TODO rename class, put in join jars
 public class FieldRenamer extends ClassVisitor
 {
 	public String className;
@@ -29,6 +29,7 @@ public class FieldRenamer extends ClassVisitor
         return super.visitField(access, name, desc, signature, value);
     }
 
+    //TODO remove, can preprocess go here?
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
     {

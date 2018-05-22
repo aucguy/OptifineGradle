@@ -13,15 +13,6 @@ import com.github.aucguy.optifinegradle.AsmProcessingTask;
 
 public class DeobfuscateJar extends AsmProcessingTask
 {	
-	protected class CustomTransformerFactory extends AsmProcessingTask.TransformerFactory
-	{	
-		@Override
-		public ClassVisitor create(ClassVisitor visitor)
-		{
-			return new ParameterRemappingClassAdapter(visitor, mapping);
-		}	
-	}
-	
 	public static class ParameterRemappingClassAdapter extends ClassRemapper
 	{
 	    public ParameterRemappingClassAdapter(ClassVisitor cv, Remapper remapper)
@@ -91,7 +82,7 @@ public class DeobfuscateJar extends AsmProcessingTask
 	{
 		if(name.endsWith(".class"))
 		{
-			data = AsmProcessingTask.processAsm(data, new CustomTransformerFactory());
+			data = AsmProcessingTask.processAsm(data, visitor -> new ParameterRemappingClassAdapter(visitor, mapping));
 		}
 		return data;
 	}

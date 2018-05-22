@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
@@ -75,10 +76,10 @@ public class JoinJars extends AsmProcessingTask
         if (inJar == optifine && name.endsWith(".class"))
         {
             addObfClass(name);
-            data = processAsm(data, new TransformerFactory()
+            data = processAsm(data, new Function<ClassVisitor, ClassVisitor>()
             {
 				@Override
-				public ClassVisitor create(ClassVisitor visitor)
+				public ClassVisitor apply(ClassVisitor visitor)
 				{
 					ClassVisitor transformer = new FieldRenamer(visitor, name.substring(0, name.length() - 6));
 					transformer = new ClassRemapper(transformer, mapping);

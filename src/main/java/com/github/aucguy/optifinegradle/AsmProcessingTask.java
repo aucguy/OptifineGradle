@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -29,11 +30,6 @@ import net.minecraftforge.gradle.util.caching.CachedTask;
 
 public abstract class AsmProcessingTask extends CachedTask
 {
-	public static abstract class TransformerFactory
-	{
-		public abstract ClassVisitor create(ClassVisitor visitor);
-	}
-	
 	public static class ParameterRemapper extends Remapper
 	{
 		public String mapParameterName(String name)
@@ -176,11 +172,11 @@ public abstract class AsmProcessingTask extends CachedTask
         }
 	}
 	
-	public static byte[] processAsm(byte[] data, TransformerFactory factory)
+	public static byte[] processAsm(byte[] data, Function<ClassVisitor, ClassVisitor> factory)
 	{
         ClassReader reader = new ClassReader(data);
         ClassWriter writer = new ClassWriter(reader, 0);
-        ClassVisitor transformer = factory.create(writer);
+        ClassVisitor transformer = factory.apply(writer);
         reader.accept(transformer, ClassReader.EXPAND_FRAMES);
         return writer.toByteArray();
 	}

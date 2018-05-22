@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.gradle.api.tasks.InputFile;
-import org.objectweb.asm.ClassVisitor;
 
 //TODO rename class/task
 public class PreProcess extends AsmProcessingTask
@@ -45,14 +44,7 @@ public class PreProcess extends AsmProcessingTask
         final String className = name.endsWith(".class") ? name.substring(0, name.length() - 6) : name;
         if(removals.containsKey(className))
         {
-            return processAsm(data, new TransformerFactory()
-            {
-                @Override
-                public ClassVisitor create(ClassVisitor visitor)
-                {
-                    return new MethodRemover(visitor, className, removals);
-                }
-            });
+            return processAsm(data, visitor -> new MethodRemover(visitor, className, removals));
         }
         else
         {
