@@ -71,7 +71,6 @@ public class OptifineUserPlugin extends ForgePlugin
         EtagDownloadTask getVersionJson = (EtagDownloadTask) project.getTasks().getByName(TASK_DL_VERSION_JSON);
         getVersionJson.doFirst(new Closure<Object>(OptifineUserPlugin.class)
         {
-            @SuppressWarnings("unchecked")
             @Override
             public Object call()
             {

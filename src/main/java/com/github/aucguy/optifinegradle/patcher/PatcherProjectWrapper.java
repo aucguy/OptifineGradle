@@ -13,7 +13,6 @@ public class PatcherProjectWrapper
     protected static Method getDelayedPatchDirMethod = ReflectHelper.retrieveMethod(PatcherProject.class, "getDelayedPatchDir");
     protected static Method doesGenPatchesMethod = ReflectHelper.retrieveMethod(PatcherProject.class, "doesGenPatches");
     
-    @SuppressWarnings("unchecked")
     public static Closure<File> getDelayedPatchDir(PatcherProject patcher)
     {
         return (Closure<File>) ReflectHelper.invoke(getDelayedPatchDirMethod, patcher);

@@ -11,7 +11,6 @@ import org.gradle.api.Task;
 
 public class TaskGenPatchesWrapper
 {
-    @SuppressWarnings("unchecked")
     public static final Class<? extends Task> CLASS = (Class<? extends Task>) ReflectHelper.retrieveClass("net.minecraftforge.gradle.patcher.TaskGenPatches");
     private static final Method setPatchDirMethod = ReflectHelper.retrieveMethod(CLASS, "setPatchDir", Object.class);
     private static final Method getOriginalSourceMethod = ReflectHelper.retrieveMethod(CLASS, "getOriginalSource");
@@ -25,7 +24,6 @@ public class TaskGenPatchesWrapper
         ReflectHelper.invoke(setPatchDirMethod, self, delayedFile);
     }
 
-    @SuppressWarnings("unchecked")
     public static List<File> getOriginalSource(Task self)
     {
         return (List<File>) ReflectHelper.invoke(getOriginalSourceMethod, self);
@@ -36,7 +34,6 @@ public class TaskGenPatchesWrapper
         ReflectHelper.invoke(addOriginalSourceMethod, self, file);
     }
 
-    @SuppressWarnings("unchecked")
     public static List<File> getChangedSource(Task self)
     {
         return (List<File>) ReflectHelper.invoke(getChangedSourceMethod, self);
