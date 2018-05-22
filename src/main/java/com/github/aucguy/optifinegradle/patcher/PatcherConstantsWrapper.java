@@ -6,7 +6,6 @@ public final class PatcherConstantsWrapper
 {
     private static final String CLASS_NAME = "net.minecraftforge.gradle.patcher.PatcherConstants";
 
-    //TODO organize constants
     // setup tasks
     public static final String TASK_DEOBF = getStringConstant("TASK_DEOBF");
     public static final String TASK_DECOMP = getStringConstant("TASK_DECOMP");

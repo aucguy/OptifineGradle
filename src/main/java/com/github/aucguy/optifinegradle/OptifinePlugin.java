@@ -121,16 +121,4 @@ public class OptifinePlugin
         }
         plugin.replacer.putReplacement(key, plugin.replacer.get(key) + "-optifine-" + OPTIFINE_VERSION);
     }
-
-    //TODO remove
-    public void askPermission()
-    {
-        plugin.project.getLogger().warn("WARNING. This will overwrite you workspace. Continue (Y/N)");
-        Scanner scanner = new Scanner(System.in);
-        String response = scanner.nextLine();
-        scanner.close();
-        if (!response.toLowerCase().startsWith("y")) {
-            throw (new RuntimeException("Failure to continue"));
-        }
-    }
 }

@@ -1,11 +1,9 @@
 package com.github.aucguy.optifinegradle;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,8 +21,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.Remapper;
 
-import au.com.bytecode.opencsv.CSVReader;
-import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.caching.Cached;
 import net.minecraftforge.gradle.util.caching.CachedTask;
 
@@ -152,24 +148,6 @@ public abstract class AsmProcessingTask extends CachedTask
 	protected boolean acceptsFile(String name)
 	{
 		return true;
-	}
-	
-	public static Map<String, String> loadCsv(File methodsCsv, File fieldsCsv, File paramsCsv) throws IOException
-	{
-		Map<String, String> renames = new HashMap<String, String>();
-		loadCsvFile(renames, methodsCsv);
-		loadCsvFile(renames, fieldsCsv);
-		loadCsvFile(renames, paramsCsv);
-		return renames;
-	}
-	
-	protected static void loadCsvFile(Map<String, String> renames, File file) throws IOException
-	{
-        CSVReader reader = Constants.getReader(file);
-        for (String[] s : reader.readAll())
-        {
-            renames.put(s[0], s[1]);
-        }
 	}
 	
 	public static byte[] processAsm(byte[] data, Function<ClassVisitor, ClassVisitor> factory)
