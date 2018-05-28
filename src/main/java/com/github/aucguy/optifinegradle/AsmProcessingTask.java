@@ -158,9 +158,4 @@ public abstract class AsmProcessingTask extends CachedTask
         reader.accept(transformer, ClassReader.EXPAND_FRAMES);
         return writer.toByteArray();
 	}
-	
-	public static Remapper createRemapper(Map<String, String> renames)
-	{
-		return new CustomRemapper(renames);
-	}
 }
