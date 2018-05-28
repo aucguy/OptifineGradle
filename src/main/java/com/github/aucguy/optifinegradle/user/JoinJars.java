@@ -3,7 +3,6 @@ package com.github.aucguy.optifinegradle.user;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -14,12 +13,13 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.SimpleRemapper;
 
 import com.github.aucguy.optifinegradle.AsmProcessingTask;
-import com.github.aucguy.optifinegradle.FieldRenamer;
 
 import net.md_5.specialsource.JarMapping;
 import net.minecraftforge.gradle.util.caching.Cached;
@@ -81,7 +81,18 @@ public class JoinJars extends AsmProcessingTask
 				@Override
 				public ClassVisitor apply(ClassVisitor visitor)
 				{
-					ClassVisitor transformer = new FieldRenamer(visitor, name.substring(0, name.length() - 6));
+					ClassVisitor transformer = new ClassVisitor(Opcodes.ASM5, visitor)
+			        {
+				        @Override
+				        public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
+				        {
+				            if (name.equals("__OBFID"))
+				            {
+				                return null;
+				            }
+				            return super.visitField(access, name, desc, signature, value);
+				        }
+			        };
 					transformer = new ClassRemapper(transformer, mapping);
 			        return transformer;
 				}

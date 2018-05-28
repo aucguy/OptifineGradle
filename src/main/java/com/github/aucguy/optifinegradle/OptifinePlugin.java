@@ -5,7 +5,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.EXTENSION;
 import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_CLIENT_JOINED;
 import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_OPTIFINE_DIFFED;
 import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_OPTIFINE_FRESH;
-import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.JAR_METHODS_REMOVED;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REMOVED_METHODS_FILE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.RENAMES_FILE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.REPLACE_MAIN_DIR;
@@ -17,7 +17,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DIFF_EXEC;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_DIFF_OPTIFINE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_METHODS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.OPTIFINE_VERSION;
 import static net.minecraftforge.gradle.common.Constants.JAR_CLIENT_FRESH;
 import static net.minecraftforge.gradle.common.Constants.JAR_MERGED;
@@ -91,13 +91,13 @@ public class OptifinePlugin
         MergeJars merge = (MergeJars) plugin.project.getTasks().getByName(TASK_MERGE_JARS);
         {
             merge.setClient(plugin.delayedFile(JAR_CLIENT_JOINED));
-            merge.setOutJar(plugin.delayedFile(JAR_PREPROCESS));
+            merge.setOutJar(plugin.delayedFile(JAR_METHODS_REMOVED));
             merge.dependsOn(join);
         }
 
-        PreProcess preprocess = plugin.makeTask(TASK_PREPROCESS, PreProcess.class);
+        RemoveMethods preprocess = plugin.makeTask(TASK_REMOVE_METHODS, RemoveMethods.class);
         {
-            preprocess.inJar = plugin.delayedFile(JAR_PREPROCESS);
+            preprocess.inJar = plugin.delayedFile(JAR_METHODS_REMOVED);
             preprocess.removedMethods = plugin.delayedFile(REMOVED_METHODS_FILE);
             preprocess.outJar = plugin.delayedFile(JAR_MERGED);
             preprocess.dependsOn(merge, extractConfig);

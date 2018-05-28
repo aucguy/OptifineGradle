@@ -7,7 +7,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CO
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_JOIN_JARS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_METHODS;
 
 import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.TASK_EXTRACT_USER_CONFIG;
 import static com.github.aucguy.optifinegradle.user.OptifineUserConstants.PATCH_DIR;
@@ -84,7 +84,7 @@ public class OptifineUserPlugin extends ForgePlugin
         {
             List<Object> dependencies = new LinkedList<Object>(deobfBin.getDependsOn());
             dependencies.remove(TASK_MERGE_JARS);
-            dependencies.add(0, TASK_PREPROCESS);
+            dependencies.add(0, TASK_REMOVE_METHODS);
             deobfBin.setDependsOn(dependencies);
         }
 
@@ -94,7 +94,6 @@ public class OptifineUserPlugin extends ForgePlugin
         	dlPatches.setUrl(delayedString(PATCH_URL));
         	dlPatches.dependsOn(net.minecraftforge.gradle.common.Constants.TASK_DL_ASSET_INDEX);
         }
-
 
         ExtractTask extractUserConfig = makeTask(TASK_EXTRACT_USER_CONFIG, ExtractTask.class);
     	{

@@ -24,7 +24,7 @@ public class OptifineConstants
     public static final String TASK_DIFF_EXEC           = "diffExecOptifine";
     public static final String TASK_JOIN_JARS           = "joinJars";
     public static final String TASK_EXTRACT_CONFIG      = "extractConfig";
-    public static final String TASK_PREPROCESS          = "preprocess";
+    public static final String TASK_REMOVE_METHODS          = "removeMethods";
     public static final String TASK_REMOVE_EXTRAS       = "removeExtras";
     public static final String TASK_FILTER_MCP_PATCHES  = "filterMcpPatches";
 
@@ -33,7 +33,7 @@ public class OptifineConstants
     public static final String JAR_CLIENT_JOINED        = OPTIFINE_CACHE + "/minecraft/" + REPLACE_MC_VERSION  + "/joined.jar";
     public static final String JAR_OPTIFINE_DIFFED      = OPTIFINE_CACHE + "/minecraft/" + REPLACE_MC_VERSION  + "/diffed.jar";
     public static final String DEOBFUSCATED_CLASSES     = OPTIFINE_CACHE + "/minecraft/" + REPLACE_MC_VERSION  + "/deobfuscatedClasses.txt";
-    public static final String JAR_PREPROCESS           = OPTIFINE_CACHE + "/minecraft/" + REPLACE_MC_VERSION  + "/preprocessed.jar";
+    public static final String JAR_METHODS_REMOVED           = OPTIFINE_CACHE + "/minecraft/" + REPLACE_MC_VERSION  + "/methodsRemoved.jar";
 
     //patch archive
     public static final String PATCH_EXTRACT            = OPTIFINE_CACHE + "patchExtracts/" + REPLACE_OPTIFINE_VERSION + "/";

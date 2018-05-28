@@ -5,7 +5,7 @@ import static com.github.aucguy.optifinegradle.OptifineConstants.EXTRA_PATCH_EXC
 import static com.github.aucguy.optifinegradle.OptifineConstants.GROUP_OPTIFINE;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_EXTRACT_CONFIG;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_FILTER_MCP_PATCHES;
-import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_PREPROCESS;
+import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_METHODS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.TASK_REMOVE_EXTRAS;
 import static com.github.aucguy.optifinegradle.OptifineConstants.CONFIG_DIR;
 
@@ -161,7 +161,7 @@ public class OptifinePatcherPlugin extends PatcherPlugin
 
         DeobfuscateJar deobfJar = (DeobfuscateJar) project.getTasks().getByName(TASK_DEOBF);
         {
-            deobfJar.dependsOn(TASK_PREPROCESS);
+            deobfJar.dependsOn(TASK_REMOVE_METHODS);
         }
 
         RemoveExtras removeExtras = makeTask(TASK_REMOVE_EXTRAS, RemoveExtras.class);

@@ -5,9 +5,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.gradle.api.tasks.InputFile;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
-//TODO rename class/task
-public class PreProcess extends AsmProcessingTask
+public class RemoveMethods extends AsmProcessingTask
 {
     @InputFile
     public Object       inJar;
@@ -44,7 +46,22 @@ public class PreProcess extends AsmProcessingTask
         final String className = name.endsWith(".class") ? name.substring(0, name.length() - 6) : name;
         if(removals.containsKey(className))
         {
-            return processAsm(data, visitor -> new MethodRemover(visitor, className, removals));
+            return processAsm(data, visitor -> new ClassVisitor(Opcodes.ASM5, visitor)
+            {
+                @Override
+                public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
+                {
+                    if(removals.containsKey(className))
+                    {
+                        String[] value = removals.get(className);
+                        if(name.equals(value[0]) && desc.equals(value[1]))
+                        {
+                            return null;
+                        }
+                    }
+                    return super.visitMethod(access, name, desc, signature, exceptions);
+                }
+            });
         }
         else
         {
