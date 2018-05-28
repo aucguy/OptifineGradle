@@ -61,10 +61,7 @@ import org.gradle.api.tasks.Delete;
 import com.github.aucguy.optifinegradle.FilterPatches;
 import com.github.aucguy.optifinegradle.MakeDir;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
-import com.github.aucguy.optifinegradle.RemapRejects;
 import com.github.aucguy.optifinegradle.RemoveExtras;
-import com.github.aucguy.optifinegradle.RetrieveRejects;
-import com.github.aucguy.optifinegradle.TaskGenPatchesWrapper;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.patcher.PatcherPlugin;

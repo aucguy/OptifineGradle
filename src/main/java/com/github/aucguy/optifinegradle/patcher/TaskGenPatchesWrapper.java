@@ -1,4 +1,4 @@
-package com.github.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle.patcher;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.gradle.api.Task;
+
+import com.github.aucguy.optifinegradle.ReflectHelper;
 
 public class TaskGenPatchesWrapper
 {

@@ -1,4 +1,4 @@
-package com.github.aucguy.optifinegradle.user;
+package com.github.aucguy.optifinegradle;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +18,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.SimpleRemapper;
-
-import com.github.aucguy.optifinegradle.AsmProcessingTask;
 
 import net.md_5.specialsource.JarMapping;
 import net.minecraftforge.gradle.util.caching.Cached;

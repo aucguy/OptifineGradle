@@ -37,6 +37,7 @@ import org.gradle.api.Task;
 import java.io.File;
 
 import com.github.aucguy.optifinegradle.FilterPatches;
+import com.github.aucguy.optifinegradle.JoinJars;
 import com.github.aucguy.optifinegradle.OptifineExtension;
 import com.github.aucguy.optifinegradle.OptifinePlugin;
 import com.github.aucguy.optifinegradle.RemoveExtras;

@@ -1,4 +1,4 @@
-package com.github.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle.patcher;
 
 import java.util.zip.ZipEntry;
 

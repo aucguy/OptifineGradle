@@ -33,8 +33,6 @@ import java.util.Scanner;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.Exec;
 
-import com.github.aucguy.optifinegradle.user.JoinJars;
-
 import net.minecraftforge.gradle.common.BasePlugin;
 import net.minecraftforge.gradle.tasks.MergeJars;
 

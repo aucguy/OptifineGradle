@@ -1,4 +1,4 @@
-package com.github.aucguy.optifinegradle;
+package com.github.aucguy.optifinegradle.patcher;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,6 +12,8 @@ import org.gradle.api.file.FileVisitor;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
+
+import com.github.aucguy.optifinegradle.IOManager;
 
 public class RetrieveRejects extends DefaultTask
 {
