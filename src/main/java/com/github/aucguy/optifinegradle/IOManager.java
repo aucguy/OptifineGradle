@@ -3,6 +3,7 @@ package com.github.aucguy.optifinegradle;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -199,11 +200,21 @@ public class IOManager
         return new HashSet<String>(readLines(inputStream));
     }
 
+    //from https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java
     public static byte[] readAll(InputStream inputStream) throws IOException
     {
-        byte[] data = new byte[inputStream.available()];
-        inputStream.read(data);
-        return data;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[16384];
+
+        while ((nRead = inputStream.read(data)) != -1)
+        {
+            buffer.write(data, 0, nRead);
+        }
+
+        buffer.flush();
+        return buffer.toByteArray();
     }
 
     public static String readAllAsString(InputStream inputStream) throws IOException
