@@ -28,8 +28,6 @@ import static net.minecraftforge.gradle.common.Constants.TASK_GENERATE_SRGS;
 import static net.minecraftforge.gradle.common.Constants.TASK_MERGE_JARS;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
 
-import java.util.Scanner;
-
 import org.gradle.api.Task;
 import org.gradle.api.tasks.Exec;
 
