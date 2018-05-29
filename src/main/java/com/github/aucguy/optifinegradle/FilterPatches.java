@@ -2,6 +2,7 @@ package com.github.aucguy.optifinegradle;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -77,14 +78,21 @@ public class FilterPatches extends CachedTask
     @TaskAction
     public void doAction() throws IOException
     {
-        IOManager manager = new IOManager(this);
         File dest = getProject().file(patchesOut);
         IOManager.delete(dest);
         dest.mkdirs();
-        List<String> exclusions = IOManager.readLines(manager.openFileForReading(excludeList));
+        List<String> exclusions;
+        try(InputStream exclusionsFile = IOManager.openFileForReading(this, excludeList))
+        {
+            exclusions = IOManager.readLines(exclusionsFile);
+        }
+        
         if(extraExclusions != null)
         {
-            exclusions.addAll(IOManager.readLines(manager.openFileForReading(extraExclusions)));
+            try(InputStream exclusionsFile = IOManager.openFileForReading(this, extraExclusions))
+            {
+                exclusions.addAll(IOManager.readLines(exclusionsFile));
+            }
         }
         ExtractionVisitor visitor = new ExtractionVisitor(dest, exclusions);
 
@@ -99,6 +107,5 @@ public class FilterPatches extends CachedTask
             tree = getProject().zipTree(input);
         }
         tree.visit(visitor);
-        manager.closeAll();
     }
 }

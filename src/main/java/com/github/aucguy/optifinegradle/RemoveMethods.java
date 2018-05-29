@@ -1,5 +1,6 @@
 package com.github.aucguy.optifinegradle;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -22,7 +23,10 @@ public class RemoveMethods extends AsmProcessingTask
     protected void middle() throws Throwable
     {
         Properties properties = new Properties();
-        properties.load(manager.openFileSomewhereForReading(removedMethods));
+        try(InputStream removedMethodsFile = IOManager.openFileSomewhereForReading(this, removedMethods))
+        {
+            properties.load(removedMethodsFile);
+        }
         removals = new HashMap<String, String[]>();
         for(Object key : properties.keySet())
         {

@@ -61,9 +61,9 @@ public class RetrieveRejects extends DefaultTask
     @TaskAction
     public void doTask() throws IOException
     {
-        IOManager manager = new IOManager(this);
-        ZipOutputStream output = manager.openZipForWriting(outZip);
-        getProject().fileTree(inFolder).visit(new RetrieverVisitor(output));
-        manager.closeAll();
+        try(ZipOutputStream output = IOManager.openZipForWriting(this, outZip))
+        {
+            getProject().fileTree(inFolder).visit(new RetrieverVisitor(output));
+        }
     }
 }

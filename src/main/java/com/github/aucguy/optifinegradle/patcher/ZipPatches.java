@@ -2,6 +2,7 @@ package com.github.aucguy.optifinegradle.patcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,37 +24,37 @@ public class ZipPatches extends DefaultTask
     @TaskAction
     public void doAction() throws IOException
     {
-        IOManager manager = new IOManager(this);
-        ZipOutputStream zip = manager.openZipForWriting(outZip);
-        for(Entry<Object, Object> entry : files.entrySet())
+        try(ZipOutputStream zip = IOManager.openZipForWriting(this, outZip))
         {
-            File input = getProject().file(entry.getKey());
-            String output = getProject().relativePath(entry.getValue());
-            getProject().fileTree(input).visit(new FileVisitor()
+            for(Entry<Object, Object> entry : files.entrySet())
             {
-                @Override
-                public void visitDir(FileVisitDetails details)
-                { 
-                }
-
-                @Override
-                public void visitFile(FileVisitDetails details)
+                File input = getProject().file(entry.getKey());
+                String output = getProject().relativePath(entry.getValue());
+                getProject().fileTree(input).visit(new FileVisitor()
                 {
-                    String path = new File(output, details.getPath()).getPath();
-                    try
+                    @Override
+                    public void visitDir(FileVisitDetails details)
                     {
-                        zip.putNextEntry(new ZipEntry(path));
-                        zip.write(IOManager.readAll(manager.openFileForReading(details.getFile())));
-                        zip.closeEntry();
                     }
-                    catch (IOException e)
+    
+                    @Override
+                    public void visitFile(FileVisitDetails details)
                     {
-                        throw(new RuntimeException(e));
+                        String path = new File(output, details.getPath()).getPath();
+                        try(InputStream detailsFile = IOManager.openFileForReading(ZipPatches.this, details.getFile()))
+                        {
+                            zip.putNextEntry(new ZipEntry(path));
+                            zip.write(IOManager.readAll(detailsFile));
+                            zip.closeEntry();
+                        }
+                        catch (IOException e)
+                        {
+                            throw(new RuntimeException(e));
+                        }
                     }
-                }
-            });
+                });
+            }
         }
-        manager.closeAll();
     }
     
     public void addFiles(Object input, Object output)

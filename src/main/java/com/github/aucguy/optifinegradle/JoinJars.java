@@ -51,20 +51,24 @@ public class JoinJars extends AsmProcessingTask
     @Override
     public void middle() throws IOException
     {
-    	InputStream stream = manager.openFileForReading(renames);
-    	Properties properties = new Properties();
-    	properties.load(stream);
+        Properties properties = new Properties();
+        try(InputStream stream = IOManager.openFileForReading(this, renames))
+        {
+    	    properties.load(stream);
+        }
     	mapping = new SimpleRemapper((Map) properties);
     	JarMapping jarMapping = new JarMapping();
     	jarMapping.loadMappings(getProject().file(srg));
     	srgMapping = jarMapping.classes;
     	copyJars(optifine, client);
     	
-    	OutputStream classListOutput = manager.openFileForWriting(classList);
-    	for(String name : optifineClasses)
+    	try(OutputStream classListOutput = IOManager.openFileForWriting(this, classList))
     	{
-    	    classListOutput.write(name.getBytes("UTF-8"));
-    	    classListOutput.write('\n');
+        	for(String name : optifineClasses)
+        	{
+        	    classListOutput.write(name.getBytes("UTF-8"));
+        	    classListOutput.write('\n');
+        	}
     	}
     }
 

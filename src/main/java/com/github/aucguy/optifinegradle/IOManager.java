@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -28,68 +27,35 @@ import net.minecraftforge.gradle.common.Constants;
  */
 public class IOManager
 {
-    protected Task           task;
-    protected Set<Closeable> handles = new HashSet<Closeable>();
-
-    public IOManager(Task task)
+    public static ZipFile openZipForReading(Task task, Object file) throws IOException
     {
-        this.task = task;
+        return new ZipFile(getFile(task, file));
     }
 
-    public ZipFile openZipForReading(Object file) throws IOException
+    public static ZipOutputStream openZipForWriting(Task task, Object file) throws IOException
     {
-        ZipFile f;
-        try
-        {
-            f = new ZipFile(this.getFile(file));
-        } catch (IOException e)
-        {
-            throw new IOException("Couldn't open input zip: " + e.getMessage());
-        }
-        this.handles.add(f);
-        return f;
+        File f = getFile(task, file);
+        f.getParentFile().mkdirs();
+        return new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
     }
 
-    public ZipOutputStream openZipForWriting(Object file) throws IOException
+    public static InputStream openFileInZipForReading(Task task, Object zip, String file) throws IOException
     {
-        ZipOutputStream f;
-        try
-        {
-            f = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(this.getFile(file, true))));
-        } catch (IOException e)
-        {
-            throw new IOException("Couldn't open output zip: " + e.getMessage());
-        }
-        this.handles.add(f);
-        return f;
-    }
-
-    public InputStream openFileInZipForReading(Object zip, String file) throws IOException
-    {
-        ZipFile z = this.openZipForReading(zip);
-        return openFileInZipForReading(z, z.getEntry(file));
+        ZipFile z = openZipForReading(task, zip);
+        return openFileInZipForReading(task, z, z.getEntry(file));
     }
     
-    public InputStream openFileInZipForReading(ZipFile z, ZipEntry file) throws IOException
+    public static InputStream openFileInZipForReading(Task task, ZipFile z, ZipEntry file) throws IOException
     {
-        InputStream f;
-        try
-        {
-            f = z.getInputStream(file);
-        } catch (IOException e)
-        {
-            throw new IOException("Couldn't open input file in zip: " + e.getMessage());
-        }
-        this.handles.add(f);
-        return f;
+        return z.getInputStream(file);
     }
     
-    public InputStream openFileSomewhereForReading(Object obj) throws IOException
+    public static InputStream openFileSomewhereForReading(Task task, Object obj) throws IOException
     {
-    	File file = getFile(obj);
+    	File file = getFile(task, obj);
     	if(file.exists()) //directly in filesystem
     	{
-    		return openFileForReading(file);
+    		return openFileForReading(task, file);
     	}
     	
     	File archive = file;
@@ -100,7 +66,7 @@ public class IOManager
     	
     	if(archive != null && archive.isFile()) //in archive
     	{
-    		return openFileInZipForReading(archive, archive.toPath().relativize(file.toPath()).toString());
+    		return openFileInZipForReading(task, archive, archive.toPath().relativize(file.toPath()).toString());
     	}
     	else //nonexistant
     	{
@@ -108,75 +74,50 @@ public class IOManager
     	}
     }
 
-    public BufferedInputStream openFileForReading(Object file) throws IOException
+    public static BufferedInputStream openFileForReading(Task task, Object file) throws IOException
     {
-        BufferedInputStream f;
-        try
-        {
-            f = new BufferedInputStream(new FileInputStream(this.getFile(file, false)));
-        } catch (IOException e)
-        {
-            throw new IOException("Couldn't open input file: " + e.getMessage());
-        }
-        this.handles.add(f);
-        return f;
+        return new BufferedInputStream(new FileInputStream(getFile(task, file)));
     }
 
-    public BufferedOutputStream openFileForWriting(Object file) throws IOException
+    public static BufferedOutputStream openFileForWriting(Task task, Object file) throws IOException
     {
-        BufferedOutputStream f;
-        try
-        {
-            f = new BufferedOutputStream(new FileOutputStream(this.getFile(file, true)));
-        } catch (IOException e)
-        {
-            throw new IOException("Couldn't open input file: " + e.getMessage());
-        }
-        this.handles.add(f);
-        return f;
-    }
-
-    public BufferedInputStream openResourceForReading(String file)
-    {
-        InputStream resource = this.getClass().getClassLoader().getResourceAsStream(file);
-        BufferedInputStream f = new BufferedInputStream(resource);
-        this.handles.add(f);
-        return f;
+        File f = getFile(task, file);
+        f.getParentFile().mkdirs();
+        return new BufferedOutputStream(new FileOutputStream(f));
     }
     
-    protected File getFile(Object file, boolean makeDirs)
+    protected static File getFile(Task task, Object file)
     {
-        File f = this.task.getProject().file(file);
-        if(makeDirs)
-        {
-        	f.getParentFile().mkdirs();
-        }
-        return f;
+    	return task.getProject().file(file);
     }
     
-    protected File getFile(Object file)
-    {
-    	return getFile(file, false);
-    }
-
-    public void closeAll() throws IOException
-    {
-        for (Closeable i : this.handles)
-        {
-            try
-            {
-                i.close();
-            } catch (IOException e)
-            {
-                throw new IOException("Couldn't close file: " + e.getMessage());
-            }
-        }
-    }
-
     public static BufferedReader toBufferedReader(InputStream inputStream)
     {
         return new BufferedReader(new InputStreamReader(inputStream));
     }
+    
+    //from https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java
+    public static byte[] readAll(InputStream inputStream) throws IOException
+    {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[16384];
+
+        while ((nRead = inputStream.read(data)) != -1)
+        {
+            buffer.write(data, 0, nRead);
+        }
+
+        buffer.flush();
+        return buffer.toByteArray();
+    }
+    
+    public static String readAllAsString(InputStream inputStream) throws IOException
+    {
+        return new String(readAll(inputStream), Constants.CHARSET);
+    }
+
 
     public static List<String> readLines(InputStream inputStream) throws IOException
     {
@@ -199,35 +140,15 @@ public class IOManager
     {
         return new HashSet<String>(readLines(inputStream));
     }
-
-    //from https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java
-    public static byte[] readAll(InputStream inputStream) throws IOException
-    {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-        int nRead;
-        byte[] data = new byte[16384];
-
-        while ((nRead = inputStream.read(data)) != -1)
-        {
-            buffer.write(data, 0, nRead);
-        }
-
-        buffer.flush();
-        return buffer.toByteArray();
-    }
-
-    public static String readAllAsString(InputStream inputStream) throws IOException
-    {
-        return new String(readAll(inputStream), Constants.CHARSET);
-    }
-
+    
     public static void delete(File f) throws IOException
     {
         if (f.isDirectory())
         {
             for (File c : f.listFiles())
+            {
                 delete(c);
+            }
         }
         f.delete();
     }

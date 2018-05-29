@@ -82,9 +82,7 @@ public abstract class AsmProcessingTask extends CachedTask
 	@Cached
 	@Optional
 	public Object outJar;
-	
-	protected IOManager manager = new IOManager(this);
-	
+
 	@TaskAction
 	public void doAction() throws Throwable
 	{
@@ -94,48 +92,44 @@ public abstract class AsmProcessingTask extends CachedTask
 		}
 		finally
 		{
-			manager.closeAll();
 		}
 	}
 	
 	public void copyJars(Object ... inJars) throws IOException
 	{
-		try
+		try(ZipOutputStream output = outJar == null ? null : IOManager.openZipForWriting(this, outJar))
 		{
 			Set<String> copiedEntries = new HashSet<String>();
-			@SuppressWarnings("resource")
-			ZipOutputStream output = outJar == null ? null : manager.openZipForWriting(outJar);
-		
+
 			for (Object inJar : inJars)
 			{
-				ZipFile input = manager.openZipForReading(inJar);
-				
-				for (@SuppressWarnings("unchecked")
-				Enumeration<ZipEntry> iter = (Enumeration<ZipEntry>) input.entries(); iter.hasMoreElements();)
-				{
-					ZipEntry entry = iter.nextElement();
-					String name = entry.getName();
-					if(entry.isDirectory() || copiedEntries.contains(name) || !acceptsFile(name)) continue;
-						
-					copiedEntries.add(name);
-					
-                    InputStream stream = new BufferedInputStream(manager.openFileInZipForReading(input, entry));
-                    byte[] data = IOManager.readAll(stream);
-                    stream.close();
-                    
-                    data = asRead(inJar, name, data);
-                    if(output != null)
-                    {
-                    	output.putNextEntry(new JarEntry(name));
-                    	output.write(data);
-                    	output.closeEntry();
-                    }
-				}
+			    try(ZipFile input = IOManager.openZipForReading(this, inJar))
+			    {
+        			for (Enumeration<ZipEntry> iter = (Enumeration<ZipEntry>) input.entries(); iter.hasMoreElements();)
+        			{
+        				ZipEntry entry = iter.nextElement();
+        				String name = entry.getName();
+        				if(entry.isDirectory() || copiedEntries.contains(name) || !acceptsFile(name)) continue;
+        					
+        				copiedEntries.add(name);
+        				
+        				byte[] data;
+        				//TODO necessary BufferedInputStream?
+        				try(InputStream stream = new BufferedInputStream(IOManager.openFileInZipForReading(this, input, entry)))
+        				{
+        				    data = IOManager.readAll(stream);
+        				}
+                        
+                        data = asRead(inJar, name, data);
+                        if(output != null)
+                        {
+                        	output.putNextEntry(new JarEntry(name));
+                        	output.write(data);
+                        	output.closeEntry();
+                        }
+        			}
+			    }
 			}
-		}
-		finally
-		{
-			manager.closeAll();
 		}
 	}
 	
